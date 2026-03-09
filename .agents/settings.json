@@ -1,0 +1,72 @@
+{
+  "$schema": "Konfigurasi project-specific untuk agent. Ubah file ini saat copy ke project lain.",
+
+  "project": {
+    "name": "vibecoding-starter",
+    "description": "Public monorepo starter for vibe coding workflow",
+    "version": "0.1.0"
+  },
+
+  "repo": {
+    "owner": "",
+    "name": "vibecoding-starter"
+  },
+
+  "stack": {
+    "frontend": "Next.js (App Router)",
+    "backend": "Hono (Clean Architecture)",
+    "language": "TypeScript",
+    "styling": "Tailwind CSS",
+    "packageManager": "bun"
+  },
+
+  "jira": {
+    "projectKey": ""
+  },
+
+  "branch": {
+    "main": "main",
+    "format": "<type>/<issue-id>-<deskripsi-singkat>",
+    "types": ["feature", "bugfix", "hotfix", "chore"],
+    "examples": [
+      "feature/PROJ-123-login-page",
+      "bugfix/PROJ-456-fix-pagination",
+      "hotfix/PROJ-789-critical-auth",
+      "feature/GH-42-user-profile"
+    ]
+  },
+
+  "paths": {
+    "features": "docs/features",
+    "templates": "docs/templates",
+    "registry": "docs/features/REGISTRY.md",
+    "mainPrd": "docs/MAIN_PRD.md",
+    "bootstrapScript": "scripts/run-workitem-bootstrap.sh",
+    "guides": ".agents/guides",
+    "examples": ".agents/examples",
+    "skills": ".agents/skills"
+  },
+
+  "onboarding": {
+    "startCommands": [
+      "mulai",
+      "start",
+      "mulai vibe coding",
+      "start vibe coding",
+      "mulai dulu",
+      "yuk mulai"
+    ],
+    "statusScript": "scripts/start-session.mjs",
+    "memoryPath": ".agents/MEMORY.md",
+    "mcpConfigPath": ".mcp.json",
+    "preferredNextSteps": [
+      "setup-mcp",
+      "resume-last-task",
+      "breakdown-new-feature"
+    ]
+  },
+
+  "mcp": {
+    "required": ["atlassian", "github", "notion"]
+  }
+}

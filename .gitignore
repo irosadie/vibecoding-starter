@@ -1,0 +1,21 @@
+# dependencies
+node_modules
+
+# outputs
+dist
+.next
+.turbo
+coverage
+*.tsbuildinfo
+
+# env files
+.env
+.env.*
+!.env.example
+.mcp.json
+
+# logs
+*.log
+
+# macOS
+.DS_Store

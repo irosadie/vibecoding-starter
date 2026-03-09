@@ -1,0 +1,19 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Add project-specific models below.
+//
+// Example:
+// model ExampleRecord {
+//   id        String   @id @default(uuid()) @db.Uuid
+//   name      String   @db.VarChar(255)
+//   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+//   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+//
+//   @@map("example_records")
+// }

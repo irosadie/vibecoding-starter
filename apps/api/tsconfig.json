@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["node", "vitest/globals"],
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@vibecoding-starter/schemas": ["../../packages/schemas/index.ts"],
+      "@vibecoding-starter/schemas/*": ["../../packages/schemas/*"]
+    }
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": [
+    "node_modules",
+    "src/**/_docs/**",
+    "src/infrastructure/config/database.ts"
+  ]
+}
