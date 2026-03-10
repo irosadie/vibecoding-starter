@@ -5,6 +5,7 @@ import type { GetAppInfoUseCase } from "../../application/use-cases/get-app-info
 import type { GetHealthUseCase } from "../../application/use-cases/get-health.js"
 import { SystemController } from "./controllers/system-controller.js"
 import { errorHandler } from "./middleware/errorHandler.js"
+import { authRoutes } from "./routes/auth-routes.js"
 import { registerHealthRoute } from "./routes/health-route.js"
 import { registerRootRoute } from "./routes/root-route.js"
 
@@ -29,6 +30,7 @@ export const createApp = ({
 
   registerRootRoute(app, systemController)
   registerHealthRoute(app, systemController)
+  app.route("/api/v1/auth", authRoutes)
 
   return app
 }

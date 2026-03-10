@@ -6,14 +6,42 @@ datasource db {
   provider = "postgresql"
 }
 
-// Add project-specific models below.
-//
-// Example:
-// model ExampleRecord {
-//   id        String   @id @default(uuid()) @db.Uuid
-//   name      String   @db.VarChar(255)
-//   createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
-//   updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
-//
-//   @@map("example_records")
-// }
+model User {
+  id           String        @id @default(uuid()) @db.Uuid
+  email        String        @unique @db.VarChar(255)
+  passwordHash String        @map("password_hash") @db.Text
+  name         String        @db.VarChar(120)
+  role         UserRole      @default(USER)
+  status       UserStatus    @default(ACTIVE)
+  photo        String?       @db.Text
+  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamp(6)
+  authSessions AuthSession[]
+
+  @@map("users")
+}
+
+model AuthSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @map("token_hash") @db.Text
+  expiresAt DateTime @map("expires_at") @db.Timestamp(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([tokenHash])
+  @@map("auth_sessions")
+}
+
+enum UserRole {
+  USER
+  CREATOR
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
