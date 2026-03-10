@@ -7,7 +7,7 @@ import { useAuthLogout } from "$/hooks/transactions/use-auth"
 import { useSession } from "next-auth/react"
 import { useRouter } from "next/navigation"
 
-export default function PanelContent() {
+export default function AdminContent() {
   const router = useRouter()
   const { data: session } = useSession()
   const logoutMutation = useAuthLogout()
@@ -25,8 +25,8 @@ export default function PanelContent() {
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-6 px-6 py-12">
       <PanelCard
         className="rounded-3xl"
-        title="Starter Panel"
-        description="Protected route after successful authentication"
+        title="Admin Area"
+        description="Area ini hanya bisa diakses admin"
         action={
           <Button
             intent="secondary"

@@ -18,13 +18,21 @@ vi.mock("$/configs/env", () => ({
 vi.mock("$/configs/auth", () => ({
   authConfig: {
     loginPath: "/login",
+    registerPath: "/register",
     defaultRedirectPath: "/panel",
     authApiBasePath: "/api/auth",
     proxyApiBasePath: "/api/proxy",
+    backendRegisterPath: "/auth/register",
     backendLoginPath: "/auth/login",
     backendRefreshPath: "/auth/refresh",
     backendLogoutPath: "/auth/logout",
+    backendMePath: "/auth/me",
     sessionMaxAgeSeconds: 6 * 60 * 60,
+    roleRedirectPath: {
+      USER: "/panel",
+      CREATOR: "/creator",
+      ADMIN: "/admin",
+    },
   },
 }))
 
@@ -53,7 +61,8 @@ vi.mock("next-auth/react", () => ({
         id: "test-user-id",
         email: "test@example.com",
         name: "Test User",
-        companyId: 123,
+        role: "USER",
+        status: "ACTIVE",
       },
       accessToken: "mock-access-token",
       refreshToken: "mock-refresh-token",

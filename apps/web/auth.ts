@@ -1,12 +1,19 @@
 import { authConfig } from "$/configs/auth"
 import { serverAuthConfig } from "$/configs/auth-server"
 import { loginSchema } from "@vibecoding-starter/schemas"
-import type { AuthLoginResponse } from "@vibecoding-starter/types"
+import type {
+  AccountRole,
+  AccountStatus,
+  AuthLoginResponse,
+} from "@vibecoding-starter/types"
 import axios from "axios"
 import type { NextAuthOptions, User } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 
 type AuthEnvelope<T> = T | { data: T }
+
+const ACCOUNT_ROLES: AccountRole[] = ["USER", "CREATOR", "ADMIN"]
+const ACCOUNT_STATUSES: AccountStatus[] = ["ACTIVE", "SUSPENDED"]
 
 const loginProxyUrl = `${serverAuthConfig.appBaseUrl}${authConfig.proxyApiBasePath}${authConfig.backendLoginPath}`
 
@@ -21,6 +28,25 @@ const unwrapData = <T>(payload: AuthEnvelope<T>): T => {
   }
 
   return payload as T
+}
+
+const normalizeAccountRole = (role: unknown): AccountRole => {
+  if (typeof role === "string" && ACCOUNT_ROLES.includes(role as AccountRole)) {
+    return role as AccountRole
+  }
+
+  return "USER"
+}
+
+const normalizeAccountStatus = (status: unknown): AccountStatus => {
+  if (
+    typeof status === "string" &&
+    ACCOUNT_STATUSES.includes(status as AccountStatus)
+  ) {
+    return status as AccountStatus
+  }
+
+  return "ACTIVE"
 }
 
 export const authOptions: NextAuthOptions = {
@@ -66,7 +92,8 @@ export const authOptions: NextAuthOptions = {
             email: result.user.email,
             name: result.user.name,
             photo: result.user.photo ?? undefined,
-            companyId: result.user.companyId ?? 0,
+            role: normalizeAccountRole(result.user.role),
+            status: normalizeAccountStatus(result.user.status),
             accessToken: result.tokens.accessToken,
             refreshToken: result.tokens.refreshToken,
             accessTokenExpires,
@@ -99,7 +126,8 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name
         token.email = user.email
         token.photo = user.photo
-        token.companyId = user.companyId
+        token.role = user.role
+        token.status = user.status
         token.accessToken = user.accessToken
         token.refreshToken = user.refreshToken
         token.accessTokenExpires = user.accessTokenExpires
@@ -133,7 +161,8 @@ export const authOptions: NextAuthOptions = {
         email: token.email ?? undefined,
         name: token.name ?? undefined,
         photo: token.photo ?? undefined,
-        companyId: (token.companyId as number | undefined) ?? 0,
+        role: normalizeAccountRole(token.role),
+        status: normalizeAccountStatus(token.status),
       }
 
       return session
