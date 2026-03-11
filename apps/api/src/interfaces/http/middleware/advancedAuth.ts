@@ -41,11 +41,8 @@ export async function jwtWithRefreshMiddleware(
     c.set("userEmail", payload.email)
     c.set("userType", payload.type)
 
-    // For backward compatibility and specific access
-    if (payload.type === "vendor") {
-      c.set("vendorId", payload.id)
-    } else if (payload.type === "driver") {
-      c.set("driverId", payload.id)
+    if (payload.type === "creator") {
+      c.set("creatorId", payload.id)
     }
 
     await next()
@@ -94,10 +91,8 @@ export async function optionalJwtMiddleware(
       c.set("userType", payload.type)
       c.set("isAuthenticated", true)
 
-      if (payload.type === "vendor") {
-        c.set("vendorId", payload.id)
-      } else if (payload.type === "driver") {
-        c.set("driverId", payload.id)
+      if (payload.type === "creator") {
+        c.set("creatorId", payload.id)
       }
     } catch {
       // Invalid token, but we don't throw error - just mark as unauthenticated
@@ -113,7 +108,7 @@ export async function optionalJwtMiddleware(
 /**
  * Middleware specifically for company users only
  */
-export async function vendorOnlyMiddleware(
+export async function creatorOnlyMiddleware(
   c: Context,
   next: () => Promise<void>,
 ) {
@@ -123,14 +118,16 @@ export async function vendorOnlyMiddleware(
     throw new HTTPException(401, { message: "Authentication required" })
   }
 
-  if (userType !== "vendor") {
+  if (userType !== "creator") {
     throw new HTTPException(403, {
-      message: "Access denied. Vendor users only.",
+      message: "Access denied. Creator users only.",
     })
   }
 
   await next()
 }
+
+export const vendorOnlyMiddleware = creatorOnlyMiddleware
 
 /**
  * Middleware for driver users only

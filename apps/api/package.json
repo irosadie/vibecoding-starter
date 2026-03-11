@@ -18,15 +18,19 @@
     "test:smoke": "vitest run src/interfaces/http/routes/app-smoke.test.ts"
   },
   "dependencies": {
+    "@hono/zod-validator": "^0.7.6",
     "@hono/node-server": "^1.14.0",
+    "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
     "hono": "^4.7.5",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.16.3",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.14.1",
+    "@types/pg": "^8.15.6",
     "prisma": "^7.4.2",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3",
