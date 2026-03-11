@@ -1,4 +1,8 @@
 // types/next-auth.d.ts
+import type {
+  AccountRole,
+  AccountStatus,
+} from "@vibecoding-starter/types/auth-response"
 import type { DefaultSession } from "next-auth"
 
 declare module "next-auth" {
@@ -8,7 +12,8 @@ declare module "next-auth" {
       name?: string | null
       email?: string | null
       photo?: string
-      companyId: number
+      role: AccountRole
+      status: AccountStatus
     } & DefaultSession["user"]
     accessToken?: string
     refreshToken?: string
@@ -21,7 +26,8 @@ declare module "next-auth" {
     name: string
     email: string
     photo?: string
-    companyId: number
+    role: AccountRole
+    status: AccountStatus
     accessToken?: string
     refreshToken?: string
     accessTokenExpires?: number
@@ -34,7 +40,8 @@ declare module "next-auth/jwt" {
     name?: string
     email?: string
     photo?: string
-    companyId?: number
+    role?: AccountRole
+    status?: AccountStatus
     accessToken?: string
     refreshToken?: string
     accessTokenExpires?: number

@@ -1,4 +1,10 @@
 export const queryKeys = {
+  auth: {
+    register: "authRegister",
+    login: "authLogin",
+    logout: "authLogout",
+    me: "authMe",
+  },
   emailJobs: {
     template: "emailJobsTemplate",
     insert: "emailJobsInsert",

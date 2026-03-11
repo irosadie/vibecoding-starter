@@ -1,10 +1,14 @@
+export type AccountRole = "USER" | "CREATOR" | "ADMIN"
+
+export type AccountStatus = "ACTIVE" | "SUSPENDED"
+
 export type AuthUserResponse = {
   id: string
   email: string
   name: string
-  companyId?: number | null
+  role: AccountRole
+  status: AccountStatus
   photo?: string | null
-  role?: string | null
 }
 
 export type AuthTokensResponse = {
@@ -16,4 +20,8 @@ export type AuthTokensResponse = {
 export type AuthLoginResponse = {
   user: AuthUserResponse
   tokens: AuthTokensResponse
+}
+
+export type AuthRegisterResponse = {
+  user: AuthUserResponse
 }

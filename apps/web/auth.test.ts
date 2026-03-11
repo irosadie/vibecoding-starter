@@ -16,7 +16,8 @@ vi.mock("next-auth/react", () => ({
         id: "test-user-id",
         email: "test@example.com",
         name: "Test User",
-        companyId: 123,
+        role: "USER",
+        status: "ACTIVE",
       },
       accessToken: "mock-access-token",
       refreshToken: "mock-refresh-token",
@@ -30,13 +31,21 @@ vi.mock("next-auth/react", () => ({
 vi.mock("$/configs/auth", () => ({
   authConfig: {
     loginPath: "/login",
+    registerPath: "/register",
     defaultRedirectPath: "/panel",
     authApiBasePath: "/api/auth",
     proxyApiBasePath: "/api/proxy",
+    backendRegisterPath: "/auth/register",
     backendLoginPath: "/auth/login",
     backendRefreshPath: "/auth/refresh",
     backendLogoutPath: "/auth/logout",
+    backendMePath: "/auth/me",
     sessionMaxAgeSeconds: 6 * 60 * 60,
+    roleRedirectPath: {
+      USER: "/panel",
+      CREATOR: "/creator",
+      ADMIN: "/admin",
+    },
   },
 }))
 
@@ -108,7 +117,8 @@ describe("Auth Configuration", () => {
         id: "user-123",
         name: "Test User",
         email: "test@example.com",
-        companyId: 123,
+        role: "USER",
+        status: "ACTIVE",
         accessToken: "access-token",
         refreshToken: "refresh-token",
       }
@@ -170,7 +180,8 @@ describe("Auth Configuration", () => {
           id: "",
           email: "",
           name: "",
-          companyId: 0,
+          role: "USER",
+          status: "ACTIVE",
         },
       }
 
@@ -178,7 +189,8 @@ describe("Auth Configuration", () => {
         id: "user-123",
         email: "test@example.com",
         name: "Test User",
-        companyId: 456,
+        role: "CREATOR",
+        status: "ACTIVE",
         accessToken: "access-token",
         refreshToken: "refresh-token",
       }
@@ -191,7 +203,7 @@ describe("Auth Configuration", () => {
       }
 
       expect(result.user.id).toBe("user-123")
-      expect(result.user.companyId).toBe(456)
+      expect(result.user.role).toBe("CREATOR")
       expect(result.accessToken).toBe("access-token")
     })
   })

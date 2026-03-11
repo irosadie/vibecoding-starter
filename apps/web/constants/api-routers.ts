@@ -1,4 +1,10 @@
 export const apiRouters = {
+  auth: {
+    register: "/auth/register",
+    login: "/auth/login",
+    logout: "/auth/logout",
+    me: "/auth/me",
+  },
   paymentMethods: {
     index: "/payment-methods",
     show: "/payment-methods/:id",

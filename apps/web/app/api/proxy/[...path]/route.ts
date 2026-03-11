@@ -16,6 +16,7 @@ type SessionToken = {
 }
 
 const publicProxyPaths = new Set([
+  authConfig.backendRegisterPath.replace(/^\//, ""),
   authConfig.backendLoginPath.replace(/^\//, ""),
   authConfig.backendRefreshPath.replace(/^\//, ""),
 ])

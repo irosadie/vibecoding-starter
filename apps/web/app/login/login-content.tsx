@@ -3,17 +3,13 @@
 import { Button } from "$/components/button"
 import { Input } from "$/components/input"
 import { PanelCard } from "$/components/panel-card"
-import { authConfig } from "$/configs/auth"
+import { authConfig, getRoleRedirectPath } from "$/configs/auth"
+import { useAuthLogin } from "$/hooks/transactions/use-auth"
 import { type LoginProps, loginSchema } from "@vibecoding-starter/schemas"
-import { signIn, useSession } from "next-auth/react"
+import { useSession } from "next-auth/react"
+import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import {
-  type FormEvent,
-  useEffect,
-  useMemo,
-  useState,
-  useTransition,
-} from "react"
+import { type FormEvent, useEffect, useMemo, useState } from "react"
 
 const sanitizeCallbackUrl = (value: string | null) => {
   if (value?.startsWith("/")) {
@@ -28,25 +24,29 @@ type LoginErrors = Partial<Record<keyof LoginProps, string>>
 export default function LoginContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { status } = useSession()
-  const [isPending, startTransition] = useTransition()
+  const { data: session, status } = useSession()
+  const loginMutation = useAuthLogin()
   const [formError, setFormError] = useState("")
   const [fieldErrors, setFieldErrors] = useState<LoginErrors>({})
   const [form, setForm] = useState<LoginProps>({
     email: "",
     password: "",
   })
+  const rawCallbackUrl = searchParams.get("callbackUrl")
 
   const callbackUrl = useMemo(
-    () => sanitizeCallbackUrl(searchParams.get("callbackUrl")),
-    [searchParams],
+    () => sanitizeCallbackUrl(rawCallbackUrl),
+    [rawCallbackUrl],
   )
 
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace(callbackUrl)
+      const fallbackPath = getRoleRedirectPath(session?.user?.role)
+      const redirectPath = rawCallbackUrl ? callbackUrl : fallbackPath
+
+      router.replace(redirectPath)
     }
-  }, [callbackUrl, router, status])
+  }, [callbackUrl, rawCallbackUrl, router, session?.user?.role, status])
 
   const handleChange = (field: keyof LoginProps, value: string) => {
     setForm((current) => ({
@@ -80,23 +80,21 @@ export default function LoginContent() {
       return
     }
 
-    startTransition(() => {
-      void (async () => {
-        const result = await signIn("credentials", {
-          ...parsedForm.data,
-          redirect: false,
-          callbackUrl,
-        })
-
-        if (result?.error) {
-          setFormError(result.error)
-          return
-        }
-
-        router.replace(result?.url || callbackUrl)
-        router.refresh()
-      })()
-    })
+    loginMutation.mutate(
+      {
+        ...parsedForm.data,
+        callbackUrl,
+      },
+      {
+        onSuccess: (result) => {
+          router.replace(result.redirectTo)
+          router.refresh()
+        },
+        onError: (error) => {
+          setFormError(error.message)
+        },
+      },
+    )
   }
 
   return (
@@ -137,10 +135,20 @@ export default function LoginContent() {
           <Button
             className="w-full justify-center"
             type="submit"
-            loading={isPending}
+            loading={loginMutation.isPending}
           >
             Sign In
           </Button>
+
+          <p className="text-center text-sm text-slate-600">
+            Belum punya akun?{" "}
+            <Link
+              href={authConfig.registerPath}
+              className="font-semibold text-brand-dark underline-offset-4 hover:underline"
+            >
+              Daftar di sini
+            </Link>
+          </p>
         </form>
       </PanelCard>
     </main>
