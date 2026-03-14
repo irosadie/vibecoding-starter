@@ -19,6 +19,9 @@ model User {
   authSessions                AuthSession[]
   creatorApplications         CreatorApplication[] @relation("CreatorApplicationUser")
   reviewedCreatorApplications CreatorApplication[] @relation("CreatorApplicationReviewer")
+  createdExams                Exam[]               @relation("ExamCreator")
+  reviewedExamVersions        ExamVersion[]        @relation("ExamVersionReviewer")
+  examReviewLogs              ExamReviewLog[]      @relation("ExamReviewLogActor")
   creatorProfile              CreatorProfile?
   commerceCartItems           CommerceCartItem[]
   commerceOrders              CommerceOrder[]
@@ -78,6 +81,92 @@ model CreatorProfile {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("creator_profiles")
+}
+
+model Exam {
+  id               String          @id @default(uuid()) @db.Uuid
+  creatorId        String          @map("creator_id") @db.Uuid
+  slug             String          @unique @db.VarChar(255)
+  title            String          @db.VarChar(255)
+  category         String          @db.VarChar(100)
+  level            ExamLevel
+  shortDescription String          @map("short_description") @db.VarChar(255)
+  description      String          @db.Text
+  durationMinutes  Int             @map("duration_minutes")
+  currentStatus    ExamDraftStatus @default(DRAFT) @map("current_status")
+  createdAt        DateTime        @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime        @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  creator  User          @relation("ExamCreator", fields: [creatorId], references: [id], onDelete: Cascade)
+  versions ExamVersion[]
+
+  @@index([creatorId])
+  @@index([currentStatus])
+  @@index([updatedAt])
+  @@map("exams")
+}
+
+model ExamVersion {
+  id               String            @id @default(uuid()) @db.Uuid
+  examId           String            @map("exam_id") @db.Uuid
+  versionNumber    Int               @map("version_number")
+  status           ExamVersionStatus @default(DRAFT)
+  metadataSnapshot Json              @map("metadata_snapshot")
+  submittedAt      DateTime?         @map("submitted_at") @db.Timestamp(6)
+  reviewedBy       String?           @map("reviewed_by") @db.Uuid
+  reviewedAt       DateTime?         @map("reviewed_at") @db.Timestamp(6)
+  reviewNote       String?           @map("review_note") @db.Text
+  publishedAt      DateTime?         @map("published_at") @db.Timestamp(6)
+  createdAt        DateTime          @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime          @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  exam       Exam            @relation(fields: [examId], references: [id], onDelete: Cascade)
+  reviewer   User?           @relation("ExamVersionReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  questions  ExamQuestion[]
+  reviewLogs ExamReviewLog[]
+
+  @@unique([examId, versionNumber])
+  @@index([status])
+  @@index([submittedAt])
+  @@map("exam_versions")
+}
+
+model ExamQuestion {
+  id                  String                @id @default(uuid()) @db.Uuid
+  examVersionId       String                @map("exam_version_id") @db.Uuid
+  orderNumber         Int                   @map("order_number")
+  prompt              String                @db.Text
+  optionA             String                @map("option_a") @db.Text
+  optionB             String                @map("option_b") @db.Text
+  optionC             String                @map("option_c") @db.Text
+  optionD             String                @map("option_d") @db.Text
+  correctOption       QuestionCorrectOption @map("correct_option")
+  explanationText     String?               @map("explanation_text") @db.Text
+  explanationVideoUrl String?               @map("explanation_video_url") @db.Text
+  createdAt           DateTime              @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime              @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  examVersion ExamVersion @relation(fields: [examVersionId], references: [id], onDelete: Cascade)
+
+  @@unique([examVersionId, orderNumber])
+  @@index([examVersionId])
+  @@map("exam_questions")
+}
+
+model ExamReviewLog {
+  id            String           @id @default(uuid()) @db.Uuid
+  examVersionId String           @map("exam_version_id") @db.Uuid
+  actorId       String           @map("actor_id") @db.Uuid
+  action        ExamReviewAction
+  note          String?          @db.Text
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamp(6)
+
+  examVersion ExamVersion @relation(fields: [examVersionId], references: [id], onDelete: Cascade)
+  actor       User        @relation("ExamReviewLogActor", fields: [actorId], references: [id], onDelete: Cascade)
+
+  @@index([examVersionId])
+  @@index([actorId])
+  @@map("exam_review_logs")
 }
 
 model ExamProduct {
@@ -203,6 +292,33 @@ enum ExamLevel {
   BEGINNER
   INTERMEDIATE
   ADVANCED
+}
+
+enum ExamDraftStatus {
+  DRAFT
+  IN_REVIEW
+  NEEDS_REVISION
+  PUBLISHED
+}
+
+enum ExamVersionStatus {
+  DRAFT
+  IN_REVIEW
+  REJECTED
+  PUBLISHED
+}
+
+enum QuestionCorrectOption {
+  A
+  B
+  C
+  D
+}
+
+enum ExamReviewAction {
+  SUBMITTED
+  APPROVED
+  REJECTED
 }
 
 enum CommerceOrderStatus {

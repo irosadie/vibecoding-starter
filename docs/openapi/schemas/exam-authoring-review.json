@@ -1,0 +1,372 @@
+{
+  "ExamLevel": {
+    "type": "string",
+    "enum": ["BEGINNER", "INTERMEDIATE", "ADVANCED"]
+  },
+  "ExamDraftStatus": {
+    "type": "string",
+    "enum": ["DRAFT", "IN_REVIEW", "NEEDS_REVISION", "PUBLISHED"]
+  },
+  "ExamReviewStatus": {
+    "type": "string",
+    "enum": ["IN_REVIEW", "PUBLISHED", "REJECTED"]
+  },
+  "QuestionCorrectOption": {
+    "type": "string",
+    "enum": ["A", "B", "C", "D"]
+  },
+  "ExamQuestion": {
+    "type": "object",
+    "required": [
+      "id",
+      "order_number",
+      "prompt",
+      "option_a",
+      "option_b",
+      "option_c",
+      "option_d",
+      "correct_option",
+      "explanation_text",
+      "explanation_video_url"
+    ],
+    "properties": {
+      "id": { "type": "string", "format": "uuid" },
+      "order_number": { "type": "integer" },
+      "prompt": { "type": "string" },
+      "option_a": { "type": "string" },
+      "option_b": { "type": "string" },
+      "option_c": { "type": "string" },
+      "option_d": { "type": "string" },
+      "correct_option": { "$ref": "#/components/schemas/QuestionCorrectOption" },
+      "explanation_text": { "type": ["string", "null"] },
+      "explanation_video_url": { "type": ["string", "null"] }
+    }
+  },
+  "CreatorExamDraftSummary": {
+    "type": "object",
+    "required": [
+      "id",
+      "title",
+      "category",
+      "level",
+      "status",
+      "question_count",
+      "updated_at",
+      "version_label"
+    ],
+    "properties": {
+      "id": { "type": "string", "format": "uuid" },
+      "title": { "type": "string" },
+      "category": { "type": "string" },
+      "level": { "$ref": "#/components/schemas/ExamLevel" },
+      "status": { "$ref": "#/components/schemas/ExamDraftStatus" },
+      "question_count": { "type": "integer" },
+      "updated_at": { "type": "string", "format": "date-time" },
+      "version_label": { "type": "string" }
+    }
+  },
+  "CreatorExamDraftDetail": {
+    "type": "object",
+    "required": [
+      "id",
+      "slug",
+      "title",
+      "category",
+      "level",
+      "short_description",
+      "description",
+      "duration_minutes",
+      "status",
+      "active_version",
+      "questions"
+    ],
+    "properties": {
+      "id": { "type": "string", "format": "uuid" },
+      "slug": { "type": "string" },
+      "title": { "type": "string" },
+      "category": { "type": "string" },
+      "level": { "$ref": "#/components/schemas/ExamLevel" },
+      "short_description": { "type": "string" },
+      "description": { "type": "string" },
+      "duration_minutes": { "type": "integer" },
+      "status": { "$ref": "#/components/schemas/ExamDraftStatus" },
+      "active_version": {
+        "type": "object",
+        "required": ["id", "status", "version_label", "submitted_at", "review_note"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "status": { "$ref": "#/components/schemas/ExamReviewStatus" },
+          "version_label": { "type": "string" },
+          "submitted_at": { "type": ["string", "null"], "format": "date-time" },
+          "review_note": { "type": ["string", "null"] }
+        }
+      },
+      "questions": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/ExamQuestion" }
+      }
+    }
+  },
+  "AdminExamReviewSummary": {
+    "type": "object",
+    "required": [
+      "id",
+      "exam_id",
+      "exam_title",
+      "category",
+      "level",
+      "version_label",
+      "submitted_at",
+      "status",
+      "question_count",
+      "creator"
+    ],
+    "properties": {
+      "id": { "type": "string", "format": "uuid" },
+      "exam_id": { "type": "string", "format": "uuid" },
+      "exam_title": { "type": "string" },
+      "category": { "type": "string" },
+      "level": { "$ref": "#/components/schemas/ExamLevel" },
+      "version_label": { "type": "string" },
+      "submitted_at": { "type": ["string", "null"], "format": "date-time" },
+      "status": { "$ref": "#/components/schemas/ExamReviewStatus" },
+      "question_count": { "type": "integer" },
+      "creator": {
+        "type": "object",
+        "required": ["id", "name", "email"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
+        }
+      }
+    }
+  },
+  "AdminExamReviewDetail": {
+    "type": "object",
+    "required": [
+      "id",
+      "exam_id",
+      "exam_title",
+      "category",
+      "level",
+      "version_label",
+      "submitted_at",
+      "status",
+      "review_note",
+      "creator",
+      "questions"
+    ],
+    "properties": {
+      "id": { "type": "string", "format": "uuid" },
+      "exam_id": { "type": "string", "format": "uuid" },
+      "exam_title": { "type": "string" },
+      "category": { "type": "string" },
+      "level": { "$ref": "#/components/schemas/ExamLevel" },
+      "version_label": { "type": "string" },
+      "submitted_at": { "type": ["string", "null"], "format": "date-time" },
+      "status": { "$ref": "#/components/schemas/ExamReviewStatus" },
+      "review_note": { "type": ["string", "null"] },
+      "creator": {
+        "type": "object",
+        "required": ["id", "name", "email"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "name": { "type": "string" },
+          "email": { "type": "string", "format": "email" }
+        }
+      },
+      "questions": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/ExamQuestion" }
+      }
+    }
+  },
+  "CreateExamDraftRequest": {
+    "type": "object",
+    "required": [
+      "title",
+      "category",
+      "level",
+      "short_description",
+      "description",
+      "duration_minutes"
+    ],
+    "properties": {
+      "title": { "type": "string" },
+      "category": { "type": "string" },
+      "level": { "$ref": "#/components/schemas/ExamLevel" },
+      "short_description": { "type": "string" },
+      "description": { "type": "string" },
+      "duration_minutes": { "type": "integer" }
+    }
+  },
+  "UpdateExamDraftRequest": {
+    "type": "object",
+    "properties": {
+      "title": { "type": "string" },
+      "category": { "type": "string" },
+      "level": { "$ref": "#/components/schemas/ExamLevel" },
+      "short_description": { "type": "string" },
+      "description": { "type": "string" },
+      "duration_minutes": { "type": "integer" }
+    }
+  },
+  "CreateExamQuestionRequest": {
+    "type": "object",
+    "required": [
+      "prompt",
+      "option_a",
+      "option_b",
+      "option_c",
+      "option_d",
+      "correct_option"
+    ],
+    "properties": {
+      "prompt": { "type": "string" },
+      "option_a": { "type": "string" },
+      "option_b": { "type": "string" },
+      "option_c": { "type": "string" },
+      "option_d": { "type": "string" },
+      "correct_option": { "$ref": "#/components/schemas/QuestionCorrectOption" },
+      "explanation_text": { "type": "string" },
+      "explanation_video_url": { "type": "string", "format": "uri" }
+    }
+  },
+  "UpdateExamQuestionRequest": {
+    "type": "object",
+    "properties": {
+      "prompt": { "type": "string" },
+      "option_a": { "type": "string" },
+      "option_b": { "type": "string" },
+      "option_c": { "type": "string" },
+      "option_d": { "type": "string" },
+      "correct_option": { "$ref": "#/components/schemas/QuestionCorrectOption" },
+      "explanation_text": { "type": "string" },
+      "explanation_video_url": { "type": "string", "format": "uri" }
+    }
+  },
+  "SubmitExamReviewRequest": {
+    "type": "object",
+    "properties": {
+      "submit_note": { "type": "string" }
+    }
+  },
+  "ApproveExamReviewRequest": {
+    "type": "object",
+    "properties": {
+      "review_note": { "type": "string" }
+    }
+  },
+  "RejectExamReviewRequest": {
+    "type": "object",
+    "required": ["review_note"],
+    "properties": {
+      "review_note": { "type": "string" }
+    }
+  },
+  "CreatorExamDraftListResponse": {
+    "type": "object",
+    "required": ["success", "message", "data", "meta"],
+    "properties": {
+      "success": { "type": "boolean", "enum": [true] },
+      "message": { "type": "string" },
+      "data": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/CreatorExamDraftSummary" }
+      },
+      "meta": {
+        "type": "object",
+        "required": ["total", "currentPage", "perPage", "lastPage"],
+        "properties": {
+          "total": { "type": "integer" },
+          "currentPage": { "type": "integer" },
+          "perPage": { "type": "integer" },
+          "lastPage": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "CreatorExamDraftDetailResponse": {
+    "type": "object",
+    "required": ["success", "message", "data"],
+    "properties": {
+      "success": { "type": "boolean", "enum": [true] },
+      "message": { "type": "string" },
+      "data": { "$ref": "#/components/schemas/CreatorExamDraftDetail" }
+    }
+  },
+  "ExamQuestionResponse": {
+    "type": "object",
+    "required": ["success", "message", "data"],
+    "properties": {
+      "success": { "type": "boolean", "enum": [true] },
+      "message": { "type": "string" },
+      "data": { "$ref": "#/components/schemas/ExamQuestion" }
+    }
+  },
+  "ExamQuestionDeleteResponse": {
+    "type": "object",
+    "required": ["success", "message", "data"],
+    "properties": {
+      "success": { "type": "boolean", "enum": [true] },
+      "message": { "type": "string" },
+      "data": {
+        "type": "object",
+        "required": ["id", "removed"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "removed": { "type": "boolean" }
+        }
+      }
+    }
+  },
+  "SubmitExamReviewResponse": {
+    "type": "object",
+    "required": ["success", "message", "data"],
+    "properties": {
+      "success": { "type": "boolean", "enum": [true] },
+      "message": { "type": "string" },
+      "data": {
+        "type": "object",
+        "required": ["exam_id", "version_id", "status"],
+        "properties": {
+          "exam_id": { "type": "string", "format": "uuid" },
+          "version_id": { "type": "string", "format": "uuid" },
+          "status": { "$ref": "#/components/schemas/ExamReviewStatus" }
+        }
+      }
+    }
+  },
+  "AdminExamReviewListResponse": {
+    "type": "object",
+    "required": ["success", "message", "data", "meta"],
+    "properties": {
+      "success": { "type": "boolean", "enum": [true] },
+      "message": { "type": "string" },
+      "data": {
+        "type": "array",
+        "items": { "$ref": "#/components/schemas/AdminExamReviewSummary" }
+      },
+      "meta": {
+        "type": "object",
+        "required": ["total", "currentPage", "perPage", "lastPage"],
+        "properties": {
+          "total": { "type": "integer" },
+          "currentPage": { "type": "integer" },
+          "perPage": { "type": "integer" },
+          "lastPage": { "type": "integer" }
+        }
+      }
+    }
+  },
+  "AdminExamReviewDetailResponse": {
+    "type": "object",
+    "required": ["success", "message", "data"],
+    "properties": {
+      "success": { "type": "boolean", "enum": [true] },
+      "message": { "type": "string" },
+      "data": { "$ref": "#/components/schemas/AdminExamReviewDetail" }
+    }
+  }
+}

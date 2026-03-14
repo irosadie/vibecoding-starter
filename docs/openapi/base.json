@@ -15,6 +15,10 @@
     {
       "name": "System",
       "description": "Baseline system endpoints for starter health and app info."
+    },
+    {
+      "name": "ExamAuthoringReview",
+      "description": "Creator exam authoring and admin review queue endpoints."
     }
   ],
   "paths": {},
