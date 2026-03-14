@@ -5,6 +5,7 @@ import { PanelCard } from "$/components/panel-card"
 import { authConfig } from "$/configs/auth"
 import { useAuthLogout } from "$/hooks/transactions/use-auth"
 import { useSession } from "next-auth/react"
+import Link from "next/link"
 import { useRouter } from "next/navigation"
 
 export default function PanelContent() {
@@ -25,8 +26,8 @@ export default function PanelContent() {
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-6 px-6 py-12">
       <PanelCard
         className="rounded-3xl"
-        title="Starter Panel"
-        description="Protected route after successful authentication"
+        title="User Panel"
+        description="Area ini bisa diakses user dan admin"
         action={
           <Button
             intent="secondary"
@@ -47,6 +48,20 @@ export default function PanelContent() {
           <p>{session?.user?.email || "No email in session"}</p>
           <p>Role: {session?.user?.role || "UNKNOWN"}</p>
           <p>Status: {session?.user?.status || "UNKNOWN"}</p>
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-2">
+          <Link
+            href="/panel/creator-application/apply"
+            className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            Apply Creator
+          </Link>
+          <Link
+            href="/panel/creator-application/status"
+            className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            Lihat Status Pengajuan
+          </Link>
         </div>
       </PanelCard>
     </main>
