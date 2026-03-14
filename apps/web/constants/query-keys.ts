@@ -5,6 +5,13 @@ export const queryKeys = {
     logout: "authLogout",
     me: "authMe",
   },
+  creatorApplications: {
+    index: "creatorApplicationsIndex",
+    get: "creatorApplicationsGet",
+    insert: "creatorApplicationsInsert",
+    update: "creatorApplicationsUpdate",
+    delete: "creatorApplicationsDelete",
+  },
   emailJobs: {
     template: "emailJobsTemplate",
     insert: "emailJobsInsert",

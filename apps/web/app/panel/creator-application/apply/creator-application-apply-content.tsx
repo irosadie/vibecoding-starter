@@ -5,35 +5,36 @@ import { Input } from "$/components/input"
 import { PanelCard } from "$/components/panel-card"
 import { authConfig } from "$/configs/auth"
 import { useAuthLogout } from "$/hooks/transactions/use-auth"
+import {
+  useCreatorApplicationGetOne,
+  useCreatorApplicationInsertOne,
+} from "$/hooks/transactions/use-creator-application"
+import {
+  creatorApplicationSchema,
+  getCreatorApplicationStatusLabel,
+} from "@vibecoding-starter/schemas"
+import type { CreatorApplicationResponseProps } from "@vibecoding-starter/types"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { type ChangeEvent, type FormEvent, useState } from "react"
 
 type CreatorApplicationFormState = {
-  payoutAccountName: string
-  payoutBankName: string
-  payoutAccountNumber: string
-  ktpFile: File | null
+  payout_account_name: string
+  payout_bank_name: string
+  payout_account_number: string
+  ktp_file: File | null
 }
 
 type CreatorApplicationFormErrors = Partial<
   Record<keyof CreatorApplicationFormState, string>
 >
 
-type SubmittedApplicationPreview = {
-  payoutAccountName: string
-  payoutBankName: string
-  payoutAccountNumber: string
-  ktpFileName: string
-  submittedAt: string
-}
-
 const initialFormState: CreatorApplicationFormState = {
-  payoutAccountName: "",
-  payoutBankName: "",
-  payoutAccountNumber: "",
-  ktpFile: null,
+  payout_account_name: "",
+  payout_bank_name: "",
+  payout_account_number: "",
+  ktp_file: null,
 }
 
 const formatDateTime = (value: string) =>
@@ -42,40 +43,44 @@ const formatDateTime = (value: string) =>
     timeStyle: "short",
   }).format(new Date(value))
 
-const validateForm = (
-  form: CreatorApplicationFormState,
-): CreatorApplicationFormErrors => {
-  const errors: CreatorApplicationFormErrors = {}
+const getErrorMessage = (error: unknown) => {
+  if (error && typeof error === "object") {
+    if ("message" in error && typeof error.message === "string") {
+      return error.message
+    }
 
-  if (!form.payoutAccountName.trim()) {
-    errors.payoutAccountName = "Nama pemilik rekening wajib diisi"
+    if (
+      "errors" in error &&
+      Array.isArray(error.errors) &&
+      error.errors[0] &&
+      typeof error.errors[0] === "object" &&
+      "message" in error.errors[0] &&
+      typeof error.errors[0].message === "string"
+    ) {
+      return error.errors[0].message
+    }
   }
 
-  if (!form.payoutBankName.trim()) {
-    errors.payoutBankName = "Nama bank wajib diisi"
-  }
-
-  if (!form.payoutAccountNumber.trim()) {
-    errors.payoutAccountNumber = "Nomor rekening wajib diisi"
-  }
-
-  if (!form.ktpFile) {
-    errors.ktpFile = "File KTP wajib diupload"
-  }
-
-  return errors
+  return "Gagal mengirim pengajuan creator"
 }
 
 export default function CreatorApplicationApplyContent() {
   const router = useRouter()
   const { data: session } = useSession()
   const logoutMutation = useAuthLogout()
+  const submitMutation = useCreatorApplicationInsertOne()
+  const myApplicationQuery = useCreatorApplicationGetOne()
+
   const [formState, setFormState] =
     useState<CreatorApplicationFormState>(initialFormState)
   const [formErrors, setFormErrors] = useState<CreatorApplicationFormErrors>({})
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [submittedPreview, setSubmittedPreview] =
-    useState<SubmittedApplicationPreview | null>(null)
+    useState<CreatorApplicationResponseProps | null>(null)
   const [ktpInputKey, setKtpInputKey] = useState(0)
+
+  const currentApplication = myApplicationQuery.data?.application ?? null
+  const hasPendingApplication = currentApplication?.status === "PENDING"
   const ktpInputId = "creator-application-ktp-file"
 
   const handleSignOut = () => {
@@ -88,7 +93,7 @@ export default function CreatorApplicationApplyContent() {
   }
 
   const handleInputChange =
-    (field: keyof Omit<CreatorApplicationFormState, "ktpFile">) =>
+    (field: keyof Omit<CreatorApplicationFormState, "ktp_file">) =>
     (event: ChangeEvent<HTMLInputElement>) => {
       const value = event.target.value
 
@@ -107,34 +112,48 @@ export default function CreatorApplicationApplyContent() {
 
     setFormState((previousValue) => ({
       ...previousValue,
-      ktpFile: nextFile,
+      ktp_file: nextFile,
     }))
     setFormErrors((previousValue) => ({
       ...previousValue,
-      ktpFile: undefined,
+      ktp_file: undefined,
     }))
   }
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setSubmitError(null)
 
-    const nextErrors = validateForm(formState)
+    const validation = creatorApplicationSchema.safeParse(formState)
 
-    setFormErrors(nextErrors)
+    if (!validation.success) {
+      const nextErrors: CreatorApplicationFormErrors = {}
 
-    if (Object.keys(nextErrors).length > 0 || !formState.ktpFile) {
+      for (const issue of validation.error.issues) {
+        const fieldName = issue.path[0]
+
+        if (typeof fieldName === "string" && !(fieldName in nextErrors)) {
+          nextErrors[fieldName as keyof CreatorApplicationFormState] =
+            issue.message
+        }
+      }
+
+      setFormErrors(nextErrors)
+
       return
     }
 
-    setSubmittedPreview({
-      payoutAccountName: formState.payoutAccountName.trim(),
-      payoutBankName: formState.payoutBankName.trim(),
-      payoutAccountNumber: formState.payoutAccountNumber.trim(),
-      ktpFileName: formState.ktpFile.name,
-      submittedAt: new Date().toISOString(),
+    submitMutation.mutate(validation.data, {
+      onSuccess: (result) => {
+        setSubmittedPreview(result)
+        setFormState(initialFormState)
+        setKtpInputKey((currentValue) => currentValue + 1)
+        myApplicationQuery.refetch()
+      },
+      onError: (error) => {
+        setSubmitError(getErrorMessage(error))
+      },
     })
-    setFormState(initialFormState)
-    setKtpInputKey((currentValue) => currentValue + 1)
   }
 
   return (
@@ -179,19 +198,61 @@ export default function CreatorApplicationApplyContent() {
         </div>
       </PanelCard>
 
+      {currentApplication ? (
+        <PanelCard
+          className="rounded-3xl"
+          title="Status Pengajuan Saat Ini"
+          description="Pengajuan terbaru yang tersimpan di backend"
+        >
+          <div className="space-y-2 text-sm text-slate-700">
+            <p>
+              <span className="font-medium">Status:</span>{" "}
+              {getCreatorApplicationStatusLabel(currentApplication.status)}
+            </p>
+            <p>
+              <span className="font-medium">Submitted at:</span>{" "}
+              {formatDateTime(currentApplication.submitted_at)}
+            </p>
+            {currentApplication.reviewed_at ? (
+              <p>
+                <span className="font-medium">Reviewed at:</span>{" "}
+                {formatDateTime(currentApplication.reviewed_at)}
+              </p>
+            ) : null}
+            {currentApplication.review_note ? (
+              <p>
+                <span className="font-medium">Review note:</span>{" "}
+                {currentApplication.review_note}
+              </p>
+            ) : null}
+          </div>
+        </PanelCard>
+      ) : null}
+
       <PanelCard
         className="rounded-3xl"
         title="Form Pengajuan Creator"
-        description="Data di bawah ini masih dummy untuk kebutuhan slicing halaman EA-4"
+        description="Lengkapi data payout dan upload KTP untuk verifikasi admin"
       >
+        {hasPendingApplication ? (
+          <p className="mb-4 rounded-xl border border-warning-300 bg-warning-50 px-4 py-3 text-sm text-warning-700">
+            Kamu masih punya pengajuan dengan status pending. Tunggu review
+            admin sebelum mengirim pengajuan baru.
+          </p>
+        ) : null}
+        {submitError ? (
+          <p className="mb-4 rounded-xl border border-danger-300 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+            {submitError}
+          </p>
+        ) : null}
         <form className="space-y-4" onSubmit={handleSubmit}>
           <Input
             label="Nama Pemilik Rekening"
             placeholder="Contoh: Imron Rosadie"
             required
-            value={formState.payoutAccountName}
-            onChange={handleInputChange("payoutAccountName")}
-            error={formErrors.payoutAccountName}
+            value={formState.payout_account_name}
+            onChange={handleInputChange("payout_account_name")}
+            error={formErrors.payout_account_name}
             rounded="large"
             intent="clean"
           />
@@ -199,9 +260,9 @@ export default function CreatorApplicationApplyContent() {
             label="Nama Bank"
             placeholder="Contoh: BCA"
             required
-            value={formState.payoutBankName}
-            onChange={handleInputChange("payoutBankName")}
-            error={formErrors.payoutBankName}
+            value={formState.payout_bank_name}
+            onChange={handleInputChange("payout_bank_name")}
+            error={formErrors.payout_bank_name}
             rounded="large"
             intent="clean"
           />
@@ -209,9 +270,9 @@ export default function CreatorApplicationApplyContent() {
             label="Nomor Rekening"
             placeholder="Contoh: 1234567890"
             required
-            value={formState.payoutAccountNumber}
-            onChange={handleInputChange("payoutAccountNumber")}
-            error={formErrors.payoutAccountNumber}
+            value={formState.payout_account_number}
+            onChange={handleInputChange("payout_account_number")}
+            error={formErrors.payout_account_number}
             rounded="large"
             intent="clean"
           />
@@ -231,15 +292,20 @@ export default function CreatorApplicationApplyContent() {
               className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-600 file:mr-4 file:rounded-lg file:border-0 file:bg-gray-100 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-gray-700 hover:file:bg-gray-200"
               onChange={handleKtpFileChange}
             />
-            {formErrors.ktpFile ? (
-              <p className="text-xs text-danger-500">{formErrors.ktpFile}</p>
-            ) : formState.ktpFile ? (
+            {formErrors.ktp_file ? (
+              <p className="text-xs text-danger-500">{formErrors.ktp_file}</p>
+            ) : formState.ktp_file ? (
               <p className="text-xs text-main-300">
-                File dipilih: {formState.ktpFile.name}
+                File dipilih: {formState.ktp_file.name}
               </p>
             ) : null}
           </div>
-          <Button type="submit" intent="primary">
+          <Button
+            type="submit"
+            intent="primary"
+            loading={submitMutation.isPending}
+            disabled={hasPendingApplication}
+          >
             Submit Creator Application
           </Button>
         </form>
@@ -248,31 +314,31 @@ export default function CreatorApplicationApplyContent() {
       {submittedPreview ? (
         <PanelCard
           className="rounded-3xl"
-          title="Preview Payload Submit"
-          description="Ringkasan data terakhir yang dikirim (dummy response)"
+          title="Pengajuan Berhasil Dikirim"
+          description="Ringkasan data submit terbaru dari API"
         >
           <div className="space-y-2 text-sm text-slate-700">
             <p>
-              <span className="font-medium">Payout account name:</span>{" "}
-              {submittedPreview.payoutAccountName}
+              <span className="font-medium">Application ID:</span>{" "}
+              {submittedPreview.id}
             </p>
             <p>
-              <span className="font-medium">Payout bank:</span>{" "}
-              {submittedPreview.payoutBankName}
-            </p>
-            <p>
-              <span className="font-medium">Payout account number:</span>{" "}
-              {submittedPreview.payoutAccountNumber}
-            </p>
-            <p>
-              <span className="font-medium">KTP file:</span>{" "}
-              {submittedPreview.ktpFileName}
+              <span className="font-medium">Status:</span>{" "}
+              {getCreatorApplicationStatusLabel(submittedPreview.status)}
             </p>
             <p>
               <span className="font-medium">Submitted at:</span>{" "}
-              {formatDateTime(submittedPreview.submittedAt)}
+              {formatDateTime(submittedPreview.submitted_at)}
             </p>
           </div>
+        </PanelCard>
+      ) : myApplicationQuery.isLoading ? (
+        <PanelCard
+          className="rounded-3xl"
+          title="Memuat Data"
+          description="Sedang mengambil status pengajuan creator..."
+        >
+          <p className="text-sm text-slate-600">Mohon tunggu sebentar.</p>
         </PanelCard>
       ) : null}
     </main>

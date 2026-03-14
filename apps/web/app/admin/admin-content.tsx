@@ -17,81 +17,26 @@ import { type ColumnDef, Table } from "$/components/table"
 import { Textarea } from "$/components/textarea"
 import { authConfig } from "$/configs/auth"
 import { useAuthLogout } from "$/hooks/transactions/use-auth"
+import {
+  useCreatorApplicationDataTable,
+  useCreatorApplicationDeleteOne,
+  useCreatorApplicationUpdateOne,
+} from "$/hooks/transactions/use-creator-application"
+import {
+  type CreatorApplicationStatus,
+  getCreatorApplicationStatusLabel,
+} from "@vibecoding-starter/schemas"
+import type { CreatorApplicationWithApplicantResponseProps } from "@vibecoding-starter/types"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { useMemo, useState } from "react"
-
-type CreatorApplicationStatus = "PENDING" | "APPROVED" | "REJECTED"
-
-type CreatorApplicationReviewItem = {
-  id: string
-  applicantName: string
-  applicantEmail: string
-  payoutAccountName: string
-  payoutBankName: string
-  payoutAccountNumber: string
-  ktpFileUrl: string
-  submittedAt: string
-  status: CreatorApplicationStatus
-  reviewNote: string | null
-  reviewedAt: string | null
-}
+import { useEffect, useMemo, useState } from "react"
 
 const statusVariantMap = {
   PENDING: "warning",
   APPROVED: "success",
   REJECTED: "danger",
 } as const
-
-const statusLabelMap = {
-  PENDING: "Pending",
-  APPROVED: "Approved",
-  REJECTED: "Rejected",
-} as const
-
-const initialApplications: CreatorApplicationReviewItem[] = [
-  {
-    id: "ca-0001",
-    applicantName: "Imron Rosadie",
-    applicantEmail: "imronrosadie@gmail.com",
-    payoutAccountName: "Imron Rosadie",
-    payoutBankName: "BCA",
-    payoutAccountNumber: "1234567890",
-    ktpFileUrl: "https://example.com/files/ca-0001-ktp.jpg",
-    submittedAt: "2026-03-14T09:30:00.000Z",
-    status: "PENDING",
-    reviewNote: null,
-    reviewedAt: null,
-  },
-  {
-    id: "ca-0002",
-    applicantName: "Dina Larasati",
-    applicantEmail: "dina.larasati@example.com",
-    payoutAccountName: "Dina Larasati",
-    payoutBankName: "Mandiri",
-    payoutAccountNumber: "980001234567",
-    ktpFileUrl: "https://example.com/files/ca-0002-ktp.jpg",
-    submittedAt: "2026-03-12T14:10:00.000Z",
-    status: "APPROVED",
-    reviewNote: "Dokumen valid dan data payout sesuai identitas.",
-    reviewedAt: "2026-03-12T16:15:00.000Z",
-  },
-  {
-    id: "ca-0003",
-    applicantName: "Rafi Pratama",
-    applicantEmail: "rafi.pratama@example.com",
-    payoutAccountName: "Rafi Pratama",
-    payoutBankName: "BRI",
-    payoutAccountNumber: "002122334455",
-    ktpFileUrl: "https://example.com/files/ca-0003-ktp.jpg",
-    submittedAt: "2026-03-11T11:05:00.000Z",
-    status: "REJECTED",
-    reviewNote:
-      "Foto KTP blur, mohon upload ulang dengan kualitas lebih jelas.",
-    reviewedAt: "2026-03-11T13:40:00.000Z",
-  },
-]
 
 const formatDateTime = (value: string | null) => {
   if (!value) {
@@ -104,19 +49,67 @@ const formatDateTime = (value: string | null) => {
   }).format(new Date(value))
 }
 
+const getErrorMessage = (error: unknown) => {
+  if (error && typeof error === "object") {
+    if ("message" in error && typeof error.message === "string") {
+      return error.message
+    }
+
+    if (
+      "errors" in error &&
+      Array.isArray(error.errors) &&
+      error.errors[0] &&
+      typeof error.errors[0] === "object" &&
+      "message" in error.errors[0] &&
+      typeof error.errors[0].message === "string"
+    ) {
+      return error.errors[0].message
+    }
+  }
+
+  return "Terjadi kesalahan saat memproses review creator application"
+}
+
 export default function AdminContent() {
   const router = useRouter()
   const { data: session } = useSession()
   const logoutMutation = useAuthLogout()
-  const [applications, setApplications] =
-    useState<CreatorApplicationReviewItem[]>(initialApplications)
+  const approveMutation = useCreatorApplicationUpdateOne()
+  const rejectMutation = useCreatorApplicationDeleteOne()
+
   const [search, setSearch] = useState("")
-  const [selectedApplicationId, setSelectedApplicationId] = useState(
-    initialApplications[0]?.id ?? "",
-  )
+  const [selectedApplicationId, setSelectedApplicationId] = useState("")
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false)
   const [rejectTargetId, setRejectTargetId] = useState("")
   const [rejectNote, setRejectNote] = useState("")
+  const [reviewError, setReviewError] = useState<string | null>(null)
+
+  const creatorApplicationsTable = useCreatorApplicationDataTable({
+    isAutoFetch: true,
+    page: 1,
+    limit: 20,
+    filter: {
+      search: search.trim() || undefined,
+    },
+  })
+
+  const applications = creatorApplicationsTable.data ?? []
+
+  useEffect(() => {
+    if (applications.length === 0) {
+      setSelectedApplicationId("")
+
+      return
+    }
+
+    const hasSelectedApplication = applications.some(
+      (application) => application.id === selectedApplicationId,
+    )
+
+    if (!selectedApplicationId || !hasSelectedApplication) {
+      setSelectedApplicationId(applications[0]?.id ?? "")
+    }
+  }, [applications, selectedApplicationId])
 
   const handleSignOut = () => {
     logoutMutation.mutate(undefined, {
@@ -132,28 +125,30 @@ export default function AdminContent() {
   }
 
   const handleApproveApplication = (applicationId: string) => {
-    const reviewedAt = new Date().toISOString()
-
-    setApplications((previousValue) =>
-      previousValue.map((application) => {
-        if (application.id !== applicationId) {
-          return application
-        }
-
-        return {
-          ...application,
-          status: "APPROVED",
-          reviewNote: "Approved by admin reviewer.",
-          reviewedAt,
-        }
-      }),
+    setReviewError(null)
+    approveMutation.mutate(
+      {
+        id: applicationId,
+        payload: {
+          review_note: "Approved by admin reviewer.",
+        },
+      },
+      {
+        onSuccess: () => {
+          creatorApplicationsTable.refetch()
+          setSelectedApplicationId(applicationId)
+        },
+        onError: (error) => {
+          setReviewError(getErrorMessage(error))
+        },
+      },
     )
-    setSelectedApplicationId(applicationId)
   }
 
   const handleOpenRejectDialog = (applicationId: string) => {
     setRejectTargetId(applicationId)
     setRejectNote("")
+    setReviewError(null)
     setIsRejectDialogOpen(true)
     setSelectedApplicationId(applicationId)
   }
@@ -163,44 +158,27 @@ export default function AdminContent() {
       return
     }
 
-    const reviewedAt = new Date().toISOString()
-
-    setApplications((previousValue) =>
-      previousValue.map((application) => {
-        if (application.id !== rejectTargetId) {
-          return application
-        }
-
-        return {
-          ...application,
-          status: "REJECTED",
-          reviewNote: rejectNote.trim(),
-          reviewedAt,
-        }
-      }),
+    setReviewError(null)
+    rejectMutation.mutate(
+      {
+        id: rejectTargetId,
+        payload: {
+          review_note: rejectNote.trim(),
+        },
+      },
+      {
+        onSuccess: () => {
+          creatorApplicationsTable.refetch()
+          setIsRejectDialogOpen(false)
+          setRejectTargetId("")
+          setRejectNote("")
+        },
+        onError: (error) => {
+          setReviewError(getErrorMessage(error))
+        },
+      },
     )
-    setIsRejectDialogOpen(false)
-    setRejectTargetId("")
-    setRejectNote("")
   }
-
-  const filteredApplications = useMemo(
-    () =>
-      applications.filter((application) => {
-        const keyword = search.trim().toLowerCase()
-
-        if (!keyword) {
-          return true
-        }
-
-        return (
-          application.applicantName.toLowerCase().includes(keyword) ||
-          application.applicantEmail.toLowerCase().includes(keyword) ||
-          application.status.toLowerCase().includes(keyword)
-        )
-      }),
-    [applications, search],
-  )
 
   const selectedApplication = useMemo(
     () =>
@@ -210,39 +188,40 @@ export default function AdminContent() {
     [applications, selectedApplicationId],
   )
 
-  const columns: ColumnDef<CreatorApplicationReviewItem>[] = [
+  const columns: ColumnDef<CreatorApplicationWithApplicantResponseProps>[] = [
     {
-      accessorKey: "applicantName",
+      accessorKey: "applicant",
       header: "Applicant",
       cell: (info) => {
-        const row = info.row.original
+        const applicant =
+          info.getValue() as CreatorApplicationWithApplicantResponseProps["applicant"]
 
         return (
           <div className="space-y-0.5">
             <p className="text-sm font-medium text-gray-900">
-              {row.applicantName}
+              {applicant.name}
             </p>
-            <p className="text-xs text-gray-500">{row.applicantEmail}</p>
+            <p className="text-xs text-gray-500">{applicant.email}</p>
           </div>
         )
       },
     },
     {
-      accessorKey: "payoutBankName",
+      accessorKey: "payout_bank_name",
       header: "Payout",
       cell: (info) => {
         const row = info.row.original
 
         return (
           <div className="space-y-0.5 text-sm text-gray-700">
-            <p>{row.payoutBankName}</p>
-            <p className="text-xs text-gray-500">{row.payoutAccountNumber}</p>
+            <p>{row.payout_bank_name}</p>
+            <p className="text-xs text-gray-500">{row.payout_account_number}</p>
           </div>
         )
       },
     },
     {
-      accessorKey: "submittedAt",
+      accessorKey: "submitted_at",
       header: "Submitted At",
       cell: (info) => (
         <span className="text-sm text-gray-700">
@@ -258,7 +237,7 @@ export default function AdminContent() {
 
         return (
           <StatusBadge variant={statusVariantMap[status]}>
-            {statusLabelMap[status]}
+            {getCreatorApplicationStatusLabel(status)}
           </StatusBadge>
         )
       },
@@ -337,22 +316,33 @@ export default function AdminContent() {
       <PanelCard
         className="rounded-3xl"
         title="Daftar Pengajuan Creator"
-        description="Data berikut dummy untuk slicing ticket EA-4"
+        description="Data diambil dari endpoint admin creator applications"
       >
         <div className="mb-4">
           <Input
             label="Cari Pengajuan"
-            placeholder="Cari nama, email, atau status"
+            placeholder="Cari nama atau email"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
             rounded="large"
             intent="clean"
           />
         </div>
+        {creatorApplicationsTable.error ? (
+          <p className="mb-4 rounded-xl border border-danger-300 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+            Gagal memuat daftar pengajuan creator.
+          </p>
+        ) : null}
+        {reviewError ? (
+          <p className="mb-4 rounded-xl border border-danger-300 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+            {reviewError}
+          </p>
+        ) : null}
         <Table
-          data={filteredApplications}
+          data={applications}
           columns={columns}
           isShowPagination={false}
+          isLoading={creatorApplicationsTable.isLoading}
           onRowClick={(row) => handleSelectApplication(row.original.id)}
           thClassName="whitespace-nowrap"
         />
@@ -371,46 +361,46 @@ export default function AdminContent() {
             </p>
             <p>
               <span className="font-medium">Applicant:</span>{" "}
-              {selectedApplication.applicantName}
+              {selectedApplication.applicant.name}
             </p>
             <p>
               <span className="font-medium">Email:</span>{" "}
-              {selectedApplication.applicantEmail}
+              {selectedApplication.applicant.email}
             </p>
             <p>
               <span className="font-medium">Payout account:</span>{" "}
-              {selectedApplication.payoutAccountName}
+              {selectedApplication.payout_account_name}
             </p>
             <p>
               <span className="font-medium">Payout bank:</span>{" "}
-              {selectedApplication.payoutBankName}
+              {selectedApplication.payout_bank_name}
             </p>
             <p>
               <span className="font-medium">Payout account number:</span>{" "}
-              {selectedApplication.payoutAccountNumber}
+              {selectedApplication.payout_account_number}
             </p>
             <p>
               <span className="font-medium">Submitted at:</span>{" "}
-              {formatDateTime(selectedApplication.submittedAt)}
+              {formatDateTime(selectedApplication.submitted_at)}
             </p>
             <p>
               <span className="font-medium">Reviewed at:</span>{" "}
-              {formatDateTime(selectedApplication.reviewedAt)}
+              {formatDateTime(selectedApplication.reviewed_at)}
             </p>
             <p className="sm:col-span-2">
               <span className="font-medium">KTP file:</span>{" "}
               <a
-                href={selectedApplication.ktpFileUrl}
+                href={selectedApplication.ktp_file_url}
                 target="_blank"
                 rel="noreferrer"
                 className="text-primary-600 underline underline-offset-2"
               >
-                {selectedApplication.ktpFileUrl}
+                {selectedApplication.ktp_file_url}
               </a>
             </p>
             <p className="sm:col-span-2">
               <span className="font-medium">Review note:</span>{" "}
-              {selectedApplication.reviewNote || "-"}
+              {selectedApplication.review_note || "-"}
             </p>
           </div>
         ) : (
@@ -447,6 +437,7 @@ export default function AdminContent() {
               type="button"
               intent="danger"
               onClick={handleRejectApplication}
+              loading={rejectMutation.isPending}
               disabled={!rejectNote.trim()}
             >
               Reject Application
