@@ -1,5 +1,6 @@
 export * from "./auth-response"
 export * from "./auth-session-response"
 export * from "./creator-application-response"
+export * from "./exam-authoring-review-response"
 export * from "./error-response"
 export * from "./success-response"

@@ -12,6 +12,22 @@ export const queryKeys = {
     update: "creatorApplicationsUpdate",
     delete: "creatorApplicationsDelete",
   },
+  creatorExams: {
+    index: "creatorExamsIndex",
+    get: "creatorExamsGet",
+    insert: "creatorExamsInsert",
+    update: "creatorExamsUpdate",
+    delete: "creatorExamsDelete",
+    insertQuestion: "creatorExamsInsertQuestion",
+    updateQuestion: "creatorExamsUpdateQuestion",
+    submitReview: "creatorExamsSubmitReview",
+  },
+  adminExamReviews: {
+    index: "adminExamReviewsIndex",
+    get: "adminExamReviewsGet",
+    approve: "adminExamReviewsApprove",
+    reject: "adminExamReviewsReject",
+  },
   emailJobs: {
     template: "emailJobsTemplate",
     insert: "emailJobsInsert",
