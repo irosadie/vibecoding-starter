@@ -304,12 +304,20 @@ export default function AdminContent() {
           <p>Status: {session?.user?.status || "UNKNOWN"}</p>
         </div>
         <div className="mt-4">
-          <Link
-            href="/panel/creator-application/status"
-            className="rounded-xl border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
-          >
-            Buka Halaman Status User
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/panel/creator-application/status"
+              className="rounded-xl border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              Buka Halaman Status User
+            </Link>
+            <Link
+              href="/admin/exam-reviews"
+              className="rounded-xl border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              Open Exam Review Queue
+            </Link>
+          </div>
         </div>
       </PanelCard>
 
