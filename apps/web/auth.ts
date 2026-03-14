@@ -1,6 +1,6 @@
 import { authConfig } from "$/configs/auth"
 import { serverAuthConfig } from "$/configs/auth-server"
-import { loginSchema } from "@vibecoding-starter/schemas"
+import { type LoginProps, loginSchema } from "@vibecoding-starter/schemas"
 import type {
   AccountRole,
   AccountStatus,
@@ -16,6 +16,18 @@ const ACCOUNT_ROLES: AccountRole[] = ["USER", "CREATOR", "ADMIN"]
 const ACCOUNT_STATUSES: AccountStatus[] = ["ACTIVE", "SUSPENDED"]
 
 const loginProxyUrl = `${serverAuthConfig.appBaseUrl}${authConfig.proxyApiBasePath}${authConfig.backendLoginPath}`
+const loginBackendUrl = `${serverAuthConfig.backendApiBaseUrl}${authConfig.backendLoginPath}`
+const loginUrls = [loginProxyUrl, loginBackendUrl]
+
+type AuthErrorBody = {
+  message?: string
+  error?: {
+    message?: string
+  }
+  errors?: Array<{
+    message?: string
+  }>
+}
 
 const unwrapData = <T>(payload: AuthEnvelope<T>): T => {
   if (
@@ -49,6 +61,67 @@ const normalizeAccountStatus = (status: unknown): AccountStatus => {
   return "ACTIVE"
 }
 
+const getAuthErrorMessage = (error: unknown) => {
+  if (axios.isAxiosError(error)) {
+    const body = error.response?.data as AuthErrorBody | undefined
+
+    return (
+      body?.message ||
+      body?.error?.message ||
+      body?.errors?.[0]?.message ||
+      "Login failed"
+    )
+  }
+
+  if (error instanceof Error) {
+    return error.message
+  }
+
+  return "An unexpected error occurred"
+}
+
+const shouldRetryWithFallback = (error: unknown) => {
+  if (!axios.isAxiosError(error)) {
+    return false
+  }
+
+  if (!error.response) {
+    return true
+  }
+
+  return error.response.status >= 500 || error.response.status === 404
+}
+
+const loginByCredentials = async (
+  credentials: LoginProps,
+): Promise<AuthLoginResponse> => {
+  let lastError: unknown
+
+  for (const [index, loginUrl] of loginUrls.entries()) {
+    try {
+      const { data } = await axios.post<AuthEnvelope<AuthLoginResponse>>(
+        loginUrl,
+        credentials,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      )
+
+      return unwrapData<AuthLoginResponse>(data)
+    } catch (error) {
+      lastError = error
+
+      if (!shouldRetryWithFallback(error) || index === loginUrls.length - 1) {
+        break
+      }
+    }
+  }
+
+  throw new Error(getAuthErrorMessage(lastError))
+}
+
 export const authOptions: NextAuthOptions = {
   debug: !serverAuthConfig.secureCookies,
   providers: [
@@ -69,17 +142,7 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const { data } = await axios.post<AuthEnvelope<AuthLoginResponse>>(
-            loginProxyUrl,
-            parsedCredentials.data,
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            },
-          )
-
-          const result = unwrapData(data)
+          const result = await loginByCredentials(parsedCredentials.data)
 
           if (!result.user || !result.tokens) {
             throw new Error("Invalid response from auth server")
@@ -102,19 +165,7 @@ export const authOptions: NextAuthOptions = {
 
           return authUser
         } catch (error: unknown) {
-          if (axios.isAxiosError(error)) {
-            const errorMessage =
-              (error.response?.data as { message?: string })?.message ||
-              "Login failed"
-
-            throw new Error(errorMessage)
-          }
-
-          if (error instanceof Error) {
-            throw new Error(error.message)
-          }
-
-          throw new Error("An unexpected error occurred")
+          throw new Error(getAuthErrorMessage(error))
         }
       },
     }),
