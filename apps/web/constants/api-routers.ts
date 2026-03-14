@@ -12,6 +12,17 @@ export const apiRouters = {
     update: "/admin/creator-applications/:id/approve",
     delete: "/admin/creator-applications/:id/reject",
   },
+  catalogExams: {
+    index: "/catalog/exams",
+    show: "/catalog/exams/:slug",
+  },
+  commerce: {
+    cart: "/commerce/cart",
+    addToCart: "/commerce/cart/items",
+    removeCartItem: "/commerce/cart/items/:id",
+    checkout: "/commerce/checkout",
+    orderStatus: "/commerce/orders/:id",
+  },
   paymentMethods: {
     index: "/payment-methods",
     show: "/payment-methods/:id",

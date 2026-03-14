@@ -12,6 +12,17 @@ export const queryKeys = {
     update: "creatorApplicationsUpdate",
     delete: "creatorApplicationsDelete",
   },
+  catalogExams: {
+    index: "catalogExamsIndex",
+    get: "catalogExamsGet",
+  },
+  commerce: {
+    cart: "commerceCart",
+    addToCart: "commerceAddToCart",
+    removeCartItem: "commerceRemoveCartItem",
+    checkout: "commerceCheckout",
+    orderStatus: "commerceOrderStatus",
+  },
   emailJobs: {
     template: "emailJobsTemplate",
     insert: "emailJobsInsert",
