@@ -20,6 +20,9 @@ model User {
   creatorApplications         CreatorApplication[] @relation("CreatorApplicationUser")
   reviewedCreatorApplications CreatorApplication[] @relation("CreatorApplicationReviewer")
   creatorProfile              CreatorProfile?
+  commerceCartItems           CommerceCartItem[]
+  commerceOrders              CommerceOrder[]
+  commerceOwnerships          CommerceOwnership[]
 
   @@map("users")
 }
@@ -53,8 +56,8 @@ model CreatorApplication {
   createdAt           DateTime                 @default(now()) @map("created_at") @db.Timestamp(6)
   updatedAt           DateTime                 @updatedAt @map("updated_at") @db.Timestamp(6)
 
-  user           User  @relation("CreatorApplicationUser", fields: [userId], references: [id], onDelete: Cascade)
-  reviewer       User? @relation("CreatorApplicationReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+  user     User  @relation("CreatorApplicationUser", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User? @relation("CreatorApplicationReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
 
   @@index([userId])
   @@index([status])
@@ -77,6 +80,103 @@ model CreatorProfile {
   @@map("creator_profiles")
 }
 
+model ExamProduct {
+  id               String    @id @default(uuid()) @db.Uuid
+  slug             String    @unique @db.VarChar(255)
+  title            String    @db.VarChar(255)
+  category         String    @db.VarChar(100)
+  level            ExamLevel
+  shortDescription String    @map("short_description") @db.Text
+  description      String    @db.Text
+  priceAmount      Int       @map("price_amount")
+  isPublished      Boolean   @default(true) @map("is_published")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime  @updatedAt @map("updated_at") @db.Timestamp(6)
+  deletedAt        DateTime? @map("deleted_at") @db.Timestamp(6)
+
+  @@index([isPublished])
+  @@index([category])
+  @@index([level])
+  @@map("exam_products")
+}
+
+model CommerceCartItem {
+  id            String      @id @default(uuid()) @db.Uuid
+  userId        String      @map("user_id") @db.Uuid
+  productType   ProductType @map("product_type")
+  productId     String      @map("product_id") @db.Uuid
+  titleSnapshot String      @map("title_snapshot") @db.VarChar(255)
+  unitPrice     Int         @map("unit_price")
+  quantity      Int         @default(1)
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt     DateTime    @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productType, productId])
+  @@index([userId])
+  @@index([productType, productId])
+  @@map("commerce_cart_items")
+}
+
+model CommerceOrder {
+  id               String              @id @default(uuid()) @db.Uuid
+  userId           String              @map("user_id") @db.Uuid
+  status           CommerceOrderStatus @default(PENDING_PAYMENT)
+  totalAmount      Int                 @map("total_amount")
+  paymentProvider  String?             @map("payment_provider") @db.VarChar(50)
+  paymentReference String?             @map("payment_reference") @db.VarChar(150)
+  paidAt           DateTime?           @map("paid_at") @db.Timestamp(6)
+  failedAt         DateTime?           @map("failed_at") @db.Timestamp(6)
+  expiredAt        DateTime?           @map("expired_at") @db.Timestamp(6)
+  createdAt        DateTime            @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt        DateTime            @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  user       User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items      CommerceOrderItem[]
+  ownerships CommerceOwnership[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([paymentReference])
+  @@map("commerce_orders")
+}
+
+model CommerceOrderItem {
+  id            String      @id @default(uuid()) @db.Uuid
+  orderId       String      @map("order_id") @db.Uuid
+  productType   ProductType @map("product_type")
+  productId     String      @map("product_id") @db.Uuid
+  titleSnapshot String      @map("title_snapshot") @db.VarChar(255)
+  priceAmount   Int         @map("price_amount")
+  quantity      Int         @default(1)
+  createdAt     DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+
+  order CommerceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([productType, productId])
+  @@map("commerce_order_items")
+}
+
+model CommerceOwnership {
+  id          String      @id @default(uuid()) @db.Uuid
+  userId      String      @map("user_id") @db.Uuid
+  orderId     String      @map("order_id") @db.Uuid
+  productType ProductType @map("product_type")
+  productId   String      @map("product_id") @db.Uuid
+  grantedAt   DateTime    @map("granted_at") @db.Timestamp(6)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+
+  user  User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  order CommerceOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productType, productId])
+  @@index([orderId])
+  @@index([productType, productId])
+  @@map("commerce_ownerships")
+}
+
 enum UserRole {
   USER
   CREATOR
@@ -92,4 +192,22 @@ enum CreatorApplicationStatus {
   PENDING
   APPROVED
   REJECTED
+}
+
+enum ProductType {
+  EXAM
+  MENTORING_PACKAGE
+}
+
+enum ExamLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum CommerceOrderStatus {
+  PENDING_PAYMENT
+  PAID
+  FAILED
+  EXPIRED
 }
