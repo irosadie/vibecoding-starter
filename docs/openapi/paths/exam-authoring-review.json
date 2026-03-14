@@ -1,0 +1,380 @@
+{
+  "/api/v1/creator/exams": {
+    "get": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "List creator exam drafts",
+      "parameters": [
+        {
+          "name": "page",
+          "in": "query",
+          "schema": { "type": "integer", "default": 1 }
+        },
+        {
+          "name": "perPage",
+          "in": "query",
+          "schema": { "type": "integer", "default": 10 }
+        },
+        {
+          "name": "search",
+          "in": "query",
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "status",
+          "in": "query",
+          "schema": { "$ref": "#/components/schemas/ExamDraftStatus" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Creator exam drafts loaded",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatorExamDraftListResponse" }
+            }
+          }
+        },
+        "401": {
+          "description": "Unauthorized",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+            }
+          }
+        }
+      }
+    },
+    "post": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Create exam draft",
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/CreateExamDraftRequest" }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Exam draft created",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatorExamDraftDetailResponse" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/creator/exams/{id}": {
+    "get": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Get creator exam draft detail",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Exam draft loaded",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatorExamDraftDetailResponse" }
+            }
+          }
+        }
+      }
+    },
+    "put": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Update exam draft metadata",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/UpdateExamDraftRequest" }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Exam draft updated",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreatorExamDraftDetailResponse" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/creator/exams/{id}/questions": {
+    "post": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Add exam question",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/CreateExamQuestionRequest" }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Exam question added",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExamQuestionResponse" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/creator/exams/{id}/questions/{questionId}": {
+    "put": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Update exam question",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        },
+        {
+          "name": "questionId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/UpdateExamQuestionRequest" }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Exam question updated",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExamQuestionResponse" }
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Delete exam question",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        },
+        {
+          "name": "questionId",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Exam question deleted",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ExamQuestionDeleteResponse" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/creator/exams/{id}/submit-review": {
+    "post": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Submit exam draft to review",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SubmitExamReviewRequest" }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Exam draft submitted to review",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/SubmitExamReviewResponse" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/admin/exam-reviews": {
+    "get": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "List admin exam review queue",
+      "parameters": [
+        {
+          "name": "page",
+          "in": "query",
+          "schema": { "type": "integer", "default": 1 }
+        },
+        {
+          "name": "perPage",
+          "in": "query",
+          "schema": { "type": "integer", "default": 10 }
+        },
+        {
+          "name": "search",
+          "in": "query",
+          "schema": { "type": "string" }
+        },
+        {
+          "name": "status",
+          "in": "query",
+          "schema": { "$ref": "#/components/schemas/ExamReviewStatus" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Exam review queue loaded",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminExamReviewListResponse" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/admin/exam-reviews/{id}": {
+    "get": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Get admin exam review detail",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Exam review detail loaded",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminExamReviewDetailResponse" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/admin/exam-reviews/{id}/approve": {
+    "post": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Approve exam review",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ApproveExamReviewRequest" }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Exam review approved",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminExamReviewDetailResponse" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "/api/v1/admin/exam-reviews/{id}/reject": {
+    "post": {
+      "tags": ["ExamAuthoringReview"],
+      "summary": "Reject exam review",
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": { "type": "string", "format": "uuid" }
+        }
+      ],
+      "requestBody": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/RejectExamReviewRequest" }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Exam review rejected",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/AdminExamReviewDetailResponse" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

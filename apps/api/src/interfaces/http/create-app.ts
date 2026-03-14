@@ -7,8 +7,10 @@ import type { GetHealthUseCase } from "../../application/use-cases/get-health.js
 import { SystemController } from "./controllers/system-controller.js"
 import { errorHandler } from "./middleware/errorHandler.js"
 import { adminCreatorApplicationRoutes } from "./routes/admin-creator-application-routes.js"
+import { adminExamReviewRoutes } from "./routes/admin-exam-review-routes.js"
 import { authRoutes } from "./routes/auth-routes.js"
 import { creatorApplicationRoutes } from "./routes/creator-application-routes.js"
+import { creatorExamAuthoringRoutes } from "./routes/creator-exam-authoring-routes.js"
 import { registerHealthRoute } from "./routes/health-route.js"
 import { registerRootRoute } from "./routes/root-route.js"
 
@@ -36,7 +38,9 @@ export const createApp = ({
   registerHealthRoute(app, systemController)
   app.route("/api/v1/auth", authRoutes)
   app.route("/api/v1/creator-applications", creatorApplicationRoutes)
+  app.route("/api/v1/creator/exams", creatorExamAuthoringRoutes)
   app.route("/api/v1/admin/creator-applications", adminCreatorApplicationRoutes)
+  app.route("/api/v1/admin/exam-reviews", adminExamReviewRoutes)
 
   return app
 }
