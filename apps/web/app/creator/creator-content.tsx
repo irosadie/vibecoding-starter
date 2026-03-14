@@ -119,6 +119,15 @@ export default function CreatorContent() {
           <p>Role: {session?.user?.role || "UNKNOWN"}</p>
           <p>Status: {session?.user?.status || "UNKNOWN"}</p>
         </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href="/creator/exams"
+            className="rounded-xl border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+          >
+            Open Exam Authoring Dashboard
+          </Link>
+        </div>
       </PanelCard>
     </main>
   )

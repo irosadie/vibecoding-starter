@@ -12,6 +12,22 @@ export const apiRouters = {
     update: "/admin/creator-applications/:id/approve",
     delete: "/admin/creator-applications/:id/reject",
   },
+  creatorExams: {
+    index: "/creator/exams",
+    show: "/creator/exams/:id",
+    insert: "/creator/exams",
+    update: "/creator/exams/:id",
+    insertQuestion: "/creator/exams/:id/questions",
+    updateQuestion: "/creator/exams/:id/questions/:questionId",
+    deleteQuestion: "/creator/exams/:id/questions/:questionId",
+    submitReview: "/creator/exams/:id/submit-review",
+  },
+  adminExamReviews: {
+    index: "/admin/exam-reviews",
+    show: "/admin/exam-reviews/:id",
+    approve: "/admin/exam-reviews/:id/approve",
+    reject: "/admin/exam-reviews/:id/reject",
+  },
   catalogExams: {
     index: "/catalog/exams",
     show: "/catalog/exams/:slug",
