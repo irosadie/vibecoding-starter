@@ -7,16 +7,19 @@ datasource db {
 }
 
 model User {
-  id           String        @id @default(uuid()) @db.Uuid
-  email        String        @unique @db.VarChar(255)
-  passwordHash String        @map("password_hash") @db.Text
-  name         String        @db.VarChar(120)
-  role         UserRole      @default(USER)
-  status       UserStatus    @default(ACTIVE)
-  photo        String?       @db.Text
-  createdAt    DateTime      @default(now()) @map("created_at") @db.Timestamp(6)
-  updatedAt    DateTime      @updatedAt @map("updated_at") @db.Timestamp(6)
-  authSessions AuthSession[]
+  id                          String               @id @default(uuid()) @db.Uuid
+  email                       String               @unique @db.VarChar(255)
+  passwordHash                String               @map("password_hash") @db.Text
+  name                        String               @db.VarChar(120)
+  role                        UserRole             @default(USER)
+  status                      UserStatus           @default(ACTIVE)
+  photo                       String?              @db.Text
+  createdAt                   DateTime             @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt                   DateTime             @updatedAt @map("updated_at") @db.Timestamp(6)
+  authSessions                AuthSession[]
+  creatorApplications         CreatorApplication[] @relation("CreatorApplicationUser")
+  reviewedCreatorApplications CreatorApplication[] @relation("CreatorApplicationReviewer")
+  creatorProfile              CreatorProfile?
 
   @@map("users")
 }
@@ -35,6 +38,45 @@ model AuthSession {
   @@map("auth_sessions")
 }
 
+model CreatorApplication {
+  id                  String                   @id @default(uuid()) @db.Uuid
+  userId              String                   @map("user_id") @db.Uuid
+  ktpFileUrl          String                   @map("ktp_file_url") @db.Text
+  payoutAccountName   String                   @map("payout_account_name") @db.VarChar(255)
+  payoutBankName      String                   @map("payout_bank_name") @db.VarChar(100)
+  payoutAccountNumber String                   @map("payout_account_number") @db.VarChar(100)
+  status              CreatorApplicationStatus @default(PENDING)
+  submittedAt         DateTime                 @map("submitted_at") @db.Timestamp(6)
+  reviewedBy          String?                  @map("reviewed_by") @db.Uuid
+  reviewedAt          DateTime?                @map("reviewed_at") @db.Timestamp(6)
+  reviewNote          String?                  @map("review_note") @db.Text
+  createdAt           DateTime                 @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime                 @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  user           User  @relation("CreatorApplicationUser", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer       User? @relation("CreatorApplicationReviewer", fields: [reviewedBy], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([status])
+  @@index([submittedAt])
+  @@map("creator_applications")
+}
+
+model CreatorProfile {
+  id                  String   @id @default(uuid()) @db.Uuid
+  userId              String   @unique @map("user_id") @db.Uuid
+  payoutAccountName   String   @map("payout_account_name") @db.VarChar(255)
+  payoutBankName      String   @map("payout_bank_name") @db.VarChar(100)
+  payoutAccountNumber String   @map("payout_account_number") @db.VarChar(100)
+  approvedAt          DateTime @map("approved_at") @db.Timestamp(6)
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamp(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("creator_profiles")
+}
+
 enum UserRole {
   USER
   CREATOR
@@ -44,4 +86,10 @@ enum UserRole {
 enum UserStatus {
   ACTIVE
   SUSPENDED
+}
+
+enum CreatorApplicationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
