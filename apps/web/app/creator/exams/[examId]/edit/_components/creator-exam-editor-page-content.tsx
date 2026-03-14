@@ -3,42 +3,46 @@
 import { Button } from "$/components/button"
 import { Input } from "$/components/input"
 import { PanelCard } from "$/components/panel-card"
+import { StatusBadge } from "$/components/status-badge"
 import { Textarea } from "$/components/textarea"
+import {
+  useExamAuthoringReviewDeleteOne,
+  useExamAuthoringReviewGetOne,
+  useExamAuthoringReviewInsertQuestion,
+  useExamAuthoringReviewSubmitReview,
+  useExamAuthoringReviewUpdateOne,
+  useExamAuthoringReviewUpdateQuestion,
+} from "$/hooks/transactions/use-exam-authoring-review"
+import {
+  type ExamAuthoringQuestionCorrectOption,
+  getExamAuthoringReviewStatusLabel,
+} from "@vibecoding-starter/schemas"
+import type { CreatorExamQuestionResponseProps } from "@vibecoding-starter/types"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 type CreatorExamEditorPageContentProps = {
   examId: string
 }
 
-type QuestionOption = {
-  key: "A" | "B" | "C" | "D"
-  text: string
-}
-
 type ExamQuestionDraft = {
   id: string
   prompt: string
-  options: QuestionOption[]
-  correct_option: "A" | "B" | "C" | "D"
-  explanation: string
+  option_a: string
+  option_b: string
+  option_c: string
+  option_d: string
+  correct_option: ExamAuthoringQuestionCorrectOption
+  explanation_text: string
+  explanation_video_url: string
 }
 
-const initialQuestions: ExamQuestionDraft[] = [
-  {
-    id: "q-1",
-    prompt: "Nilai median dari data 2, 3, 5, 8, 13 adalah...",
-    options: [
-      { key: "A", text: "3" },
-      { key: "B", text: "5" },
-      { key: "C", text: "6" },
-      { key: "D", text: "8" },
-    ],
-    correct_option: "B",
-    explanation: "Data sudah terurut. Nilai tengah berada pada angka 5.",
-  },
-]
+const reviewStatusVariantMap = {
+  IN_REVIEW: "warning",
+  PUBLISHED: "success",
+  REJECTED: "danger",
+} as const
 
 const formatDateTime = (value: string | null) => {
   if (!value) {
@@ -51,6 +55,43 @@ const formatDateTime = (value: string | null) => {
   }).format(new Date(value))
 }
 
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error && typeof error === "object") {
+    if (
+      "errors" in error &&
+      Array.isArray(error.errors) &&
+      error.errors[0] &&
+      typeof error.errors[0] === "object" &&
+      "message" in error.errors[0] &&
+      typeof error.errors[0].message === "string"
+    ) {
+      return error.errors[0].message
+    }
+
+    if ("message" in error && typeof error.message === "string") {
+      return error.message
+    }
+  }
+
+  return fallback
+}
+
+const toQuestionDraft = (
+  question: CreatorExamQuestionResponseProps,
+): ExamQuestionDraft => {
+  return {
+    id: question.id,
+    prompt: question.prompt,
+    option_a: question.option_a,
+    option_b: question.option_b,
+    option_c: question.option_c,
+    option_d: question.option_d,
+    correct_option: question.correct_option,
+    explanation_text: question.explanation_text || "",
+    explanation_video_url: question.explanation_video_url || "",
+  }
+}
+
 export default function CreatorExamEditorPageContent({
   examId,
 }: CreatorExamEditorPageContentProps) {
@@ -58,64 +99,65 @@ export default function CreatorExamEditorPageContent({
   const role = session?.user?.role
   const hasCreatorAccess = role === "CREATOR" || role === "ADMIN"
 
-  const [title, setTitle] = useState("Draft Ujian Baru")
-  const [category, setCategory] = useState("General")
+  const draftQuery = useExamAuthoringReviewGetOne({
+    id: examId,
+    enabled: hasCreatorAccess,
+  })
+  const updateDraftMutation = useExamAuthoringReviewUpdateOne()
+  const insertQuestionMutation = useExamAuthoringReviewInsertQuestion()
+  const updateQuestionMutation = useExamAuthoringReviewUpdateQuestion()
+  const deleteQuestionMutation = useExamAuthoringReviewDeleteOne()
+  const submitReviewMutation = useExamAuthoringReviewSubmitReview()
+
+  const draft = draftQuery.data
+
+  const [title, setTitle] = useState("")
+  const [category, setCategory] = useState("")
   const [level, setLevel] = useState<"BEGINNER" | "INTERMEDIATE" | "ADVANCED">(
     "BEGINNER",
   )
   const [durationMinutes, setDurationMinutes] = useState("90")
   const [shortDescription, setShortDescription] = useState("")
   const [description, setDescription] = useState("")
-  const [questions, setQuestions] = useState<ExamQuestionDraft[]>(initialQuestions)
-  const [activeQuestionId, setActiveQuestionId] = useState(initialQuestions[0]?.id)
+  const [questions, setQuestions] = useState<ExamQuestionDraft[]>([])
+  const [activeQuestionId, setActiveQuestionId] = useState<string | undefined>(
+    undefined,
+  )
   const [lastSavedAt, setLastSavedAt] = useState<string | null>(null)
-  const [isSubmittedToReview, setIsSubmittedToReview] = useState(false)
+  const [actionError, setActionError] = useState<string | null>(null)
+  const [actionNotice, setActionNotice] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!draft) {
+      return
+    }
+
+    setTitle(draft.title)
+    setCategory(draft.category)
+    setLevel(draft.level)
+    setDurationMinutes(String(draft.duration_minutes))
+    setShortDescription(draft.short_description)
+    setDescription(draft.description)
+
+    const draftQuestions = draft.questions.map(toQuestionDraft)
+    setQuestions(draftQuestions)
+    setActiveQuestionId((currentActiveQuestionId) => {
+      const hasCurrentQuestion = draftQuestions.some(
+        (question) => question.id === currentActiveQuestionId,
+      )
+
+      if (hasCurrentQuestion) {
+        return currentActiveQuestionId
+      }
+
+      return draftQuestions[0]?.id
+    })
+  }, [draft])
 
   const activeQuestion = useMemo(
     () => questions.find((question) => question.id === activeQuestionId) || null,
     [questions, activeQuestionId],
   )
-
-  const handleSaveDraft = () => {
-    setLastSavedAt(new Date().toISOString())
-  }
-
-  const handleSubmitReview = () => {
-    setIsSubmittedToReview(true)
-    setLastSavedAt(new Date().toISOString())
-  }
-
-  const handleAddQuestion = () => {
-    const newQuestion: ExamQuestionDraft = {
-      id: `q-${Date.now()}`,
-      prompt: "",
-      options: [
-        { key: "A", text: "" },
-        { key: "B", text: "" },
-        { key: "C", text: "" },
-        { key: "D", text: "" },
-      ],
-      correct_option: "A",
-      explanation: "",
-    }
-
-    setQuestions((current) => [...current, newQuestion])
-    setActiveQuestionId(newQuestion.id)
-  }
-
-  const handleRemoveQuestion = (questionId: string) => {
-    setQuestions((current) => {
-      const nextQuestions = current.filter((question) => question.id !== questionId)
-
-      if (nextQuestions.length === 0) {
-        setActiveQuestionId(undefined)
-      } else if (activeQuestionId === questionId) {
-        setActiveQuestionId(nextQuestions[0]?.id)
-      }
-
-      return nextQuestions
-    })
-  }
 
   const updateActiveQuestion = (
     updater: (question: ExamQuestionDraft) => ExamQuestionDraft,
@@ -124,10 +166,183 @@ export default function CreatorExamEditorPageContent({
       return
     }
 
-    setQuestions((current) =>
-      current.map((question) =>
+    setQuestions((currentQuestions) =>
+      currentQuestions.map((question) =>
         question.id === activeQuestionId ? updater(question) : question,
       ),
+    )
+  }
+
+  const handleSaveDraft = () => {
+    const parsedDuration = Number(durationMinutes)
+
+    if (!Number.isFinite(parsedDuration) || parsedDuration <= 0) {
+      setActionError("Durasi exam harus berupa angka lebih dari 0")
+      setActionNotice(null)
+      return
+    }
+
+    setActionError(null)
+    setActionNotice(null)
+
+    updateDraftMutation.mutate(
+      {
+        id: examId,
+        payload: {
+          title: title.trim(),
+          category: category.trim(),
+          level,
+          short_description: shortDescription.trim(),
+          description: description.trim(),
+          duration_minutes: parsedDuration,
+        },
+      },
+      {
+        onSuccess: () => {
+          draftQuery.refetch()
+          setLastSavedAt(new Date().toISOString())
+          setActionNotice("Metadata draft berhasil disimpan.")
+        },
+        onError: (error) => {
+          setActionError(getErrorMessage(error, "Gagal menyimpan metadata draft."))
+        },
+      },
+    )
+  }
+
+  const handleAddQuestion = () => {
+    setActionError(null)
+    setActionNotice(null)
+
+    insertQuestionMutation.mutate(
+      {
+        id: examId,
+        payload: {
+          prompt: "Pertanyaan baru",
+          option_a: "Option A",
+          option_b: "Option B",
+          option_c: "Option C",
+          option_d: "Option D",
+          correct_option: "A",
+          explanation_text: "Tambahkan pembahasan soal.",
+        },
+      },
+      {
+        onSuccess: (result) => {
+          draftQuery.refetch()
+          setActiveQuestionId(result.id)
+          setActionNotice("Soal baru berhasil ditambahkan.")
+        },
+        onError: (error) => {
+          setActionError(getErrorMessage(error, "Gagal menambahkan soal baru."))
+        },
+      },
+    )
+  }
+
+  const handleSaveActiveQuestion = () => {
+    if (!activeQuestion) {
+      setActionError("Pilih soal yang ingin disimpan.")
+      setActionNotice(null)
+      return
+    }
+
+    if (
+      !activeQuestion.prompt.trim() ||
+      !activeQuestion.option_a.trim() ||
+      !activeQuestion.option_b.trim() ||
+      !activeQuestion.option_c.trim() ||
+      !activeQuestion.option_d.trim()
+    ) {
+      setActionError("Prompt dan seluruh option wajib diisi sebelum menyimpan.")
+      setActionNotice(null)
+      return
+    }
+
+    setActionError(null)
+    setActionNotice(null)
+
+    updateQuestionMutation.mutate(
+      {
+        id: examId,
+        questionId: activeQuestion.id,
+        payload: {
+          prompt: activeQuestion.prompt,
+          option_a: activeQuestion.option_a,
+          option_b: activeQuestion.option_b,
+          option_c: activeQuestion.option_c,
+          option_d: activeQuestion.option_d,
+          correct_option: activeQuestion.correct_option,
+          explanation_text: activeQuestion.explanation_text.trim() || undefined,
+          explanation_video_url:
+            activeQuestion.explanation_video_url.trim() || undefined,
+        },
+      },
+      {
+        onSuccess: () => {
+          draftQuery.refetch()
+          setLastSavedAt(new Date().toISOString())
+          setActionNotice("Soal aktif berhasil disimpan.")
+        },
+        onError: (error) => {
+          setActionError(getErrorMessage(error, "Gagal menyimpan soal aktif."))
+        },
+      },
+    )
+  }
+
+  const handleRemoveQuestion = (questionId: string) => {
+    if (questions.length <= 1) {
+      setActionError("Draft harus memiliki minimal satu soal.")
+      setActionNotice(null)
+      return
+    }
+
+    setActionError(null)
+    setActionNotice(null)
+
+    deleteQuestionMutation.mutate(
+      {
+        id: examId,
+        questionId,
+      },
+      {
+        onSuccess: () => {
+          draftQuery.refetch()
+          setActiveQuestionId((currentActiveQuestionId) => {
+            if (currentActiveQuestionId !== questionId) {
+              return currentActiveQuestionId
+            }
+
+            return questions.find((question) => question.id !== questionId)?.id
+          })
+          setActionNotice("Soal berhasil dihapus.")
+        },
+        onError: (error) => {
+          setActionError(getErrorMessage(error, "Gagal menghapus soal."))
+        },
+      },
+    )
+  }
+
+  const handleSubmitReview = () => {
+    setActionError(null)
+    setActionNotice(null)
+
+    submitReviewMutation.mutate(
+      {
+        id: examId,
+      },
+      {
+        onSuccess: () => {
+          draftQuery.refetch()
+          setLastSavedAt(new Date().toISOString())
+          setActionNotice("Draft berhasil disubmit ke review queue admin.")
+        },
+        onError: (error) => {
+          setActionError(getErrorMessage(error, "Gagal submit draft ke review queue."))
+        },
+      },
     )
   }
 
@@ -161,6 +376,47 @@ export default function CreatorExamEditorPageContent({
     )
   }
 
+  if (draftQuery.isLoading) {
+    return (
+      <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-10">
+        <PanelCard
+          className="rounded-3xl"
+          title="Exam Draft Editor"
+          description={`Draft ID: ${examId}`}
+        >
+          <p className="text-sm text-slate-600">Memuat draft exam...</p>
+        </PanelCard>
+      </main>
+    )
+  }
+
+  if (draftQuery.error || !draft) {
+    return (
+      <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-10">
+        <PanelCard
+          className="rounded-3xl"
+          title="Exam Draft Editor"
+          description={`Draft ID: ${examId}`}
+        >
+          <p className="text-sm text-danger-700">
+            {getErrorMessage(draftQuery.error, "Gagal memuat detail draft exam.")}
+          </p>
+          <div className="mt-4">
+            <Link
+              href="/creator/exams"
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-gray-200 px-4 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              Kembali ke Dashboard Exam
+            </Link>
+          </div>
+        </PanelCard>
+      </main>
+    )
+  }
+
+  const reviewStatus = draft.active_version.status
+  const isDraftSubmitted = reviewStatus === "IN_REVIEW"
+
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-10">
       <PanelCard
@@ -169,11 +425,28 @@ export default function CreatorExamEditorPageContent({
         description={`Draft ID: ${examId}`}
         action={
           <div className="flex gap-2">
-            <Button intent="secondary" onClick={handleSaveDraft}>
+            <Button
+              intent="secondary"
+              onClick={handleSaveDraft}
+              loading={updateDraftMutation.isPending}
+            >
               Save Draft
             </Button>
-            <Button intent="primary" onClick={handleSubmitReview}>
-              Submit Review
+            <Button
+              intent="secondary"
+              onClick={handleSaveActiveQuestion}
+              loading={updateQuestionMutation.isPending}
+              disabled={!activeQuestion}
+            >
+              Save Active Question
+            </Button>
+            <Button
+              intent="primary"
+              onClick={handleSubmitReview}
+              loading={submitReviewMutation.isPending}
+              disabled={isDraftSubmitted}
+            >
+              {isDraftSubmitted ? "Already In Review" : "Submit Review"}
             </Button>
           </div>
         }
@@ -185,10 +458,44 @@ export default function CreatorExamEditorPageContent({
           <p>
             Review state:{" "}
             <span className="font-medium">
-              {isSubmittedToReview ? "SUBMITTED" : "NOT_SUBMITTED"}
+              <StatusBadge variant={reviewStatusVariantMap[reviewStatus]}>
+                {getExamAuthoringReviewStatusLabel(reviewStatus)}
+              </StatusBadge>
             </span>
           </p>
+          <p>
+            Last submitted:{" "}
+            <span className="font-medium">
+              {formatDateTime(draft.active_version.submitted_at)}
+            </span>
+          </p>
+          <p>
+            Version:{" "}
+            <span className="font-medium">{draft.active_version.version_label}</span>
+          </p>
         </div>
+
+        {draft.active_version.review_note ? (
+          <div className="mt-3 rounded-xl border border-warning-200 bg-warning-50 px-4 py-3">
+            <p className="text-xs uppercase tracking-[0.08em] text-warning-700">
+              Feedback Reviewer
+            </p>
+            <p className="mt-1 text-sm text-warning-800">
+              {draft.active_version.review_note}
+            </p>
+          </div>
+        ) : null}
+
+        {actionError ? (
+          <p className="mt-3 rounded-xl border border-danger-300 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+            {actionError}
+          </p>
+        ) : null}
+        {actionNotice ? (
+          <p className="mt-3 rounded-xl border border-success-300 bg-success-50 px-4 py-3 text-sm text-success-700">
+            {actionNotice}
+          </p>
+        ) : null}
       </PanelCard>
 
       <PanelCard
@@ -230,6 +537,8 @@ export default function CreatorExamEditorPageContent({
           </div>
           <Input
             label="Duration (minutes)"
+            type="number"
+            min={1}
             value={durationMinutes}
             onChange={(event) => setDurationMinutes(event.target.value)}
             placeholder="90"
@@ -261,7 +570,12 @@ export default function CreatorExamEditorPageContent({
       >
         <div className="grid gap-4 lg:grid-cols-[280px_1fr]">
           <div className="space-y-3 rounded-xl border border-gray-200 bg-gray-50 p-3">
-            <Button intent="primary" className="w-full" onClick={handleAddQuestion}>
+            <Button
+              intent="primary"
+              className="w-full"
+              onClick={handleAddQuestion}
+              loading={insertQuestionMutation.isPending}
+            >
               Add Question
             </Button>
 
@@ -302,24 +616,50 @@ export default function CreatorExamEditorPageContent({
                 />
 
                 <div className="grid gap-2 md:grid-cols-2">
-                  {activeQuestion.options.map((option) => (
-                    <Input
-                      key={option.key}
-                      label={`Option ${option.key}`}
-                      value={option.text}
-                      onChange={(event) =>
-                        updateActiveQuestion((question) => ({
-                          ...question,
-                          options: question.options.map((item) =>
-                            item.key === option.key
-                              ? { ...item, text: event.target.value }
-                              : item,
-                          ),
-                        }))
-                      }
-                      placeholder={`Jawaban ${option.key}`}
-                    />
-                  ))}
+                  <Input
+                    label="Option A"
+                    value={activeQuestion.option_a}
+                    onChange={(event) =>
+                      updateActiveQuestion((question) => ({
+                        ...question,
+                        option_a: event.target.value,
+                      }))
+                    }
+                    placeholder="Jawaban A"
+                  />
+                  <Input
+                    label="Option B"
+                    value={activeQuestion.option_b}
+                    onChange={(event) =>
+                      updateActiveQuestion((question) => ({
+                        ...question,
+                        option_b: event.target.value,
+                      }))
+                    }
+                    placeholder="Jawaban B"
+                  />
+                  <Input
+                    label="Option C"
+                    value={activeQuestion.option_c}
+                    onChange={(event) =>
+                      updateActiveQuestion((question) => ({
+                        ...question,
+                        option_c: event.target.value,
+                      }))
+                    }
+                    placeholder="Jawaban C"
+                  />
+                  <Input
+                    label="Option D"
+                    value={activeQuestion.option_d}
+                    onChange={(event) =>
+                      updateActiveQuestion((question) => ({
+                        ...question,
+                        option_d: event.target.value,
+                      }))
+                    }
+                    placeholder="Jawaban D"
+                  />
                 </div>
 
                 <div className="space-y-1.5">
@@ -333,7 +673,7 @@ export default function CreatorExamEditorPageContent({
                     onChange={(event) =>
                       updateActiveQuestion((question) => ({
                         ...question,
-                        correct_option: event.target.value as "A" | "B" | "C" | "D",
+                        correct_option: event.target.value as ExamAuthoringQuestionCorrectOption,
                       }))
                     }
                   >
@@ -346,15 +686,27 @@ export default function CreatorExamEditorPageContent({
 
                 <Textarea
                   label="Explanation"
-                  value={activeQuestion.explanation}
+                  value={activeQuestion.explanation_text}
                   onChange={(event) =>
                     updateActiveQuestion((question) => ({
                       ...question,
-                      explanation: event.target.value,
+                      explanation_text: event.target.value,
                     }))
                   }
                   placeholder="Tulis pembahasan jawaban"
                   rows={4}
+                />
+
+                <Input
+                  label="Explanation Video URL (optional)"
+                  value={activeQuestion.explanation_video_url}
+                  onChange={(event) =>
+                    updateActiveQuestion((question) => ({
+                      ...question,
+                      explanation_video_url: event.target.value,
+                    }))
+                  }
+                  placeholder="https://..."
                 />
 
                 <Button
@@ -362,6 +714,7 @@ export default function CreatorExamEditorPageContent({
                   textOnly
                   type="button"
                   onClick={() => handleRemoveQuestion(activeQuestion.id)}
+                  loading={deleteQuestionMutation.isPending}
                   disabled={questions.length <= 1}
                 >
                   Remove Active Question

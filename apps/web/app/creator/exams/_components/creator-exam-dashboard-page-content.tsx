@@ -14,72 +14,29 @@ import { Input } from "$/components/input"
 import { PanelCard } from "$/components/panel-card"
 import { StatusBadge } from "$/components/status-badge"
 import { type ColumnDef, Table } from "$/components/table"
+import {
+  useExamAuthoringReviewDataTable,
+  useExamAuthoringReviewInsertOne,
+  useExamAuthoringReviewSubmitReview,
+} from "$/hooks/transactions/use-exam-authoring-review"
+import {
+  type ExamAuthoringDraftStatus,
+  getExamAuthoringDraftStatusLabel,
+} from "@vibecoding-starter/schemas"
+import type { CreatorExamDraftSummaryResponseProps } from "@vibecoding-starter/types"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useMemo, useState } from "react"
 
-type ExamDraftStatus = "DRAFT" | "IN_REVIEW" | "NEEDS_REVISION" | "PUBLISHED"
-
-type ExamDraftItem = {
-  id: string
-  title: string
-  category: string
-  level: "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
-  question_count: number
-  updated_at: string
-  status: ExamDraftStatus
-  version_label: string
-}
-
-const initialDrafts: ExamDraftItem[] = [
-  {
-    id: "draft-cpns-001",
-    title: "Tryout CPNS Paket 1",
-    category: "CPNS",
-    level: "INTERMEDIATE",
-    question_count: 45,
-    updated_at: "2026-03-14T08:30:00.000Z",
-    status: "DRAFT",
-    version_label: "v0.7",
-  },
-  {
-    id: "draft-utbk-002",
-    title: "UTBK Penalaran Kuantitatif",
-    category: "UTBK",
-    level: "ADVANCED",
-    question_count: 60,
-    updated_at: "2026-03-13T14:15:00.000Z",
-    status: "IN_REVIEW",
-    version_label: "v1.0",
-  },
-  {
-    id: "draft-eng-003",
-    title: "Academic English Fundamentals",
-    category: "Language",
-    level: "BEGINNER",
-    question_count: 30,
-    updated_at: "2026-03-12T10:05:00.000Z",
-    status: "NEEDS_REVISION",
-    version_label: "v0.9",
-  },
-]
-
 const statusVariantMap: Record<
-  ExamDraftStatus,
+  ExamAuthoringDraftStatus,
   "success" | "warning" | "danger" | "neutral"
 > = {
   DRAFT: "neutral",
   IN_REVIEW: "warning",
   NEEDS_REVISION: "danger",
   PUBLISHED: "success",
-}
-
-const statusLabelMap: Record<ExamDraftStatus, string> = {
-  DRAFT: "Draft",
-  IN_REVIEW: "In Review",
-  NEEDS_REVISION: "Needs Revision",
-  PUBLISHED: "Published",
 }
 
 const formatDateTime = (value: string) => {
@@ -89,35 +46,67 @@ const formatDateTime = (value: string) => {
   }).format(new Date(value))
 }
 
+const getErrorMessage = (
+  error: unknown,
+  fallback: string,
+  overrideByStatus?: Record<number, string>,
+) => {
+  if (error && typeof error === "object") {
+    if (
+      "errors" in error &&
+      Array.isArray(error.errors) &&
+      error.errors[0] &&
+      typeof error.errors[0] === "object" &&
+      "message" in error.errors[0] &&
+      typeof error.errors[0].message === "string"
+    ) {
+      return error.errors[0].message
+    }
+
+    if ("statusCode" in error && typeof error.statusCode === "number") {
+      const mappedMessage = overrideByStatus?.[error.statusCode]
+      if (mappedMessage) {
+        return mappedMessage
+      }
+    }
+
+    if ("message" in error && typeof error.message === "string") {
+      return error.message
+    }
+  }
+
+  return fallback
+}
+
 export default function CreatorExamDashboardPageContent() {
   const router = useRouter()
   const { data: session } = useSession()
   const role = session?.user?.role
   const hasCreatorAccess = role === "CREATOR" || role === "ADMIN"
 
-  const [drafts, setDrafts] = useState<ExamDraftItem[]>(initialDrafts)
   const [search, setSearch] = useState("")
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [createError, setCreateError] = useState("")
+  const [createError, setCreateError] = useState<string | null>(null)
+  const [actionError, setActionError] = useState<string | null>(null)
   const [newDraftTitle, setNewDraftTitle] = useState("")
   const [newDraftCategory, setNewDraftCategory] = useState("General")
   const [newDraftLevel, setNewDraftLevel] = useState<
     "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
   >("BEGINNER")
+  const [newDraftDuration, setNewDraftDuration] = useState("90")
 
-  const filteredDrafts = useMemo(() => {
-    const normalizedQuery = search.trim().toLowerCase()
+  const draftTable = useExamAuthoringReviewDataTable({
+    isAutoFetch: hasCreatorAccess,
+    page: 1,
+    limit: 20,
+    filter: {
+      search: search.trim() || undefined,
+    },
+  })
+  const insertDraftMutation = useExamAuthoringReviewInsertOne()
+  const submitReviewMutation = useExamAuthoringReviewSubmitReview()
 
-    if (!normalizedQuery) {
-      return drafts
-    }
-
-    return drafts.filter((draft) => {
-      const searchableText = `${draft.title} ${draft.category} ${draft.status}`
-
-      return searchableText.toLowerCase().includes(normalizedQuery)
-    })
-  }, [drafts, search])
+  const drafts = draftTable.data ?? []
 
   const draftSummary = useMemo(() => {
     return {
@@ -130,52 +119,84 @@ export default function CreatorExamDashboardPageContent() {
   }, [drafts])
 
   const handleSubmitReview = (draftId: string) => {
-    setDrafts((current) =>
-      current.map((draft) =>
-        draft.id === draftId
-          ? {
-              ...draft,
-              status: "IN_REVIEW",
-              updated_at: new Date().toISOString(),
-            }
-          : draft,
-      ),
+    setActionError(null)
+
+    submitReviewMutation.mutate(
+      {
+        id: draftId,
+      },
+      {
+        onSuccess: () => {
+          draftTable.refetch()
+        },
+        onError: (error) => {
+          setActionError(
+            getErrorMessage(
+              error,
+              "Gagal submit draft ke review queue.",
+              {
+                422:
+                  "Draft belum memenuhi syarat submit. Lengkapi minimal 1 soal dengan pembahasan aktif.",
+              },
+            ),
+          )
+        },
+      },
     )
   }
 
   const handleCreateDraft = () => {
     const normalizedTitle = newDraftTitle.trim()
+    const normalizedCategory = newDraftCategory.trim()
+    const parsedDuration = Number(newDraftDuration)
 
     if (!normalizedTitle) {
       setCreateError("Judul draft wajib diisi")
       return
     }
 
-    const draftId = `draft-${Date.now()}`
+    if (!normalizedCategory) {
+      setCreateError("Kategori draft wajib diisi")
+      return
+    }
 
-    setDrafts((current) => [
+    if (!Number.isFinite(parsedDuration) || parsedDuration <= 0) {
+      setCreateError("Durasi draft harus berupa angka lebih dari 0")
+      return
+    }
+
+    setCreateError(null)
+    setActionError(null)
+
+    insertDraftMutation.mutate(
       {
-        id: draftId,
         title: normalizedTitle,
-        category: newDraftCategory,
+        category: normalizedCategory,
         level: newDraftLevel,
-        question_count: 0,
-        updated_at: new Date().toISOString(),
-        status: "DRAFT",
-        version_label: "v0.1",
+        short_description: normalizedTitle,
+        description: `Draft ${normalizedTitle}`,
+        duration_minutes: parsedDuration,
       },
-      ...current,
-    ])
-
-    setIsCreateDialogOpen(false)
-    setCreateError("")
-    setNewDraftTitle("")
-    setNewDraftCategory("General")
-    setNewDraftLevel("BEGINNER")
-    router.push(`/creator/exams/${draftId}/edit`)
+      {
+        onSuccess: (result) => {
+          setIsCreateDialogOpen(false)
+          setNewDraftTitle("")
+          setNewDraftCategory("General")
+          setNewDraftLevel("BEGINNER")
+          setNewDraftDuration("90")
+          draftTable.refetch()
+          router.push(`/creator/exams/${result.id}/edit`)
+        },
+        onError: (error) => {
+          setCreateError(
+            getErrorMessage(error, "Gagal membuat exam draft baru."),
+          )
+        },
+      },
+    )
   }
 
-  const columns: ColumnDef<ExamDraftItem>[] = [
+  const columns: ColumnDef<CreatorExamDraftSummaryResponseProps>[] = [
     {
       accessorKey: "title",
       header: "Exam Draft",
@@ -224,11 +245,11 @@ export default function CreatorExamDashboardPageContent() {
       accessorKey: "status",
       header: "Status",
       cell: (info) => {
-        const status = info.getValue() as ExamDraftStatus
+        const status = info.getValue() as ExamAuthoringDraftStatus
 
         return (
           <StatusBadge variant={statusVariantMap[status]}>
-            {statusLabelMap[status]}
+            {getExamAuthoringDraftStatusLabel(status)}
           </StatusBadge>
         )
       },
@@ -238,6 +259,8 @@ export default function CreatorExamDashboardPageContent() {
       header: "",
       cell: (info) => {
         const row = info.row.original
+        const isSubmittable =
+          row.status === "DRAFT" || row.status === "NEEDS_REVISION"
 
         return (
           <ActionsDropdown
@@ -246,11 +269,15 @@ export default function CreatorExamDashboardPageContent() {
                 label: "Edit",
                 onClick: () => router.push(`/creator/exams/${row.id}/edit`),
               },
-              {
-                label: "Submit Review",
-                onClick: () => handleSubmitReview(row.id),
-                warning: true,
-              },
+              ...(isSubmittable
+                ? [
+                    {
+                      label: "Submit Review",
+                      onClick: () => handleSubmitReview(row.id),
+                      warning: true,
+                    },
+                  ]
+                : []),
             ]}
           />
         )
@@ -344,12 +371,25 @@ export default function CreatorExamDashboardPageContent() {
           />
         </div>
 
+        {draftTable.error ? (
+          <p className="mb-4 rounded-xl border border-danger-300 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+            {getErrorMessage(draftTable.error, "Gagal memuat daftar draft exam.")}
+          </p>
+        ) : null}
+
+        {actionError ? (
+          <p className="mb-4 rounded-xl border border-danger-300 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+            {actionError}
+          </p>
+        ) : null}
+
         <Table
-          data={filteredDrafts}
+          data={drafts}
           columns={columns}
           isShowPagination={false}
           wrapperClassName="overflow-x-auto"
           thClassName="whitespace-nowrap"
+          isLoading={draftTable.isLoading}
         />
       </PanelCard>
 
@@ -368,7 +408,7 @@ export default function CreatorExamDashboardPageContent() {
               value={newDraftTitle}
               onChange={(event) => {
                 setNewDraftTitle(event.target.value)
-                setCreateError("")
+                setCreateError(null)
               }}
               placeholder="Contoh: Tryout CPNS Penalaran"
             />
@@ -378,6 +418,15 @@ export default function CreatorExamDashboardPageContent() {
               value={newDraftCategory}
               onChange={(event) => setNewDraftCategory(event.target.value)}
               placeholder="Contoh: CPNS"
+            />
+
+            <Input
+              label="Duration (minutes)"
+              type="number"
+              min={1}
+              value={newDraftDuration}
+              onChange={(event) => setNewDraftDuration(event.target.value)}
+              placeholder="90"
             />
 
             <div className="space-y-1.5">
@@ -414,7 +463,12 @@ export default function CreatorExamDashboardPageContent() {
             >
               Cancel
             </Button>
-            <Button intent="primary" type="button" onClick={handleCreateDraft}>
+            <Button
+              intent="primary"
+              type="button"
+              onClick={handleCreateDraft}
+              loading={insertDraftMutation.isPending}
+            >
               Create & Open Editor
             </Button>
           </DialogFooter>

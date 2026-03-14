@@ -15,84 +15,60 @@ import { PanelCard } from "$/components/panel-card"
 import { StatusBadge } from "$/components/status-badge"
 import { type ColumnDef, Table } from "$/components/table"
 import { Textarea } from "$/components/textarea"
+import {
+  useExamAuthoringReviewAdminApproveOne,
+  useExamAuthoringReviewAdminDataTable,
+  useExamAuthoringReviewAdminGetOne,
+  useExamAuthoringReviewAdminRejectOne,
+} from "$/hooks/transactions/use-exam-authoring-review"
+import {
+  type ExamAuthoringReviewStatus,
+  getExamAuthoringReviewStatusLabel,
+} from "@vibecoding-starter/schemas"
+import type { AdminExamReviewSummaryResponseProps } from "@vibecoding-starter/types"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
 import { useEffect, useMemo, useState } from "react"
 
-type ReviewStatus = "PENDING_REVIEW" | "APPROVED" | "REJECTED"
-
-type ReviewQueueItem = {
-  id: string
-  exam_title: string
-  creator_name: string
-  category: string
-  level: "BEGINNER" | "INTERMEDIATE" | "ADVANCED"
-  version_label: string
-  submitted_at: string
-  question_count: number
-  status: ReviewStatus
-  review_note: string | null
-}
-
-const initialQueue: ReviewQueueItem[] = [
-  {
-    id: "review-001",
-    exam_title: "Tryout CPNS Paket Numerik",
-    creator_name: "Arga Saputra",
-    category: "CPNS",
-    level: "INTERMEDIATE",
-    version_label: "v1.0",
-    submitted_at: "2026-03-14T07:20:00.000Z",
-    question_count: 60,
-    status: "PENDING_REVIEW",
-    review_note: null,
-  },
-  {
-    id: "review-002",
-    exam_title: "UTBK Logic Drill",
-    creator_name: "Nadia Putri",
-    category: "UTBK",
-    level: "ADVANCED",
-    version_label: "v0.9",
-    submitted_at: "2026-03-13T15:00:00.000Z",
-    question_count: 40,
-    status: "PENDING_REVIEW",
-    review_note: null,
-  },
-  {
-    id: "review-003",
-    exam_title: "Grammar Foundations",
-    creator_name: "Dewi Laras",
-    category: "Language",
-    level: "BEGINNER",
-    version_label: "v1.1",
-    submitted_at: "2026-03-12T11:10:00.000Z",
-    question_count: 35,
-    status: "REJECTED",
-    review_note: "Perlu tambahkan pembahasan untuk 10 soal terakhir.",
-  },
-]
-
 const statusVariantMap: Record<
-  ReviewStatus,
+  ExamAuthoringReviewStatus,
   "success" | "warning" | "danger"
 > = {
-  PENDING_REVIEW: "warning",
-  APPROVED: "success",
+  IN_REVIEW: "warning",
+  PUBLISHED: "success",
   REJECTED: "danger",
 }
 
-const statusLabelMap: Record<ReviewStatus, string> = {
-  PENDING_REVIEW: "Pending Review",
-  APPROVED: "Approved",
-  REJECTED: "Rejected",
-}
+const formatDateTime = (value: string | null) => {
+  if (!value) {
+    return "-"
+  }
 
-const formatDateTime = (value: string) => {
   return new Intl.DateTimeFormat("id-ID", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value))
+}
+
+const getErrorMessage = (error: unknown, fallback: string) => {
+  if (error && typeof error === "object") {
+    if (
+      "errors" in error &&
+      Array.isArray(error.errors) &&
+      error.errors[0] &&
+      typeof error.errors[0] === "object" &&
+      "message" in error.errors[0] &&
+      typeof error.errors[0].message === "string"
+    ) {
+      return error.errors[0].message
+    }
+
+    if ("message" in error && typeof error.message === "string") {
+      return error.message
+    }
+  }
+
+  return fallback
 }
 
 export default function AdminExamReviewQueuePageContent() {
@@ -100,57 +76,73 @@ export default function AdminExamReviewQueuePageContent() {
   const role = session?.user?.role
   const hasAdminAccess = role === "ADMIN"
 
-  const [queue, setQueue] = useState<ReviewQueueItem[]>(initialQueue)
   const [search, setSearch] = useState("")
-  const [selectedReviewId, setSelectedReviewId] = useState(initialQueue[0]?.id || "")
+  const [selectedReviewId, setSelectedReviewId] = useState("")
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false)
   const [rejectTargetId, setRejectTargetId] = useState("")
   const [rejectNote, setRejectNote] = useState("")
   const [rejectError, setRejectError] = useState("")
+  const [actionError, setActionError] = useState<string | null>(null)
 
-  const filteredQueue = useMemo(() => {
-    const normalizedQuery = search.trim().toLowerCase()
+  const reviewQueueTable = useExamAuthoringReviewAdminDataTable({
+    isAutoFetch: hasAdminAccess,
+    page: 1,
+    limit: 20,
+    filter: {
+      search: search.trim() || undefined,
+    },
+  })
+  const approveMutation = useExamAuthoringReviewAdminApproveOne()
+  const rejectMutation = useExamAuthoringReviewAdminRejectOne()
 
-    if (!normalizedQuery) {
-      return queue
-    }
-
-    return queue.filter((item) => {
-      const searchableText = `${item.exam_title} ${item.creator_name} ${item.status}`
-
-      return searchableText.toLowerCase().includes(normalizedQuery)
-    })
-  }, [queue, search])
+  const queue = reviewQueueTable.data ?? []
+  const selectedReviewQuery = useExamAuthoringReviewAdminGetOne({
+    id: selectedReviewId,
+    enabled: hasAdminAccess && Boolean(selectedReviewId),
+  })
 
   useEffect(() => {
-    if (filteredQueue.length === 0) {
+    if (queue.length === 0) {
       setSelectedReviewId("")
       return
     }
 
-    const hasSelected = filteredQueue.some((item) => item.id === selectedReviewId)
+    const hasSelectedReview = queue.some((item) => item.id === selectedReviewId)
 
-    if (!hasSelected) {
-      setSelectedReviewId(filteredQueue[0]?.id || "")
+    if (!hasSelectedReview) {
+      setSelectedReviewId(queue[0]?.id || "")
     }
-  }, [filteredQueue, selectedReviewId])
+  }, [queue, selectedReviewId])
 
-  const selectedItem = useMemo(
-    () => filteredQueue.find((item) => item.id === selectedReviewId) || null,
-    [filteredQueue, selectedReviewId],
-  )
+  const selectedItem = selectedReviewQuery.data ?? null
+
+  const summary = useMemo(() => {
+    return {
+      inReview: queue.filter((item) => item.status === "IN_REVIEW").length,
+      published: queue.filter((item) => item.status === "PUBLISHED").length,
+      rejected: queue.filter((item) => item.status === "REJECTED").length,
+    }
+  }, [queue])
 
   const handleApprove = (reviewId: string) => {
-    setQueue((current) =>
-      current.map((item) =>
-        item.id === reviewId
-          ? {
-              ...item,
-              status: "APPROVED",
-              review_note: "Approved for publish.",
-            }
-          : item,
-      ),
+    setActionError(null)
+
+    approveMutation.mutate(
+      {
+        id: reviewId,
+      },
+      {
+        onSuccess: () => {
+          reviewQueueTable.refetch()
+          selectedReviewQuery.refetch()
+          setSelectedReviewId(reviewId)
+        },
+        onError: (error) => {
+          setActionError(
+            getErrorMessage(error, "Gagal approve exam review submission."),
+          )
+        },
+      },
     )
   }
 
@@ -158,6 +150,7 @@ export default function AdminExamReviewQueuePageContent() {
     setRejectTargetId(reviewId)
     setRejectNote("")
     setRejectError("")
+    setActionError(null)
     setSelectedReviewId(reviewId)
     setIsRejectDialogOpen(true)
   }
@@ -170,25 +163,34 @@ export default function AdminExamReviewQueuePageContent() {
       return
     }
 
-    setQueue((current) =>
-      current.map((item) =>
-        item.id === rejectTargetId
-          ? {
-              ...item,
-              status: "REJECTED",
-              review_note: normalizedNote,
-            }
-          : item,
-      ),
-    )
-
-    setIsRejectDialogOpen(false)
-    setRejectTargetId("")
-    setRejectNote("")
     setRejectError("")
+    setActionError(null)
+
+    rejectMutation.mutate(
+      {
+        id: rejectTargetId,
+        payload: {
+          review_note: normalizedNote,
+        },
+      },
+      {
+        onSuccess: () => {
+          reviewQueueTable.refetch()
+          selectedReviewQuery.refetch()
+          setIsRejectDialogOpen(false)
+          setRejectTargetId("")
+          setRejectNote("")
+        },
+        onError: (error) => {
+          setActionError(
+            getErrorMessage(error, "Gagal reject exam review submission."),
+          )
+        },
+      },
+    )
   }
 
-  const columns: ColumnDef<ReviewQueueItem>[] = [
+  const columns: ColumnDef<AdminExamReviewSummaryResponseProps>[] = [
     {
       accessorKey: "exam_title",
       header: "Exam",
@@ -204,18 +206,26 @@ export default function AdminExamReviewQueuePageContent() {
       },
     },
     {
-      accessorKey: "creator_name",
+      accessorKey: "creator",
       header: "Creator",
-      cell: (info) => (
-        <span className="text-sm text-gray-700">{info.getValue() as string}</span>
-      ),
+      cell: (info) => {
+        const creator =
+          info.getValue() as AdminExamReviewSummaryResponseProps["creator"]
+
+        return (
+          <div className="space-y-0.5">
+            <p className="text-sm text-gray-900">{creator.name}</p>
+            <p className="text-xs text-gray-500">{creator.email}</p>
+          </div>
+        )
+      },
     },
     {
       accessorKey: "submitted_at",
       header: "Submitted",
       cell: (info) => (
         <span className="text-sm text-gray-700">
-          {formatDateTime(info.getValue() as string)}
+          {formatDateTime(info.getValue() as string | null)}
         </span>
       ),
     },
@@ -223,11 +233,11 @@ export default function AdminExamReviewQueuePageContent() {
       accessorKey: "status",
       header: "Status",
       cell: (info) => {
-        const status = info.getValue() as ReviewStatus
+        const status = info.getValue() as ExamAuthoringReviewStatus
 
         return (
           <StatusBadge variant={statusVariantMap[status]}>
-            {statusLabelMap[status]}
+            {getExamAuthoringReviewStatusLabel(status)}
           </StatusBadge>
         )
       },
@@ -237,7 +247,7 @@ export default function AdminExamReviewQueuePageContent() {
       header: "",
       cell: (info) => {
         const row = info.row.original
-        const isPending = row.status === "PENDING_REVIEW"
+        const isPendingReview = row.status === "IN_REVIEW"
 
         return (
           <ActionsDropdown
@@ -246,21 +256,21 @@ export default function AdminExamReviewQueuePageContent() {
                 label: "Open Detail",
                 onClick: () => setSelectedReviewId(row.id),
               },
-              {
-                label: "Approve",
-                onClick: () => handleApprove(row.id),
-                warning: true,
-                loading: false,
-              },
-              {
-                label: "Reject",
-                onClick: () => handleOpenRejectDialog(row.id),
-                destructive: true,
-                loading: false,
-              },
-            ].filter((action) =>
-              isPending ? true : action.label === "Open Detail",
-            )}
+              ...(isPendingReview
+                ? [
+                    {
+                      label: "Approve",
+                      onClick: () => handleApprove(row.id),
+                      warning: true,
+                    },
+                    {
+                      label: "Reject",
+                      onClick: () => handleOpenRejectDialog(row.id),
+                      destructive: true,
+                    },
+                  ]
+                : []),
+            ]}
           />
         )
       },
@@ -306,22 +316,16 @@ export default function AdminExamReviewQueuePageContent() {
       >
         <div className="grid gap-2 text-sm text-gray-600 sm:grid-cols-3">
           <p>
-            Pending:{" "}
-            <span className="font-medium text-gray-900">
-              {queue.filter((item) => item.status === "PENDING_REVIEW").length}
-            </span>
+            Pending Review:{" "}
+            <span className="font-medium text-gray-900">{summary.inReview}</span>
           </p>
           <p>
-            Approved:{" "}
-            <span className="font-medium text-gray-900">
-              {queue.filter((item) => item.status === "APPROVED").length}
-            </span>
+            Published:{" "}
+            <span className="font-medium text-gray-900">{summary.published}</span>
           </p>
           <p>
             Rejected:{" "}
-            <span className="font-medium text-gray-900">
-              {queue.filter((item) => item.status === "REJECTED").length}
-            </span>
+            <span className="font-medium text-gray-900">{summary.rejected}</span>
           </p>
         </div>
       </PanelCard>
@@ -340,13 +344,29 @@ export default function AdminExamReviewQueuePageContent() {
           />
         </div>
 
+        {reviewQueueTable.error ? (
+          <p className="mb-4 rounded-xl border border-danger-300 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+            {getErrorMessage(
+              reviewQueueTable.error,
+              "Gagal memuat daftar submission review.",
+            )}
+          </p>
+        ) : null}
+
+        {actionError ? (
+          <p className="mb-4 rounded-xl border border-danger-300 bg-danger-50 px-4 py-3 text-sm text-danger-700">
+            {actionError}
+          </p>
+        ) : null}
+
         <Table
-          data={filteredQueue}
+          data={queue}
           columns={columns}
           isShowPagination={false}
           wrapperClassName="overflow-x-auto"
           thClassName="whitespace-nowrap"
           onRowClick={(row) => setSelectedReviewId(row.original.id)}
+          isLoading={reviewQueueTable.isLoading}
         />
       </PanelCard>
 
@@ -355,14 +375,28 @@ export default function AdminExamReviewQueuePageContent() {
         title="Review Detail"
         description="Preview metadata versi ujian + feedback review"
       >
-        {selectedItem ? (
+        {selectedReviewQuery.isLoading ? (
+          <p className="text-sm text-gray-600">Memuat detail review...</p>
+        ) : selectedReviewQuery.error ? (
+          <p className="text-sm text-danger-700">
+            {getErrorMessage(
+              selectedReviewQuery.error,
+              "Gagal memuat detail review submission.",
+            )}
+          </p>
+        ) : selectedItem ? (
           <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
             <div className="space-y-2 text-sm text-gray-700">
               <p>
                 <span className="font-medium">Title:</span> {selectedItem.exam_title}
               </p>
               <p>
-                <span className="font-medium">Creator:</span> {selectedItem.creator_name}
+                <span className="font-medium">Creator:</span>{" "}
+                {selectedItem.creator.name}
+              </p>
+              <p>
+                <span className="font-medium">Creator Email:</span>{" "}
+                {selectedItem.creator.email}
               </p>
               <p>
                 <span className="font-medium">Category:</span> {selectedItem.category}
@@ -371,11 +405,12 @@ export default function AdminExamReviewQueuePageContent() {
                 <span className="font-medium">Level:</span> {selectedItem.level}
               </p>
               <p>
-                <span className="font-medium">Version:</span> {selectedItem.version_label}
+                <span className="font-medium">Version:</span>{" "}
+                {selectedItem.version_label}
               </p>
               <p>
                 <span className="font-medium">Question Count:</span>{" "}
-                {selectedItem.question_count}
+                {selectedItem.questions.length}
               </p>
               <p>
                 <span className="font-medium">Submitted:</span>{" "}
@@ -383,7 +418,7 @@ export default function AdminExamReviewQueuePageContent() {
               </p>
               <div className="pt-2">
                 <StatusBadge variant={statusVariantMap[selectedItem.status]}>
-                  {statusLabelMap[selectedItem.status]}
+                  {getExamAuthoringReviewStatusLabel(selectedItem.status)}
                 </StatusBadge>
               </div>
             </div>
@@ -395,12 +430,13 @@ export default function AdminExamReviewQueuePageContent() {
                   "Belum ada review note. Lanjutkan approve/reject dari action table."}
               </p>
 
-              {selectedItem.status === "PENDING_REVIEW" ? (
+              {selectedItem.status === "IN_REVIEW" ? (
                 <div className="flex gap-2 pt-2">
                   <Button
                     intent="primary"
                     type="button"
                     onClick={() => handleApprove(selectedItem.id)}
+                    loading={approveMutation.isPending}
                   >
                     Approve
                   </Button>
@@ -453,7 +489,12 @@ export default function AdminExamReviewQueuePageContent() {
             >
               Cancel
             </Button>
-            <Button intent="danger" type="button" onClick={handleConfirmReject}>
+            <Button
+              intent="danger"
+              type="button"
+              onClick={handleConfirmReject}
+              loading={rejectMutation.isPending}
+            >
               Confirm Reject
             </Button>
           </DialogFooter>
