@@ -1,5 +1,11 @@
-import AdminContent from "./admin-content"
+import { LoadingSpinner } from "$/components/loading-spinner"
+import { Suspense } from "react"
+import AdminPageContent from "./_components/admin-content"
 
 export default function AdminPage() {
-  return <AdminContent />
+  return (
+    <Suspense fallback={<LoadingSpinner />}>
+      <AdminPageContent />
+    </Suspense>
+  )
 }
