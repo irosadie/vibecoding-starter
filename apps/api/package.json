@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "prebuild": "bun run prisma:generate",
     "start": "node dist/index.js",
     "lint": "biome check .",
     "format": "biome format --write .",
@@ -14,7 +15,10 @@
     "prisma:seed": "tsx prisma/seed.ts",
     "prisma:studio": "prisma studio --schema ./prisma/schema.prisma --port 5555",
     "typecheck": "tsc --noEmit",
+    "pretypecheck": "bun run prisma:generate",
     "test": "vitest run",
+    "pretest": "bun run prisma:generate",
+    "pretest:smoke": "bun run prisma:generate",
     "test:smoke": "vitest run src/interfaces/http/routes/app-smoke.test.ts"
   },
   "dependencies": {
