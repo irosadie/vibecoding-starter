@@ -1,13 +1,15 @@
 "use client"
 
-import { Button } from "$/components/button"
 import { PanelCard } from "$/components/panel-card"
 import { StatusBadge } from "$/components/status-badge"
+import { useCreatorApplicationGetOne } from "$/hooks/transactions/use-creator-application"
+import {
+  type CreatorApplicationStatus,
+  getCreatorApplicationStatusLabel,
+} from "@vibecoding-starter/schemas"
 import { useSession } from "next-auth/react"
 import Link from "next/link"
-import { useMemo, useState } from "react"
-
-type CreatorApplicationStatus = "PENDING" | "APPROVED" | "REJECTED"
+import { useMemo } from "react"
 
 type CreatorApplicationStep = {
   id: string
@@ -22,12 +24,6 @@ const statusVariantMap = {
   REJECTED: "danger",
 } as const
 
-const statusLabelMap = {
-  PENDING: "Pending Review",
-  APPROVED: "Approved",
-  REJECTED: "Rejected",
-} as const
-
 const statusDescriptionMap: Record<CreatorApplicationStatus, string> = {
   PENDING: "Admin belum mereview pengajuan. Mohon tunggu proses verifikasi.",
   APPROVED:
@@ -36,54 +32,48 @@ const statusDescriptionMap: Record<CreatorApplicationStatus, string> = {
     "Pengajuan ditolak. Silakan perbaiki data payout/KTP lalu submit ulang.",
 }
 
-const reviewNoteMap: Record<CreatorApplicationStatus, string | null> = {
-  PENDING: null,
-  APPROVED: "Dokumen KTP valid dan data payout sesuai.",
-  REJECTED:
-    "Nama pemilik rekening tidak sama dengan identitas pada KTP. Mohon perbaiki.",
-}
+const formatDateTime = (value: string | null) => {
+  if (!value) {
+    return "-"
+  }
 
-const formatDateTime = (value: string) =>
-  new Intl.DateTimeFormat("id-ID", {
+  return new Intl.DateTimeFormat("id-ID", {
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date(value))
+}
 
 export default function CreatorApplicationStatusContent() {
   const { data: session } = useSession()
-  const [status, setStatus] = useState<CreatorApplicationStatus>("PENDING")
-  const submittedAt = "2026-03-14T08:20:00.000Z"
-  const reviewedAt = useMemo(() => {
-    if (status === "PENDING") {
-      return null
-    }
+  const myApplicationQuery = useCreatorApplicationGetOne()
+  const application = myApplicationQuery.data?.application ?? null
+  const status = application?.status ?? null
 
-    return "2026-03-14T11:10:00.000Z"
-  }, [status])
+  const steps = useMemo<CreatorApplicationStep[]>(() => {
+    const isReviewed = status !== null && status !== "PENDING"
+    const isActivated = status === "APPROVED"
 
-  const steps = useMemo<CreatorApplicationStep[]>(
-    () => [
+    return [
       {
         id: "submitted",
         title: "Pengajuan terkirim",
         description: "Data payout dan file KTP berhasil tersimpan.",
-        isDone: true,
+        isDone: Boolean(application),
       },
       {
         id: "reviewed",
         title: "Review admin",
         description: "Admin mengecek kelengkapan payout dan validitas KTP.",
-        isDone: status !== "PENDING",
+        isDone: isReviewed,
       },
       {
         id: "activated",
         title: "Aktivasi creator",
         description: "Role creator diaktifkan ketika pengajuan disetujui.",
-        isDone: status === "APPROVED",
+        isDone: isActivated,
       },
-    ],
-    [status],
-  )
+    ]
+  }, [application, status])
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-4xl flex-col gap-6 px-6 py-12">
@@ -120,55 +110,67 @@ export default function CreatorApplicationStatusContent() {
       <PanelCard
         className="rounded-3xl"
         title="Ringkasan Status"
-        description="Data status di bawah ini masih dummy untuk kebutuhan slicing EA-4"
+        description="Status diambil langsung dari backend creator application"
       >
-        <div className="flex flex-wrap items-center gap-3">
-          <StatusBadge variant={statusVariantMap[status]}>
-            {statusLabelMap[status]}
-          </StatusBadge>
-          <span className="text-sm text-slate-600">
-            {statusDescriptionMap[status]}
-          </span>
-        </div>
-        <div className="mt-3 flex flex-wrap gap-2">
-          <Button
-            type="button"
-            intent={status === "PENDING" ? "primary" : "secondary"}
-            onClick={() => setStatus("PENDING")}
-          >
-            Preview Pending
-          </Button>
-          <Button
-            type="button"
-            intent={status === "APPROVED" ? "primary" : "secondary"}
-            onClick={() => setStatus("APPROVED")}
-          >
-            Preview Approved
-          </Button>
-          <Button
-            type="button"
-            intent={status === "REJECTED" ? "danger" : "secondary"}
-            onClick={() => setStatus("REJECTED")}
-          >
-            Preview Rejected
-          </Button>
-        </div>
-        <div className="mt-4 space-y-2 text-sm text-slate-700">
-          <p>
-            <span className="font-medium">Submitted at:</span>{" "}
-            {formatDateTime(submittedAt)}
+        {myApplicationQuery.isLoading ? (
+          <p className="text-sm text-slate-600">
+            Sedang memuat status pengajuan creator...
           </p>
-          <p>
-            <span className="font-medium">Reviewed at:</span>{" "}
-            {reviewedAt ? formatDateTime(reviewedAt) : "-"}
+        ) : myApplicationQuery.error ? (
+          <p className="text-sm text-danger-600">
+            Gagal memuat status pengajuan creator.
           </p>
-          {reviewNoteMap[status] ? (
-            <p>
-              <span className="font-medium">Review note:</span>{" "}
-              {reviewNoteMap[status]}
+        ) : !application || !status ? (
+          <div className="space-y-4">
+            <p className="text-sm text-slate-600">
+              Belum ada pengajuan creator. Silakan submit pengajuan terlebih
+              dahulu.
             </p>
-          ) : null}
-        </div>
+            <Link
+              href="/panel/creator-application/apply"
+              className="inline-flex rounded-xl border border-gray-200 px-3 py-2 text-xs font-medium text-gray-700 transition-colors hover:bg-gray-50"
+            >
+              Buka Form Apply Creator
+            </Link>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-wrap items-center gap-3">
+              <StatusBadge variant={statusVariantMap[status]}>
+                {getCreatorApplicationStatusLabel(status)}
+              </StatusBadge>
+              <span className="text-sm text-slate-600">
+                {statusDescriptionMap[status]}
+              </span>
+            </div>
+            <div className="mt-4 space-y-2 text-sm text-slate-700">
+              <p>
+                <span className="font-medium">Submitted at:</span>{" "}
+                {formatDateTime(application.submitted_at)}
+              </p>
+              <p>
+                <span className="font-medium">Reviewed at:</span>{" "}
+                {formatDateTime(application.reviewed_at)}
+              </p>
+              {application.review_note ? (
+                <p>
+                  <span className="font-medium">Review note:</span>{" "}
+                  {application.review_note}
+                </p>
+              ) : null}
+              {status === "APPROVED" ? (
+                <div className="pt-2">
+                  <Link
+                    href="/creator"
+                    className="inline-flex rounded-xl border border-primary-200 bg-primary-50 px-3 py-2 text-sm font-medium text-primary-700 transition-colors hover:bg-primary-100"
+                  >
+                    Buka Creator Dashboard
+                  </Link>
+                </div>
+              ) : null}
+            </div>
+          </>
+        )}
       </PanelCard>
 
       <PanelCard

@@ -5,6 +5,13 @@ export const apiRouters = {
     logout: "/auth/logout",
     me: "/auth/me",
   },
+  creatorApplications: {
+    index: "/admin/creator-applications",
+    get: "/creator-applications/me",
+    insert: "/creator-applications",
+    update: "/admin/creator-applications/:id/approve",
+    delete: "/admin/creator-applications/:id/reject",
+  },
   paymentMethods: {
     index: "/payment-methods",
     show: "/payment-methods/:id",
