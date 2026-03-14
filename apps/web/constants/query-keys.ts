@@ -28,6 +28,17 @@ export const queryKeys = {
     approve: "adminExamReviewsApprove",
     reject: "adminExamReviewsReject",
   },
+  catalogExams: {
+    index: "catalogExamsIndex",
+    get: "catalogExamsGet",
+  },
+  commerce: {
+    cart: "commerceCart",
+    addToCart: "commerceAddToCart",
+    removeCartItem: "commerceRemoveCartItem",
+    checkout: "commerceCheckout",
+    orderStatus: "commerceOrderStatus",
+  },
   emailJobs: {
     template: "emailJobsTemplate",
     insert: "emailJobsInsert",
