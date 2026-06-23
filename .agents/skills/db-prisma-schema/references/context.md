@@ -1,6 +1,6 @@
 # Context: DB Prisma Schema
 
-## Folder Target
+## Target Folder
 
 ```
 apps/api/
@@ -8,7 +8,7 @@ apps/api/
     └── schema.prisma
 ```
 
-## Pattern Model Lengkap
+## Full Model Pattern
 
 ```prisma
 model MasterServiceType {
@@ -24,7 +24,7 @@ model MasterServiceType {
 }
 ```
 
-## Pattern Relasi
+## Relation Pattern
 
 ```prisma
 model BusinessShipment {
@@ -40,7 +40,7 @@ model BusinessShipment {
 }
 ```
 
-## Pattern Enum
+## Enum Pattern
 
 ```prisma
 enum ShipmentStatus {

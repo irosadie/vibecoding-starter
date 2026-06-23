@@ -1,21 +1,21 @@
 ---
 name: api-code-review
-description: Melakukan code review backend dengan standar senior lead yang tegas, fokus pada bug, regresi, contract drift, risiko clean architecture, dan gap test di apps/api serta shared contract terkait.
+description: Review backend code with a senior lead standard, focused on bugs, regressions, contract drift, clean architecture risks, and test gaps in apps/api and related shared contracts.
 ---
 
 # Skill: API Code Review
 
-## Context Cepat (Wajib)
-- Folder scope + pattern utama: `references/context.md`
-- Checklist review: `templates/checklist.md`
+## Context (Required)
+- Folder scope + key patterns: `references/context.md`
+- Review checklist: `templates/checklist.md`
 
-Gunakan skill ini saat user meminta review perubahan backend, review PR API, atau audit kualitas implementasi server. Review harus tegas seperti senior lead: cari bug, regresi, contract drift, pelanggaran layering, dan test gap. Bukan review kosmetik.
+Use this skill when the user asks for review of backend changes, an API PR, or an audit of server-side implementation quality. Review like a senior lead: hunt bugs, regressions, contract drift, layering violations, and test gaps. Not a cosmetic review.
 
-## Alur Kerja
+## Workflow
 
-### 1. Tentukan Surface Review
+### 1. Define the Review Surface
 
-Baca diff atau file target, lalu petakan surface yang relevan:
+Read the diff or target files, then map the relevant surface:
 - `apps/api/src/interfaces/http`
 - `apps/api/src/application`
 - `apps/api/src/domain`
@@ -23,66 +23,65 @@ Baca diff atau file target, lalu petakan surface yang relevan:
 - `packages/schemas`
 - `packages/types`
 - `docs/openapi`
-- `docs/api-contracts`
 
-Jika perubahan menyentuh endpoint, validator, DTO, atau response shape, audit contract artefacts juga.
+If the change touches an endpoint, validator, DTO, or response shape, audit contract artifacts too.
 
-### 2. Prioritaskan Risiko yang Benar
+### 2. Prioritize Real Risk
 
-Cari temuan dalam urutan prioritas ini:
-1. bug fungsional dan regresi endpoint
-2. pelanggaran clean architecture / boundary leakage
-3. validator, DTO, schema, type, dan OpenAPI drift
-4. error handling dan status code mismatch
-5. persistence / queue side effect yang salah
-6. gap test untuk behavior penting
+Find issues in this priority order:
+1. functional bugs and endpoint regressions
+2. clean architecture violations / boundary leakage
+3. validator, DTO, schema, type, and OpenAPI drift
+4. error handling and status code mismatch
+5. wrong persistence / queue side effects
+6. test gaps for important behavior
 
-### 3. Audit dengan Standar Repo
+### 3. Audit Against Repo Standards
 
-Cek secara tegas hal-hal berikut:
-- flow tetap `route -> controller -> service -> use case`
-- validasi request tidak bocor ke layer yang salah
-- repository interface dan implementation tetap selaras
-- error tetap bubble ke `errorHandler`, bukan di-handle acak
-- request/response contract sinkron dengan `packages/schemas`, `packages/types`, dan `docs/openapi`
-- perubahan behavior penting punya test yang relevan
+Check strictly:
+- flow stays `route -> controller -> service -> use case`
+- request validation does not leak into the wrong layer
+- repository interface and implementation stay aligned
+- errors bubble to `errorHandler`, not handled ad hoc
+- request/response contract stays in sync with `packages/schemas`, `packages/types`, and `docs/openapi`
+- important behavior changes have relevant tests
 
-### 4. Format Hasil Review
+### 4. Format the Review Output
 
-Hasil review **wajib** berisi findings dulu, urut dari paling serius.
+The review **must** lead with findings, ordered by severity.
 
 Format per finding:
-- severity `[P1]`, `[P2]`, atau `[P3]`
-- judul singkat
-- file/area terdampak
-- kenapa ini bug/risiko/regresi
-- apa yang seharusnya diperbaiki
+- severity `[P1]`, `[P2]`, or `[P3]`
+- short title
+- affected file/area
+- why this is a bug/risk/regression
+- what should be fixed
 
-Setelah findings, baru boleh tulis:
+After findings, you may add:
 - open questions / assumptions
-- residual risks atau testing gaps
-- change summary singkat jika memang perlu
+- residual risks or testing gaps
+- brief change summary if needed
 
-Jika tidak ada findings, katakan eksplisit bahwa tidak ada temuan, lalu sebutkan sisa risiko atau gap coverage yang masih ada.
+If no findings, state explicitly that there are none, then call out remaining risks or coverage gaps.
 
-### 5. Jangan Diam-Diam Memperbaiki
+### 5. Do Not Silently Fix
 
-Skill ini default-nya untuk review, bukan implementasi. Jangan ubah kode kecuali user secara eksplisit meminta fix setelah review.
+This skill defaults to review, not implementation. Do not change code unless the user explicitly asks for a fix after the review.
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** membuka review dengan pujian atau ringkasan sebelum findings.
-- **DILARANG** fokus ke style nit jika tidak berdampak ke correctness atau maintainability nyata.
-- **DILARANG** melewatkan drift antara endpoint behavior dan OpenAPI / shared types.
-- **DILARANG** menganggap layering bersih hanya karena test pass; cek boundary antar layer secara eksplisit.
-- **DILARANG** memperbaiki kode diam-diam saat user hanya meminta review.
+- **NEVER** open a review with praise or summary before findings.
+- **NEVER** focus on style nits with no real impact on correctness or maintainability.
+- **NEVER** skip drift between endpoint behavior and OpenAPI / shared types.
+- **NEVER** treat the layering as clean just because tests pass; verify boundaries explicitly.
+- **NEVER** fix code silently when the user only asked for a review.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Scope review dipetakan dari diff atau file target
-- [ ] Layering backend repo ikut dicek
-- [ ] Contract artefacts ikut dicek bila endpoint berubah
-- [ ] Findings disusun dari severity tertinggi
-- [ ] Summary tidak mendahului findings
-- [ ] Jika tidak ada findings, residual risk atau testing gap tetap disebutkan
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Review scope mapped from diff or target files
+- [ ] Backend layering checked
+- [ ] Contract artifacts checked when endpoint changes
+- [ ] Findings ordered by severity
+- [ ] No summary ahead of findings
+- [ ] If no findings, residual risk or test gap still called out
+- [ ] All files end with a newline (EOF)

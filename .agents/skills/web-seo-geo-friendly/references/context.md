@@ -1,6 +1,6 @@
 # Context: Web SEO + GEO
 
-## Folder Target
+## Target Folder
 
 ```
 apps/web/app/
@@ -11,7 +11,7 @@ apps/web/app/
         └── page.tsx    → generateMetadata + JSON-LD
 ```
 
-## Pattern generateMetadata
+## generateMetadata Pattern
 
 ```tsx
 import type { Metadata } from 'next'
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 }
 ```
 
-## Pattern JSON-LD
+## JSON-LD Pattern
 
 ```tsx
 function OrganizationSchema() {
@@ -50,7 +50,7 @@ function OrganizationSchema() {
 }
 ```
 
-## Pattern Sitemap
+## Sitemap Pattern
 
 ```typescript
 // app/sitemap.ts

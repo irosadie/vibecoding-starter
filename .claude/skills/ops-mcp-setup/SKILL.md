@@ -1,11 +1,11 @@
 ---
 name: "ops-mcp-setup"
-description: "Mengonfigurasi MCP server GitHub, Jira (Atlassian), Notion, dan Figma (opsional) di project ini agar skill flow dapat berjalan. Gunakan saat pertama kali setup project atau saat MCP belum terhubung."
+description: "Configure the GitHub MCP server in this project so the agent can interact with the repository. Use on first-time project setup or when MCP is not yet connected."
 ---
 
-Source of truth ada di `.agents/skills/ops-mcp-setup/SKILL.md`.
+Source of truth lives at `.agents/skills/ops-mcp-setup/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/ops-mcp-setup/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/ops-mcp-setup/SKILL.md`.
+2. Follow the workflow and rules defined in that file.
+3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.

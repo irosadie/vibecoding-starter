@@ -1,6 +1,6 @@
 # Context: API Feature
 
-## Folder Target
+## Target Folders
 
 ```
 apps/api/src/

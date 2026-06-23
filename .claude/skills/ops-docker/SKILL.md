@@ -1,11 +1,11 @@
 ---
 name: "ops-docker"
-description: "Menulis atau mengubah Dockerfile untuk backend ini agar siap deploy di Linux. Gunakan saat task terkait containerization, optimasi image, atau build/runtime issue di container. Docker Compose dikelola oleh server — jangan ubah."
+description: "Write or modify Dockerfiles for this backend so it is ready to deploy on Linux. Use for tasks involving containerization, image optimization, or build/runtime issues in containers. Docker Compose is managed by the server — do not touch it."
 ---
 
-Source of truth ada di `.agents/skills/ops-docker/SKILL.md`.
+Source of truth lives at `.agents/skills/ops-docker/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/ops-docker/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/ops-docker/SKILL.md`.
+2. Follow the workflow and rules defined in that file.
+3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.

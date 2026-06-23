@@ -6,5 +6,5 @@
     "noEmit": true
   },
   "include": ["**/*.ts"],
-  "exclude": ["node_modules", "**/_docs/**"]
+  "exclude": ["node_modules", "**/_docs/**", "../../.agents/examples/**"]
 }

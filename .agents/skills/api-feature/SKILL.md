@@ -1,21 +1,21 @@
 ---
 name: api-feature
-description: Mengimplementasikan fitur backend baru mengikuti Clean Architecture. Gunakan saat ada task terkait endpoint baru, use case, entity, repository, atau perubahan layer aplikasi.
+description: Implement new backend features following Clean Architecture. Use for tasks involving new endpoints, use cases, entities, repositories, or application-layer changes.
 ---
 
 # Skill: API Feature
 
-## Context Cepat (Wajib)
-- Folder scope + contoh kode: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Folder scope + code examples: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-Implementasikan fitur backend secara profesional mengikuti Clean Architecture.
+Implement backend features professionally, following Clean Architecture.
 
-## Alur Kerja
+## Workflow
 
-1. Baca API contract atau requirement yang diberikan.
+1. Read the API contract or requirement provided.
 
-2. Baca guide **setiap folder** sebelum membuat file di sana:
+2. Read the guide for **each folder** before creating files there:
    - `.agents/guides/api-dto.md`
    - `.agents/guides/api-validator.md`
    - `.agents/guides/api-entity.md`
@@ -27,46 +27,47 @@ Implementasikan fitur backend secara profesional mengikuti Clean Architecture.
    - `.agents/guides/api-route.md`
    - `.agents/guides/api-error.md`
 
-3. Buat file **berurutan** sesuai dependency antar layer:
+3. Create files **in order** by layer dependency:
    ```
    1. application/dtos/{Domain}Dto.ts
    2. application/validators/{domain}.schemas.ts
    3. domain/entities/{Domain}.ts
    4. domain/repositories/I{Domain}Repository.ts
-   5. domain/use-cases/{verb}-{domain}.ts    (per operasi)
+   5. domain/use-cases/{verb}-{domain}.ts    (one per operation)
    6. application/services/{Domain}Service.ts
    7. infrastructure/database/Prisma{Domain}Repository.ts
    8. interfaces/http/controllers/{Domain}Controller.ts
    9. interfaces/http/routes/{domain}Routes.ts
-   10. Daftarkan di interfaces/http/create-app.ts
+   10. Register in interfaces/http/create-app.ts
    ```
 
-4. Error handling — jangan catch di Service atau Controller:
+4. Error handling — do not catch in Service or Controller:
    ```
    UseCase throws DomainError → errorHandler middleware
    ```
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** gunakan `any`.
-- **DILARANG** taruh business logic di Controller.
-- **DILARANG** akses Prisma di Use Case.
-- **DILARANG** throw `HTTPException` dari Use Case — gunakan `DomainError`.
-- **DILARANG** ubah file yang tidak berkaitan dengan task.
+- **NEVER** use `any`.
+- **NEVER** put business logic in the Controller.
+- **NEVER** access Prisma in a Use Case.
+- **NEVER** throw `HTTPException` from a Use Case — use `DomainError`.
+- **NEVER** change files unrelated to the task.
+- **NEVER** use plain `string` for fields with a fixed value set — import the shared enum from `@vibecoding-starter/schemas`.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] DTO dibuat
-- [ ] Validator schema dibuat
-- [ ] Entity dibuat
-- [ ] Repository interface dibuat
-- [ ] Use case(s) dibuat (satu per operasi)
-- [ ] Service dibuat
-- [ ] Prisma repository dibuat
-- [ ] Controller dibuat
-- [ ] Route dibuat dan didaftarkan di create-app.ts
-- [ ] Tidak ada `any`
-- [ ] Tidak ada business logic di Controller
-- [ ] Tidak ada Prisma di Use Case
-- [ ] `bun run build` pass
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] DTO created
+- [ ] Validator schema created
+- [ ] Entity created
+- [ ] Repository interface created
+- [ ] Use case(s) created (one per operation)
+- [ ] Service created
+- [ ] Prisma repository created
+- [ ] Controller created
+- [ ] Route created and registered in create-app.ts
+- [ ] No `any`
+- [ ] No business logic in Controller
+- [ ] No Prisma in Use Case
+- [ ] `bun run build` passes
+- [ ] All files end with a newline (EOF)

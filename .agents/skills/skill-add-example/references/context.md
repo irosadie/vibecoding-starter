@@ -1,25 +1,24 @@
 # Context: Skill Add Example
 
-## Folder Target
+## Target Folder
 
 ```
 .agents/examples/
 ├── web-slicing/
 │   └── nextjs-app-router/
-│       ├── examples/              → CRUD basic template
-│       └── payment-methods/       → CRUD kompleks (form kompleks, Select, RadioGroup)
+│       └── examples/              → basic CRUD template
 └── web-api-integrated/
     └── hooks/
-        └── use-examples/          → contoh hook folder per domain
+        └── use-examples/          → hook folder example per domain
 ```
 
-## Struktur Folder Example
+## Example Folder Structure
 
 ```
 .agents/examples/{skill-name}/{subfolder}/{example-name}/
-├── {feature}-content.tsx   → Client Component (untuk web-slicing)
-├── page.tsx                → Suspense wrapper (untuk web-slicing)
-├── use-data-table.ts       → hook (untuk web-api-integrated)
+├── {feature}-content.tsx   → Client Component (for web-slicing)
+├── page.tsx                → Suspense wrapper (for web-slicing)
+├── use-data-table.ts       → hook (for web-api-integrated)
 ├── use-get-one.ts
 ├── use-insert-one.ts
 ├── use-update-one.ts
@@ -29,60 +28,60 @@
 
 ## Naming Convention
 
-| Komponen | Format | Contoh |
+| Component | Format | Example |
 |---|---|---|
-| Folder skill | Sama persis dengan skill name | `web-slicing` |
-| Subfolder konteks | kebab-case, framework/domain | `nextjs-app-router`, `hooks` |
-| Example name | kebab-case, nama domain/fitur | `payment-methods`, `use-products` |
-| File | sesuai konvensi codebase | `payment-methods-content.tsx` |
+| Skill folder | Exactly matches skill name | `web-slicing` |
+| Context subfolder | kebab-case, framework/domain | `nextjs-app-router`, `hooks` |
+| Example name | kebab-case, domain/feature name | `use-products` |
+| File | per codebase convention | `use-products-content.tsx` |
 
-## Pemetaan Skill → Lokasi Examples
+## Skill → Examples Mapping
 
-| Skill | Folder Examples |
+| Skill | Examples Folder |
 |---|---|
 | `web-slicing` | `.agents/examples/web-slicing/nextjs-app-router/` |
 | `web-api-integrated` | `.agents/examples/web-api-integrated/hooks/` |
-| Skill baru | `.agents/examples/{skill-name}/` |
+| New skill | `.agents/examples/{skill-name}/` |
 
-## Cara Update `references/context.md` di Skill Terkait
+## How to Update `references/context.md` in Related Skill
 
-Cari section `## Contoh Kode Nyata` di `references/context.md` skill terkait, lalu tambahkan:
+Find the `## Real Code Examples` section in the related skill's `references/context.md`, then add:
 
 ```markdown
-### Example N — {Nama Deskriptif}
-Lokasi: `.agents/examples/{skill-name}/{subfolder}/{example-name}/`
+### Example N — {Descriptive Name}
+Location: `.agents/examples/{skill-name}/{subfolder}/{example-name}/`
 
 Pattern: {pattern-1} + {pattern-2} + {pattern-3}
 
-File:
-- `{file}.tsx` — {penjelasan fungsi file}
-- `{file2}.ts` — {penjelasan fungsi file}
+Files:
+- `{file}.tsx` — {file purpose}
+- `{file2}.ts` — {file purpose}
 
-**Gunakan untuk:** {kondisi spesifik kapan example ini relevan}
+**Use for:** {specific condition when this example is relevant}
 
 ---
 ```
 
-## Contoh Entry yang Sudah Ada (Referensi)
+## Existing Entry Reference
 
-### Entry di `web-slicing/references/context.md`
+### Entry in `web-slicing/references/context.md`
 
 ```markdown
-### Example 2 — CRUD dengan Form Kompleks (REFERENSI UTAMA)
-Lokasi: `.agents/examples/web-slicing/nextjs-app-router/payment-methods/`
+### Example 1 — CRUD Basic (Template)
+Location: `.agents/examples/web-slicing/nextjs-app-router/examples/`
 
-Pattern: useDataTable + useQueryParam + debounce + SweetAlert preConfirm + Select component + RadioGroup + form dengan watch/setValue
+Pattern: useDataTable + useQueryParam + debounce + SweetAlert preConfirm + ActionsDropdown
 
-File:
+Files:
 - `page.tsx` — Suspense wrapper
-- `payment-methods-content.tsx` — **Baca ini dulu** untuk pola lengkap
+- `examples-content.tsx` — all logic: list, search, form dialog, delete confirm
 
-**Gunakan untuk:** halaman dengan form kompleks (Select, RadioGroup, banyak field).
+**Use for:** CRUD pages with simple fields.
 ```
 
-## Kapan Perlu Tambah Example
+## When to Add an Example
 
-- Ada pattern baru yang berulang dipakai di codebase
-- Ada skenario kompleks yang tidak tercakup example yang ada
-- Skill baru dibuat dan belum punya contoh kode nyata
-- Pattern lama sudah berubah dan perlu di-update
+- A new pattern is used repeatedly in the codebase
+- A complex scenario is not covered by existing examples
+- A new skill is created and has no real code examples yet
+- An old pattern has changed and needs updating

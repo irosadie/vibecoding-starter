@@ -1,21 +1,21 @@
 ---
 name: web-code-review
-description: Melakukan code review frontend dengan standar senior lead yang tegas, fokus pada bug, regresi, risiko arsitektur, dan gap test di apps/web serta shared contract yang dipakai frontend.
+description: Review frontend code with a firm senior-lead standard, focusing on bugs, regressions, architecture risks, and test gaps in apps/web and the shared contracts the frontend depends on.
 ---
 
 # Skill: Web Code Review
 
-## Context Cepat (Wajib)
-- Folder scope + pattern utama: `references/context.md`
-- Checklist review: `templates/checklist.md`
+## Context (Required)
+- Folder scope + key patterns: `references/context.md`
+- Review checklist: `templates/checklist.md`
 
-Gunakan skill ini saat user meminta review perubahan frontend, review PR frontend, atau audit kualitas implementasi UI/integrasi FE. Review harus terasa seperti senior lead yang tegas: fokus ke bug, regresi, contract drift, aksesibilitas yang benar-benar berdampak, dan gap test. Bukan review kosmetik.
+Use this skill when the user asks for a review of frontend changes, a frontend PR, or an audit of UI/FE integration quality. The review must read like a firm senior lead: focus on bugs, regressions, contract drift, accessibility that actually matters, and test gaps. Not cosmetic review.
 
-## Alur Kerja
+## Workflow
 
-### 1. Tentukan Surface Review
+### 1. Define the Review Surface
 
-Baca diff atau file yang diminta user, lalu petakan surface yang relevan:
+Read the diff or the files the user asked about, then map the relevant surface:
 - `apps/web/app`
 - `apps/web/hooks/transactions`
 - `apps/web/components`
@@ -24,67 +24,67 @@ Baca diff atau file yang diminta user, lalu petakan surface yang relevan:
 - `packages/schemas`
 - `packages/types`
 
-Kalau perubahan frontend menyentuh contract API atau shared payload, review juga artefak shared yang ikut terdampak.
+If the frontend change touches an API contract or shared payload, review the impacted shared artifacts as well.
 
-### 2. Prioritaskan Risiko yang Benar
+### 2. Prioritize the Real Risks
 
-Temukan temuan dalam urutan prioritas ini:
-1. bug fungsional dan regresi perilaku
-2. pelanggaran rule arsitektur repo
-3. contract drift antara UI, hooks, schema, dan response types
-4. error handling, loading state, dan state consistency
-5. gap test untuk logic penting
-6. aksesibilitas atau performance issue yang nyata berdampak
+Surface findings in this priority order:
+1. functional bugs and behavior regressions
+2. violations of repo architecture rules
+3. contract drift between UI, hooks, schema, and response types
+4. error handling, loading state, and state consistency
+5. test gaps on important logic
+6. accessibility or performance issues with real impact
 
-Jangan habiskan waktu pada style nit atau preferensi pribadi yang tidak mengubah correctness.
+Do not burn time on style nits or personal preferences that do not affect correctness.
 
-### 3. Audit dengan Standar Repo
+### 3. Audit Against Repo Standards
 
-Cek secara tegas hal-hal berikut:
-- `page.tsx` tetap tipis, bukan tempat business logic
-- JSX tidak memanggil `fetch` / `axios` langsung
-- data flow tetap lewat hooks transaksi
-- `packages/schemas` dan `packages/types` masih sinkron dengan penggunaan frontend
-- query keys, API routers, dan hook contracts tidak drift
-- error/loading/success states tidak menyebabkan UI bohong atau race condition
-- perubahan penting punya test yang layak
+Firmly check:
+- `page.tsx` stays thin, not a business logic container
+- JSX does not call `fetch` / `axios` directly
+- data flow still goes through transaction hooks
+- `packages/schemas` and `packages/types` remain in sync with frontend usage
+- query keys, API routers, and hook contracts have no drift
+- error/loading/success states do not cause UI lies or race conditions
+- important changes have adequate tests
 
-### 4. Format Hasil Review
+### 4. Format the Review Output
 
-Hasil review **wajib** berisi findings dulu, urut dari paling serius.
+The review **must** lead with findings, ordered from most severe.
 
-Format per finding:
-- severity `[P1]`, `[P2]`, atau `[P3]`
-- judul singkat
-- file/area terdampak
-- kenapa ini bug/risiko/regresi
-- apa yang seharusnya diperbaiki
+Per-finding format:
+- severity `[P1]`, `[P2]`, or `[P3]`
+- short title
+- impacted file/area
+- why this is a bug/risk/regression
+- what should be fixed
 
-Setelah findings, baru boleh tulis:
+After findings, optionally include:
 - open questions / assumptions
-- residual risks atau testing gaps
-- change summary singkat jika memang perlu
+- residual risks or testing gaps
+- brief change summary if truly needed
 
-Jika tidak ada findings, katakan eksplisit bahwa tidak ada temuan, lalu sebutkan sisa risiko atau gap coverage yang masih ada.
+If there are no findings, state that explicitly, then list remaining risks or coverage gaps.
 
-### 5. Jangan Diam-Diam Memperbaiki
+### 5. Do Not Silently Fix
 
-Skill ini default-nya untuk review, bukan implementasi. Jangan ubah kode kecuali user secara eksplisit meminta fix setelah review.
+This skill defaults to review, not implementation. Do not change code unless the user explicitly asks for fixes after the review.
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** membuka review dengan pujian, ringkasan manis, atau komentar basa-basi.
-- **DILARANG** menaruh summary sebelum findings.
-- **DILARANG** fokus ke format, naming, atau style jika tidak menimbulkan bug atau risiko nyata.
-- **DILARANG** mengabaikan contract drift di `packages/schemas` / `packages/types` bila frontend bergantung pada keduanya.
-- **DILARANG** memperbaiki kode diam-diam saat user hanya meminta review.
+- **NEVER** open the review with praise, sweet summaries, or pleasantries.
+- **NEVER** place a summary before findings.
+- **NEVER** focus on formatting, naming, or style if it does not produce a real bug or risk.
+- **NEVER** ignore contract drift in `packages/schemas` / `packages/types` when the frontend depends on them.
+- **NEVER** silently fix code when the user only asked for a review.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Scope review dipetakan dari diff atau file target
-- [ ] Rule arsitektur frontend repo ikut dicek
-- [ ] Shared schema/types yang dipakai frontend ikut dicek bila relevan
-- [ ] Findings disusun dari severity tertinggi
-- [ ] Summary tidak mendahului findings
-- [ ] Jika tidak ada findings, residual risk atau testing gap tetap disebutkan
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Review scope mapped from diff or target files
+- [ ] Frontend architecture rules checked
+- [ ] Shared schema/types used by the frontend checked when relevant
+- [ ] Findings ordered from highest severity
+- [ ] Summary does not precede findings
+- [ ] If no findings, residual risk or test gap still mentioned
+- [ ] All files end with a newline (EOF)

@@ -1,6 +1,6 @@
 # Context: docs-openapi
 
-## Shared Components yang Sudah Ada
+## Existing Shared Components
 
 ### components/schemas/PaginationMeta.yaml
 ```yaml
@@ -24,7 +24,7 @@ properties:
 
 ### components/responses/NotFound.yaml
 ```yaml
-description: Resource tidak ditemukan
+description: Resource not found
 content:
   application/json:
     schema:
@@ -42,7 +42,7 @@ content:
 
 ### components/responses/Validation.yaml
 ```yaml
-description: Validasi gagal
+description: Validation failed
 content:
   application/json:
     schema:
@@ -64,7 +64,7 @@ content:
                   type: string
 ```
 
-## Contoh Schema Entity
+## Entity Schema Example
 
 ### components/schemas/PaymentMethod.yaml
 ```yaml
@@ -88,9 +88,9 @@ properties:
 required: [id, name, code, isActive, createdAt, updatedAt]
 ```
 
-## Cara Tambah Fitur Baru
+## Adding a New Feature
 
-1. Buat `docs/openapi/paths/{feature-slug}.yaml`
-2. Buat `docs/openapi/components/schemas/{EntityName}.yaml` jika belum ada
-3. Tambah `$ref` ke `docs/openapi/openapi.yaml`
-4. Gunakan shared components yang sudah ada — jangan duplikasi
+1. Create `docs/openapi/paths/{feature-slug}.yaml`
+2. Create `docs/openapi/components/schemas/{EntityName}.yaml` if it does not exist
+3. Add `$ref` entries in `docs/openapi/openapi.yaml`
+4. Reuse existing shared components — never duplicate

@@ -1,23 +1,23 @@
 # Checklist: Web Code Review
 
-## Persiapan
+## Preparation
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `references/context.md`
-- [ ] Tentukan file frontend dan shared contract yang perlu direview
+- [ ] Read `.agents/settings.json`
+- [ ] Read `references/context.md`
+- [ ] Identify the frontend files and shared contracts to review
 
-## Review Inti
+## Core Review
 
-- [ ] Cari bug/regresi perilaku dulu
-- [ ] Cek rule arsitektur frontend repo
-- [ ] Cek drift schema/types/constants/hooks bila relevan
-- [ ] Cek loading/error/success state yang bisa menipu UI
-- [ ] Cek gap test untuk logic penting
+- [ ] Look for behavior bugs/regressions first
+- [ ] Check frontend architecture rules
+- [ ] Check schema/types/constants/hooks drift when relevant
+- [ ] Check loading/error/success states that could mislead the UI
+- [ ] Check test gaps on important logic
 
 ## Output
 
-- [ ] Findings ditulis lebih dulu, urut severity
-- [ ] Tidak ada nit stylistic yang tidak relevan
-- [ ] Open questions atau residual risks ditulis setelah findings
-- [ ] Jika tidak ada findings, hal itu disebut eksplisit
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Findings written first, ordered by severity
+- [ ] No irrelevant stylistic nits
+- [ ] Open questions or residual risks written after findings
+- [ ] If no findings, state that explicitly
+- [ ] All files end with a newline (EOF)

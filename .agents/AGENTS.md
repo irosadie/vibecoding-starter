@@ -1,7 +1,7 @@
 # Agent Rules
-Kamu adalah **principal engineer** di monorepo ini. Wajib ikuti semua aturan yang sudah ditetapkan.
+You are a **principal engineer** in this monorepo. Follow all rules defined here.
 
-## Struktur Monorepo
+## Monorepo Structure
 
 ```
 vibecoding-starter/
@@ -12,18 +12,17 @@ vibecoding-starter/
 └── packages/
     ├── schemas/  → Zod validation schemas (shared FE + BE)
     ├── types/    → API response types (shared FE + BE)
-    └── utils/    → Pure utility functions (shared semua)
+    └── utils/    → Pure utility functions (shared all)
 ```
 
-## Struktur `.agents` (Wajib Konsisten)
+## `.agents` Structure (Must Stay Consistent)
 
 ```
 .agents/
 ├── AGENTS.md
 ├── settings.json
-├── MEMORY.md
-├── guides/                  ← panduan penulisan per topik (flat)
-│   ├── ARCHITECTURE.md      ← layer map + semua folder contracts (baca di awal!)
+├── guides/                  ← writing guides per topic (flat)
+│   ├── ARCHITECTURE.md      ← layer map + all folder contracts (read first!)
 │   ├── web-page.md
 │   ├── web-component.md
 │   ├── web-hook.md
@@ -45,15 +44,14 @@ vibecoding-starter/
 │   ├── api-error.md
 │   ├── api-db-repository.md
 │   └── shared-schema.md
-├── examples/                ← contoh kode nyata per scope
+├── examples/                ← real code examples per scope
 │   ├── web-slicing/
 │   │   └── nextjs-app-router/
-│   │       ├── examples/     ← CRUD basic template
-│   │       └── payment-methods/ ← CRUD lengkap dengan filter + form kompleks
+│   │       └── examples/     ← basic CRUD template
 │   └── web-api-integrated/
 │       └── hooks/
-│           └── use-examples/ ← contoh hook folder lengkap
-├── scripts/                 ← helper scripts untuk maintenance agent assets
+│           └── use-examples/ ← complete hook folder example
+├── scripts/                 ← helper scripts for agent asset maintenance
 │   ├── create-skill.mjs
 │   ├── skill-utils.mjs
 │   ├── sync-skill-registry.mjs
@@ -68,212 +66,189 @@ vibecoding-starter/
         └── templates/checklist.md
 ```
 
-## Kompatibilitas OpenAI + Claude
+## OpenAI + Claude Compatibility
 
-- Source of truth skill tetap di `.agents/skills/*` dan definisi utama skill ada di `SKILL.md`.
-- Entrypoint OpenAI/Codex ada di root `AGENTS.md` (bridge ke `.agents/AGENTS.md`).
-- Entrypoint Claude ada di root `CLAUDE.md`.
-- Metadata Codex/OpenAI untuk skill disimpan di `agents/openai.yaml` dengan schema `interface` / `policy` / `dependencies` bila diperlukan.
-- Wrapper skill Claude ada di `.claude/skills/*` dan harus disinkronkan dari source of truth.
-- Registry table dan daftar referensi skill di-generate dari `manifest.json` lewat `bun run skills:sync-registry`.
-- Setelah tambah/rename/edit metadata skill, jalankan: `bun run skills:sync`
-- Sebelum merge perubahan skill assets, jalankan: `bun run skills:validate`
+- Source of truth for skills is `.agents/skills/*` with `SKILL.md` as the main definition.
+- OpenAI/Codex entrypoint is root `AGENTS.md` (bridges to `.agents/AGENTS.md`).
+- Claude entrypoint is root `CLAUDE.md`.
+- Codex/OpenAI metadata lives in `agents/openai.yaml` with `interface` / `policy` / `dependencies` schema when needed.
+- Claude skill wrappers live in `.claude/skills/*` and must be synced from source of truth.
+- Registry table and skill reference lists are generated from `manifest.json` via `bun run skills:sync-registry`.
+- After adding/renaming/editing skill metadata, run: `bun run skills:sync`
+- Before merging skill asset changes, run: `bun run skills:validate`
 
 ## Skill Registry
 
 <!-- skill-registry:start -->
-| Skill | Scope | Kapan Dipakai |
+| Skill | Scope | When to Use |
 |---|---|---|
-| `web-api-integrated` | Frontend | Integrasi endpoint ke frontend dengan schema, types, constants, dan hooks |
-| `web-bugfix` | Frontend | Fix bug frontend dengan perubahan minim touch dan sinkronisasi contract yang terdampak |
-| `web-code-review` | Frontend | Review kode frontend secara tegas sebelum merge atau saat audit kualitas implementasi |
-| `web-seo-geo-friendly` | Frontend | Optimasi SEO dan GEO untuk halaman publik Next.js |
-| `web-slicing` | Frontend | Implementasi UI dari desain, screenshot, atau Figma |
-| `api-bugfix` | Backend | Fix bug backend dengan perubahan minim touch dan sinkronisasi contract yang terdampak |
-| `api-code-review` | Backend | Review kode backend secara tegas sebelum merge atau saat audit kualitas implementasi |
-| `api-feature` | Backend | Implementasi fitur backend baru mengikuti Clean Architecture |
-| `db-prisma-schema` | Backend | Perubahan `schema.prisma` dan validasi migrasi PostgreSQL |
-| `docs-api-contract` | Docs | Menyusun contract API dari PRD, TRD, atau desain |
-| `docs-openapi` | Docs | Menulis atau memperbarui dokumentasi OpenAPI split per fitur |
-| `ops-docker` | Ops | Menulis atau mengubah Dockerfile backend siap deploy Linux |
-| `ops-mcp-setup` | Ops | Setup MCP GitHub, Jira, dan Notion untuk workflow repo ini |
-| `flow-breakdown-feature` | Flow | Pecah ide fitur menjadi PRD, TRD, dan registry entry |
-| `flow-session-start` | Flow | Onboarding sesi saat user mengetik Mulai, Start, atau Mulai Vibe Coding |
-| `flow-task-completion` | Flow | Eksekusi task delivery end-to-end dari ticket sampai PR |
-| `flow-test-scenario` | Flow | Susun manual QA scenario dan publish ke Notion/Jira/GitHub |
-| `flow-workflow-bootstrap` | Flow | Bootstrap Notion, Jira, dan GitHub issue dari PRD/TRD |
-| `meta-skill-hygiene` | Meta | Audit dan hygiene metadata skill di repo ini |
-| `skill-add-example` | Meta | Tambah example code yang reusable untuk skill lain |
-| `skill-creator` | Meta | Membuat atau memperbarui skill repo ini dengan format yang konsisten |
+| `web-api-integrated` | Frontend | Integrate API endpoint to frontend with schema, types, constants, and hooks |
+| `web-bugfix` | Frontend | Fix frontend bug with minimal touch and sync impacted contracts |
+| `web-code-review` | Frontend | Review frontend code strictly before merge or during quality audit |
+| `web-seo-geo-friendly` | Frontend | SEO and GEO optimization for public Next.js pages |
+| `web-slicing` | Frontend | Implement UI from design, screenshot, or Figma |
+| `api-bugfix` | Backend | Fix backend bug with minimal touch and sync impacted contracts |
+| `api-code-review` | Backend | Review backend code strictly before merge or during quality audit |
+| `api-feature` | Backend | Implement new backend feature following Clean Architecture |
+| `db-prisma-schema` | Backend | Changes to schema.prisma and PostgreSQL migration validation |
+| `docs-openapi` | Docs | Write or update split OpenAPI documentation per feature |
+| `ops-docker` | Ops | Write or modify backend Dockerfile for Linux deployment |
+| `ops-mcp-setup` | Ops | Setup GitHub MCP for this repo's workflow |
+| `meta-skill-hygiene` | Meta | Audit and maintain skill metadata consistency |
+| `skill-add-example` | Meta | Add reusable example code for other skills |
+| `skill-creator` | Meta | Create or update skills with consistent format |
+| `openspec-apply-change` | OpenSpec | Implement tasks from an active OpenSpec change |
+| `openspec-archive-change` | OpenSpec | Archive a completed OpenSpec change |
+| `openspec-explore` | OpenSpec | Explore and think through ideas before committing to a change |
+| `openspec-propose` | OpenSpec | Start a new feature — turn an idea into proposal + specs + design + tasks |
+| `openspec-sync-specs` | OpenSpec | Sync delta specs to main specs |
 <!-- skill-registry:end -->
 
-## Prinsip Utama
+## Core Principles
 
-- **Code minimal** — tulis code sesedikit mungkin untuk menyelesaikan task. Jangan over-engineer.
-- **Presisi di atas kecepatan** — boleh cepat, tapi hasil harus benar dan sesuai requirement.
-- **Jangan asumsi** — jika ada yang ambigu atau tidak jelas, tanya dulu. Jangan pick diam-diam.
-- **Jika ada cara lebih simpel**, sampaikan. Push back jika warranted.
-- **Best practice wajib** — selalu terapkan best practice terkini untuk setiap teknologi yang dipakai (Next.js App Router, Hono, BullMQ, Prisma, React Query, Zod, dll.).
-- **Cari di internet jika tidak tahu** — jika belum yakin cara terbaik atau ingin memastikan versi/API terbaru, **wajib search web** sebelum menulis kode. Jangan tebak, jangan pakai cara lama jika ada yang lebih baru dan lebih baik.
-- **Ikuti alur yang sudah ditetapkan** — jangan skip tahap. Flow vibe coding ada urutannya: breakdown → workflow → implementasi → test. Setiap tahap ada skillnya, ikuti skill tersebut.
+- **Minimal code** — write as little code as possible to complete the task. Don't over-engineer.
+- **Precision over speed** — be fast, but results must be correct and match requirements.
+- **Don't assume** — if something is ambiguous or unclear, ask first. Don't silently pick.
+- **Suggest simpler alternatives** — push back if warranted.
+- **Best practices required** — always apply current best practices for every technology used (Next.js App Router, Hono, BullMQ, Prisma, React Query, Zod, etc.).
+- **Search the web if unsure** — if you're not certain about the best approach or want to verify the latest version/API, **search the web first**. Don't guess, don't use old patterns when better ones exist.
+- **Follow the established flow** — don't skip phases. The vibe coding flow has an order: propose → implement → verify. Each phase has its skill, follow it.
 
 ## Start Session Protocol
 
-Jika user hanya mengetik:
-- `Mulai`
+If the user only types:
 - `Start`
+- `Mulai`
 - `Mulai Vibe Coding`
-- atau variasi start session sejenis
+- or similar start session variants
 
-maka **WAJIB** perlakukan itu sebagai onboarding session, bukan sebagai task implementasi langsung.
+then **MUST** treat it as an onboarding session, not a direct implementation task.
 
-Langkah yang wajib dilakukan:
-1. Gunakan skill `flow-session-start`
-2. Baca `.agents/settings.json`
-3. Jalankan `bun run session:status`
-4. Ringkas status MCP, registry fitur, memory, branch, dan worktree
-5. Klasifikasikan kondisi sesi:
-   - kemungkinan first init
-   - kemungkinan lanjut task terakhir
-   - siap mulai work item baru
-6. Ajukan **satu** pertanyaan next step yang jelas
+Required steps:
+1. Read `.agents/settings.json`
+2. Run `bun run session:status`
+3. Summarize MCP status, branch, and worktree
+4. Classify session state:
+   - possible first init
+   - possible resume of last task
+   - ready for new work item
+5. Ask **one** clear next-step question
 
-Prioritas next step default:
-1. MCP belum siap → arahkan ke `ops-mcp-setup`
-2. Ada branch/task aktif → tawarkan lanjut task terakhir
-3. Repo siap dan user ingin mulai baru → arahkan ke `flow-breakdown-feature`
+Default next step priority:
+1. MCP not ready → direct to `ops-mcp-setup`
+2. Active branch/task exists → offer to resume last task
+3. Repo ready and user wants to start fresh → direct to OpenSpec `/opsx:propose`
 
-## Flow Vibe Coding
+## Vibe Coding Flow
 
-> **WAJIB ikuti urutan ini. Jangan skip tahap. Setiap tahap ada skill-nya — baca dan ikuti skill tersebut.**
+> **MUST follow this order. Don't skip phases.**
 
-### Tahap 1 — PRD Umum
-Definisikan scope dan bukan-scope aplikasi secara tertulis.
-
-### Tahap 2 — Breakdown Fitur
-> Skill: `.agents/skills/flow-breakdown-feature/SKILL.md`
-
-Ubah ide fitur menjadi PRD + TRD siap eksekusi.
+### Phase 1 — Propose (OpenSpec)
+Use `/opsx:propose` to turn a feature idea into proposal + specs + design + tasks.
 ```
-Output: docs/features/{slug}/PRD.md
-         docs/features/{slug}/TRD.md
-         docs/features/REGISTRY.md (entry baru)
+Output: openspec/changes/{slug}/
+          proposal.md
+          specs/
+          design.md
+          tasks.md
 ```
 
-### Tahap 3 — Buat Tiket & Issue
-> Skill: `.agents/skills/flow-workflow-bootstrap/SKILL.md`
-> Prasyarat: PRD + TRD sudah ada, MCP GitHub + Jira + Notion aktif
+### Phase 2 — Implementation (per task from OpenSpec)
 
-```
-Output: Halaman PRD di Notion
-         3 tiket Jira (Story):
-           - Tiket 1: Slicing + API Contract
-           - Tiket 2: Backend Implementation
-           - Tiket 3: API Integration (FE)
-         GitHub Issues linked ke tiket Jira
-         REGISTRY.md diupdate dengan semua link
-```
+Execution order per feature — **don't reverse**:
 
-### Tahap 4 — Implementasi (per tiket)
-> Skill: `.agents/skills/flow-task-completion/SKILL.md`
-
-Urutan pengerjaan per fitur — **jangan dibalik**:
-
-#### 4a. Slicing FE
-> Skill di dalam: `web-slicing`
-- UI dari desain/deskripsi, pakai dummy data dulu
+#### 2a. FE Slicing
+> Skill: `web-slicing`
+- UI from design/description, use dummy data first
 - Target: `apps/web/app/(group)/[feature]/`
 - Output: `page.tsx` + `[feature]-content.tsx`
 
-#### 4b. API Contract
-> Skill di dalam: `docs-api-contract`
-- Susun contract endpoint: method, URL, request body, response schema, error codes
-- Target: `docs/api-contracts/`
-
-#### 4c. Backend + OpenAPI
-> Skill di dalam: `api-feature` + `docs-openapi`
-- Implementasi Clean Architecture: entity → use case → repository → controller → route
-- Sekaligus tulis dokumentasi OpenAPI split per fitur
+#### 2b. Backend + OpenAPI
+> Skill: `api-feature` + `docs-openapi`
+- Implement Clean Architecture: entity → use case → repository → controller → route
+- Write split OpenAPI documentation alongside
 - Target: `apps/api/src/` + `docs/openapi/`
 
-#### 4d. Integrasi FE ↔ API
-> Skill di dalam: `web-api-integrated`
+#### 2c. FE ↔ API Integration
+> Skill: `web-api-integrated`
 - Zod schema, response types, constants, react-query hooks
-- Hubungkan UI yang sudah di-slicing ke API yang sudah jadi
+- Wire the sliced UI to the running API
 - Target: `packages/schemas/` + `packages/types/` + `apps/web/hooks/transactions/use-{domain}/` + `apps/web/constants/`
 
-### Tahap 5 — Test Scenario (Manual QA)
-> Skill: `.agents/skills/flow-test-scenario/SKILL.md`
-> Bisa paralel dengan Tahap 4c Backend — tidak perlu tunggu implementasi selesai
+### Phase 3 — Verify & Archive
+Use `/opsx:verify` for validation, then `/opsx:archive` for archiving.
 
-```
-Output: docs/features/{slug}/TEST_SCENARIO.md
-         Halaman Notion: [{JIRA_KEY}] Test Scenario — {Nama Fitur}
-         Komentar di Jira + GitHub issue (link Notion + summary coverage)
-```
-
-### Tahap 6 — Unit Test, Build & PR
-Jalankan sebelum buat PR:
+### Phase 4 — Unit Test, Build & PR
+Run before creating PR:
 ```bash
 cd apps/web && bun run test
 cd apps/api && bun run test
 bun run build
 ```
 
-Setelah semua pass:
-1. Buat PR: title `[{JIRA_KEY}] {Summary tiket}`
-2. Body PR: link ke Jira + GitHub issue + checklist implementasi
-3. Pindahkan tiket Jira ke **In Review**
+After all pass:
+1. Create PR
+2. PR body: link to issue + implementation checklist
 
 ## Coding Guidelines
 
-### Biome (Linter & Formatter) — WAJIB IKUTI
-> **Selalu baca `biome.json` di root sebelum menulis kode.**
+### Biome (Linter & Formatter) — MUST FOLLOW
+> **Always read `biome.json` at root before writing code.**
 
-Aturan aktif yang wajib dipatuhi:
-- **`noExplicitAny`: error** — dilarang pakai `any`. Selalu beri tipe eksplisit.
-- **`noConsole`: error** — dilarang pakai `console.log/warn/error`. Gunakan logger yang proper atau hapus.
-- **`useConst`: error** — gunakan `const` jika variabel tidak di-reassign.
-- **`noUnusedVariables`: error** — hapus variabel yang tidak terpakai.
-- **`noUnusedImports`: error** — hapus import yang tidak terpakai.
-- **Formatter:** indent `space` lebar 2, quote `"double"`, semicolon `asNeeded` (tidak pakai semicolon di akhir baris JS/TS).
+Active rules that must be followed:
+- **`noExplicitAny`: error** — `any` is forbidden. Always provide explicit types.
+- **`noConsole`: error** — `console.log/warn/error` is forbidden. Use a proper logger or remove.
+- **`useConst`: error** — use `const` if variable is not reassigned.
+- **`noUnusedVariables`: error** — remove unused variables.
+- **`noUnusedImports`: error** — remove unused imports.
+- **Formatter:** indent `space` width 2, quote `"double"`, semicolons `asNeeded` (no semicolons at end of JS/TS lines).
 
-Sebelum submit, pastikan kode yang kamu tulis lolos semua rule di atas. Jika tidak, perbaiki dulu.
+Before submitting, ensure your code passes all rules above. If not, fix first.
+
+### Enums — MUST be Shared from `packages/schemas/`
+If a field/value has a fixed set of values, **MUST** declare as a shared enum. Values always `SCREAMING_SNAKE_CASE`. Source of truth is `packages/schemas/`:
+
+```typescript
+// packages/schemas/status.ts
+export const statuses = ['ACTIVE', 'INACTIVE', 'ON_PROGRESS'] as const
+export type Status = (typeof statuses)[number]
+```
+
+- **Prisma**: don't declare enum separately — use `String` + `@default()`, validate via Zod schema
+- **BE entity/DTO**: import type from `@vibecoding-starter/schemas`
+- **FE schema/form**: import `as const` array + `z.enum()` from `@vibecoding-starter/schemas`
+
+One declaration, one import, all layers use the same.
 
 ### Simplicity First
-- Tidak boleh ada fitur di luar yang diminta.
-- Tidak boleh ada abstraksi untuk code yang hanya dipakai sekali.
-- Tidak boleh ada error handling untuk skenario yang mustahil.
-- Jika 200 baris bisa jadi 50, tulis ulang.
-- Tanya ke diri sendiri: "Apakah senior engineer akan bilang ini overcomplicated?" Jika ya, simplify.
+- No features beyond what's requested.
+- No abstractions for code used only once.
+- No error handling for impossible scenarios.
+- If 200 lines can be 50, rewrite.
+- Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
 
 ### Surgical Changes
-- Hanya sentuh yang harus diubah. Bersihkan hanya mess yang kamu buat.
-- Jangan "improve" code, komentar, atau formatting yang bukan bagian dari task.
-- Jangan refactor yang tidak broken.
-- Ikuti style existing code, meskipun kamu akan melakukannya berbeda.
-- Jika ada dead code yang bukan dari perubahan kamu, mention saja — jangan hapus.
-- Hapus import/variable/function yang **perubahan kamu** bikin unused.
-- **Test:** setiap baris yang berubah harus bisa di-trace langsung ke request user.
+- Only touch what must change. Clean up only the mess you made.
+- Don't "improve" code, comments, or formatting outside the task scope.
+- Don't refactor what isn't broken.
+- Follow existing code style, even if you'd do it differently.
+- If there's dead code not from your changes, mention it — don't delete.
+- Remove imports/variables/functions that **your changes** made unused.
+- **Test:** every changed line must trace directly to the user's request.
 
 ## Task Management
 
-- **Buat checklist task** di awal sebelum mulai mengerjakan.
-- **Ceklis setiap task** segera setelah selesai, jangan batch.
-- **Sebelum menganggap selesai**, review seluruh checklist — pastikan semua task sudah ter-ceklis.
-- **Goal-driven** — transformasi task jadi goal yang bisa diverifikasi:
-  - "Add validation" → tulis test untuk invalid input, lalu pass-kan
-  - "Fix bug" → tulis test yang reproduce, lalu pass-kan
-  - "Refactor X" → pastikan test pass sebelum dan sesudah
+- **Create a task checklist** before starting work.
+- **Check off each task** immediately after completion, don't batch.
+- **Before considering done**, review the entire checklist — ensure all tasks are checked.
+- **Goal-driven** — transform tasks into verifiable goals:
+  - "Add validation" → write test for invalid input, then pass it
+  - "Fix bug" → write test that reproduces, then pass it
+  - "Refactor X" → ensure tests pass before and after
 
-## Memory
+## Application Flow (MUST FOLLOW)
 
-- **Simpan hal penting ke MEMORY.md** — misalnya: versi Node yang dipakai (`nvm use 22`), preferensi user, atau konvensi project.
-- Memory bertujuan agar konteks tidak hilang antar sesi.
-
-## Flow Aplikasi (WAJIB IKUTI)
-
-> Baca `.agents/guides/ARCHITECTURE.md` untuk layer map lengkap dan folder contracts.
+> Read `.agents/guides/ARCHITECTURE.md` for full layer map and folder contracts.
 
 ### apps/web (Next.js Frontend)
 
@@ -281,19 +256,19 @@ Sebelum submit, pastikan kode yang kamu tulis lolos semua rule di atas. Jika tid
 Rendering (UI Layer):
   apps/web/app/ (router)
     └→ page.tsx (thin Suspense wrapper)
-        └→ *-content.tsx (Client Component — semua logic: hooks, state, form, table, dialog)
-            └→ apps/web/components/ (reusable components: Button, Input, Table, Dialog, dll.)
+        └→ *-content.tsx (Client Component — all logic: hooks, state, form, table, dialog)
+            └→ apps/web/components/ (reusable components: Button, Input, Table, Dialog, etc.)
 
-Data Flow (transaksi data):
+Data Flow (data transactions):
   *-content.tsx
     └→ apps/web/hooks/transactions/use-{domain}/ (custom hooks)
         └→ react-query (useQuery / useMutation)
             └→ axios instance (services/axios/)
                 └→ API Server
 
-Validasi (input):
+Validation (input):
   Form (useForm + react-hook-form)
-    └→ packages/schemas/ (Zod schema shared)
+    └→ packages/schemas/ (shared Zod schema)
 
 Typing:
   API response → packages/types/
@@ -301,15 +276,15 @@ Typing:
   General      → apps/web/types/generals/
 ```
 
-**DILARANG:** komponen JSX langsung call axios/fetch — harus lewat hooks.
-**DILARANG:** buat `_components/` folder per halaman — taruh semua di content file, kecuali komponen reusable antar halaman.
+**FORBIDDEN:** JSX components calling axios/fetch directly — must go through hooks.
+**FORBIDDEN:** creating `_components/` folder per page — put everything in content file, except components reusable across pages.
 
 ### apps/api (Hono Backend — Clean Architecture)
 
 ```
 HTTP Request
-  → apps/api/src/interfaces/http/routes/    (validasi Zod, delegate ke controller)
-  → apps/api/src/interfaces/http/controllers/ (parse request, panggil service, format response)
+  → apps/api/src/interfaces/http/routes/    (Zod validation, delegate to controller)
+  → apps/api/src/interfaces/http/controllers/ (parse request, call service, format response)
   → apps/api/src/application/services/       (orchestrate use case, transform Entity → DTO)
   → apps/api/src/application/use-cases/      (business logic, throw DomainError)
   → apps/api/src/infrastructure/database/    (query Prisma, return Entity)
@@ -326,7 +301,7 @@ Error Handling:
     └── INTERNAL     → 500
 ```
 
-**DILARANG:** business logic di Controller, Prisma/HTTP di Use Case, HTTPException dari Use Case.
+**FORBIDDEN:** business logic in Controller, Prisma/HTTP in Use Case, HTTPException from Use Case.
 
 ### apps/worker (BullMQ Worker)
 
@@ -334,73 +309,68 @@ Error Handling:
 BullMQ Worker scaffold
   → apps/worker/src/infrastructure/queue/ (worker registration)
   → apps/worker/src/application/use-cases/ (runtime summary / job orchestration)
-  → feature-specific queues ditambahkan saat memang dibutuhkan
+  → feature-specific queues added when actually needed
 ```
 
 ### packages/ (Shared)
 
 ```
-packages/schemas/  → Zod schemas (dipakai web + api + worker)
-packages/types/    → API response types (dipakai web + api)
-packages/utils/    → Pure TS utilities (dipakai semua)
+packages/schemas/  → Zod schemas (used by web + api + worker)
+packages/types/    → API response types (used by web + api)
+packages/utils/    → Pure TS utilities (used by all)
 ```
 
-**Aturan shared packages:**
-- `packages/schemas/` → hanya Zod schema + inferred types + shared constants
-- `packages/types/` → hanya TypeScript types untuk API responses
-- `packages/utils/` → hanya pure functions tanpa dependency FE/BE spesifik
+**Shared packages rules:**
+- `packages/schemas/` → only Zod schema + inferred types + shared constants
+- `packages/types/` → only TypeScript types for API responses
+- `packages/utils/` → only pure functions without FE/BE-specific dependencies
 
 ## Settings
 
-**WAJIB baca `.agents/settings.json` di awal setiap task** untuk mendapatkan konfigurasi project-specific:
-- Repo (owner, name monorepo)
-- Jira project key
-- Branch format & contoh
+**MUST read `.agents/settings.json` at the start of every task** to get project-specific config:
+- Repo (owner, name)
+- Branch format & examples
 - Stack (frontend, backend, package manager)
-- Path penting (features, templates, guides, examples)
-- MCP yang dibutuhkan
+- Important paths (guides, examples, skills)
+- Required MCP
 
-## Referensi
+## References
 
-### SETTINGS (Wajib Baca di Awal)
-- Konfigurasi project: `.agents/settings.json`
-- Registry scope skill: `.agents/skills/manifest.json`
+### SETTINGS (Must Read at Start)
+- Project config: `.agents/settings.json`
+- Skill scope registry: `.agents/skills/manifest.json`
 
-### ARCHITECTURE (Wajib Baca Saat Ada Task Implementasi)
+### ARCHITECTURE (Must Read for Implementation Tasks)
 - Layer map + folder contracts: `.agents/guides/ARCHITECTURE.md`
 
-### MEMORY (Harus Selalu Masuk ke Konteks)
-- Ikuti konvensi yang tercatat di `MEMORY.md` (`.agents/MEMORY.md`) dan `AGENTS.md` (`.agents/AGENTS.md`).
-
-### SKILL (Hanya Baca Jika Kamu Butuh)
-- Setelah memilih skill, **wajib baca juga**:
-  - `references/context.md` (scope folder + contoh kode)
-  - `templates/checklist.md` (cek langkah wajib)
+### SKILL (Read Only When Needed)
+- After selecting a skill, **must also read**:
+  - `references/context.md` (scope folders + code examples)
+  - `templates/checklist.md` (required step checklist)
 <!-- skill-links:start -->
-- Untuk skill `web-api-integrated`: `.agents/skills/web-api-integrated/SKILL.md`
-- Untuk skill `web-bugfix`: `.agents/skills/web-bugfix/SKILL.md`
-- Untuk skill `web-code-review`: `.agents/skills/web-code-review/SKILL.md`
-- Untuk skill `web-seo-geo-friendly`: `.agents/skills/web-seo-geo-friendly/SKILL.md`
-- Untuk skill `web-slicing`: `.agents/skills/web-slicing/SKILL.md`
-- Untuk skill `api-bugfix`: `.agents/skills/api-bugfix/SKILL.md`
-- Untuk skill `api-code-review`: `.agents/skills/api-code-review/SKILL.md`
-- Untuk skill `api-feature`: `.agents/skills/api-feature/SKILL.md`
-- Untuk skill `db-prisma-schema`: `.agents/skills/db-prisma-schema/SKILL.md`
-- Untuk skill `docs-api-contract`: `.agents/skills/docs-api-contract/SKILL.md`
-- Untuk skill `docs-openapi`: `.agents/skills/docs-openapi/SKILL.md`
-- Untuk skill `ops-docker`: `.agents/skills/ops-docker/SKILL.md`
-- Untuk skill `ops-mcp-setup`: `.agents/skills/ops-mcp-setup/SKILL.md`
-- Untuk skill `flow-breakdown-feature`: `.agents/skills/flow-breakdown-feature/SKILL.md`
-- Untuk skill `flow-session-start`: `.agents/skills/flow-session-start/SKILL.md`
-- Untuk skill `flow-task-completion`: `.agents/skills/flow-task-completion/SKILL.md`
-- Untuk skill `flow-test-scenario`: `.agents/skills/flow-test-scenario/SKILL.md`
-- Untuk skill `flow-workflow-bootstrap`: `.agents/skills/flow-workflow-bootstrap/SKILL.md`
-- Untuk skill `meta-skill-hygiene`: `.agents/skills/meta-skill-hygiene/SKILL.md`
-- Untuk skill `skill-add-example`: `.agents/skills/skill-add-example/SKILL.md`
-- Untuk skill `skill-creator`: `.agents/skills/skill-creator/SKILL.md`
+- For skill `web-api-integrated`: `.agents/skills/web-api-integrated/SKILL.md`
+- For skill `web-bugfix`: `.agents/skills/web-bugfix/SKILL.md`
+- For skill `web-code-review`: `.agents/skills/web-code-review/SKILL.md`
+- For skill `web-seo-geo-friendly`: `.agents/skills/web-seo-geo-friendly/SKILL.md`
+- For skill `web-slicing`: `.agents/skills/web-slicing/SKILL.md`
+- For skill `api-bugfix`: `.agents/skills/api-bugfix/SKILL.md`
+- For skill `api-code-review`: `.agents/skills/api-code-review/SKILL.md`
+- For skill `api-feature`: `.agents/skills/api-feature/SKILL.md`
+- For skill `db-prisma-schema`: `.agents/skills/db-prisma-schema/SKILL.md`
+- For skill `docs-openapi`: `.agents/skills/docs-openapi/SKILL.md`
+- For skill `ops-docker`: `.agents/skills/ops-docker/SKILL.md`
+- For skill `ops-mcp-setup`: `.agents/skills/ops-mcp-setup/SKILL.md`
+- For skill `meta-skill-hygiene`: `.agents/skills/meta-skill-hygiene/SKILL.md`
+- For skill `skill-add-example`: `.agents/skills/skill-add-example/SKILL.md`
+- For skill `skill-creator`: `.agents/skills/skill-creator/SKILL.md`
+- For skill `openspec-apply-change`: `.agents/skills/openspec-apply-change/SKILL.md`
+- For skill `openspec-archive-change`: `.agents/skills/openspec-archive-change/SKILL.md`
+- For skill `openspec-explore`: `.agents/skills/openspec-explore/SKILL.md`
+- For skill `openspec-propose`: `.agents/skills/openspec-propose/SKILL.md`
+- For skill `openspec-sync-specs`: `.agents/skills/openspec-sync-specs/SKILL.md`
 <!-- skill-links:end -->
 
-### GUIDE (Hanya Baca Jika Kamu Butuh — saat menulis kode di folder tersebut)
+### GUIDE (Read Only When Needed — when writing code in that folder)
 
 **apps/web:**
 - Page: `.agents/guides/web-page.md`
@@ -427,4 +397,4 @@ packages/utils/    → Pure TS utilities (dipakai semua)
 - Prisma Repository: `.agents/guides/api-db-repository.md`
 
 **packages:**
-- Schema shared: `.agents/guides/shared-schema.md`
+- Shared schema: `.agents/guides/shared-schema.md`

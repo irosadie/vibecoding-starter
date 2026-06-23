@@ -1,44 +1,4 @@
 export const apiRouters = {
-  auth: {
-    register: "/auth/register",
-    login: "/auth/login",
-    logout: "/auth/logout",
-    me: "/auth/me",
-  },
-  creatorApplications: {
-    index: "/admin/creator-applications",
-    get: "/creator-applications/me",
-    insert: "/creator-applications",
-    update: "/admin/creator-applications/:id/approve",
-    delete: "/admin/creator-applications/:id/reject",
-  },
-  creatorExams: {
-    index: "/creator/exams",
-    show: "/creator/exams/:id",
-    insert: "/creator/exams",
-    update: "/creator/exams/:id",
-    insertQuestion: "/creator/exams/:id/questions",
-    updateQuestion: "/creator/exams/:id/questions/:questionId",
-    deleteQuestion: "/creator/exams/:id/questions/:questionId",
-    submitReview: "/creator/exams/:id/submit-review",
-  },
-  adminExamReviews: {
-    index: "/admin/exam-reviews",
-    show: "/admin/exam-reviews/:id",
-    approve: "/admin/exam-reviews/:id/approve",
-    reject: "/admin/exam-reviews/:id/reject",
-  },
-  catalogExams: {
-    index: "/catalog/exams",
-    show: "/catalog/exams/:slug",
-  },
-  commerce: {
-    cart: "/commerce/cart",
-    addToCart: "/commerce/cart/items",
-    removeCartItem: "/commerce/cart/items/:id",
-    checkout: "/commerce/checkout",
-    orderStatus: "/commerce/orders/:id",
-  },
   paymentMethods: {
     index: "/payment-methods",
     show: "/payment-methods/:id",

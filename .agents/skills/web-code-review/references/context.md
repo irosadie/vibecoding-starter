@@ -1,27 +1,27 @@
 # Context: Web Code Review
 
-## Folder Target
+## Target Folder
 
 ```
-apps/web/app/                          → page wrapper + content component utama
+apps/web/app/                          → page wrapper + main content component
 apps/web/components/                   → reusable UI components
-apps/web/hooks/transactions/           → data-fetching hooks frontend
+apps/web/hooks/transactions/           → frontend data-fetching hooks
 apps/web/constants/                    → query keys + API routes
 apps/web/services/axios/               → axios instance + interceptor
 packages/schemas/                      → shared request schema / payload shape
 packages/types/                        → shared response types
 ```
 
-## Pattern Penting
+## Key Patterns
 
-- `page.tsx` harus tipis, logic utama ada di `*-content.tsx`
-- JSX tidak boleh `fetch` / `axios` langsung
-- integrasi API harus lewat hooks transaksi
-- perubahan payload harus sinkron dengan `packages/schemas`
-- perubahan response handling harus sinkron dengan `packages/types`
-- review frontend harus curiga pada race condition, stale state, dan error state yang menipu user
+- `page.tsx` must stay thin; main logic lives in `*-content.tsx`
+- JSX must not call `fetch` / `axios` directly
+- API integration must go through transaction hooks
+- payload changes must sync with `packages/schemas`
+- response handling changes must sync with `packages/types`
+- frontend review must suspect race conditions, stale state, and error states that mislead users
 
-## Contoh Surface Aktif
+## Active Surface Examples
 
 - Starter homepage: `apps/web/app/page.tsx`, `apps/web/app/home-content.tsx`
 - Hook integration: `apps/web/hooks/transactions/`

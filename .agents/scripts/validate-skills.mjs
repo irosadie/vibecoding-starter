@@ -23,10 +23,10 @@ const requiredScripts = {
   'skills:validate': 'node .agents/scripts/validate-skills.mjs',
 };
 const requiredSkillSections = [
-  '## Context Cepat',
-  '## Alur Kerja',
-  '## Larangan',
-  '## Checklist Sebelum Selesai',
+  ['## Context Cepat', '## Quick Context', '## Context (Required)', '## Context'],
+  ['## Alur Kerja', '## Workflow'],
+  ['## Larangan', '## Constraints', '## Restrictions', '## Prohibitions'],
+  ['## Checklist Sebelum Selesai', '## Checklist Before Done', '## Checklist', '## Pre-Completion Checklist'],
 ];
 const requiredSkillFiles = [
   'SKILL.md',
@@ -78,9 +78,15 @@ function validateSkillFiles(skill) {
   }
 
   const skillMarkdown = readText(skill.skillPath);
-  for (const section of requiredSkillSections) {
-    if (!skillMarkdown.includes(section)) {
-      addError(`${skill.name} missing section: ${section}`);
+  const isDelegate = skillMarkdown.includes('\n@') || skillMarkdown.match(/^@/m);
+
+  if (!isDelegate) {
+    for (const section of requiredSkillSections) {
+      const alternatives = Array.isArray(section) ? section : [section];
+      const found = alternatives.some((alt) => skillMarkdown.includes(alt));
+      if (!found) {
+        addError(`${skill.name} missing section: ${alternatives[0]}`);
+      }
     }
   }
 
@@ -101,7 +107,7 @@ function validateSkillFiles(skill) {
   if (!/^policy:\n/m.test(yaml)) {
     addError(`${skill.name} openai.yaml missing policy block`);
   }
-  if (!/^\s{2}allow_implicit_invocation:\s+true$/m.test(yaml)) {
+  if (!isDelegate && !/^\s{2}allow_implicit_invocation:\s+true$/m.test(yaml)) {
     addError(`${skill.name} openai.yaml should set policy.allow_implicit_invocation: true`);
   }
 

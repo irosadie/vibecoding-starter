@@ -1,42 +1,42 @@
 ---
 name: web-seo-geo-friendly
-description: Mengoptimalkan halaman publik Next.js App Router agar SEO-friendly dan GEO-friendly (Generative Engine Optimization). Gunakan saat user meminta optimasi SEO/GEO secara spesifik pada halaman publik.
+description: Optimize public Next.js App Router pages for SEO and GEO (Generative Engine Optimization). Use when the user explicitly requests SEO/GEO optimization on public pages.
 ---
 
 # Skill: Web SEO + GEO
 
-## Context Cepat (Wajib)
-- Folder scope + contoh kode: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Folder scope + code examples: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-Optimalkan halaman publik agar mudah ditemukan search engine dan AI answer engines.
+Optimize public pages for discoverability by search engines and AI answer engines.
 
 ## Scope
 
-Hanya untuk halaman **publik** di `apps/web/app/` yang tidak di-protect auth.
+Applies only to **public** pages in `apps/web/app/` that are not protected by auth.
 
-## Alur Kerja
+## Workflow
 
-1. Tambahkan `generateMetadata` atau `metadata` di `page.tsx`
-2. Tambahkan Open Graph dan Twitter card meta
-3. Tambahkan JSON-LD structured data sesuai jenis konten
-4. Tambahkan halaman ke `sitemap.ts`
-5. Pastikan `robots.ts` tidak block halaman publik
+1. Add `generateMetadata` or `metadata` in `page.tsx`
+2. Add Open Graph and Twitter card meta
+3. Add JSON-LD structured data matching the content type
+4. Add the page to `sitemap.ts`
+5. Ensure `robots.ts` does not block public pages
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** menerapkan skill ini ke halaman private atau halaman yang di-protect auth.
-- **DILARANG** menambahkan metadata generik yang tidak sesuai isi halaman.
-- **DILARANG** membuat structured data yang tidak valid atau tidak relevan dengan konten.
+- **FORBIDDEN** to apply this skill to private or auth-protected pages.
+- **FORBIDDEN** to add generic metadata unrelated to the page content.
+- **FORBIDDEN** to add structured data that is invalid or irrelevant to the content.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] `generateMetadata` ada: title, description, canonical
+- [ ] `generateMetadata` present: title, description, canonical
 - [ ] Open Graph meta: title, description, url, image
 - [ ] Twitter card meta: card type, title, description
-- [ ] JSON-LD structured data sesuai jenis halaman
-- [ ] Halaman ada di sitemap.ts
-- [ ] robots.ts tidak mem-block halaman
-- [ ] H1 ada dan deskriptif (satu per halaman)
-- [ ] Meta description 150-160 karakter
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] JSON-LD structured data matches the page type
+- [ ] Page listed in `sitemap.ts`
+- [ ] `robots.ts` does not block the page
+- [ ] H1 present and descriptive (one per page)
+- [ ] Meta description 150-160 characters
+- [ ] Every file ends with a newline (EOF)

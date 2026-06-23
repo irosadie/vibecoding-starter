@@ -1,32 +1,32 @@
 # Checklist: docs-openapi
 
-## Persiapan
+## Preparation
 
-- [ ] Baca API contract di `docs/api-contracts/{slug}.md`
-- [ ] Cek `docs/openapi/components/` — apakah schema/response yang dibutuhkan sudah ada?
+- [ ] Check OpenSpec specs/design under `openspec/changes/{slug}/` for endpoint requirements
+- [ ] Check `docs/openapi/components/` — are the required schemas/responses already present?
 
-## File Paths
+## Path Files
 
-- [ ] Buat `docs/openapi/paths/{feature-slug}.yaml`
-- [ ] Semua endpoint fitur tercakup
-- [ ] Parameter (path, query, body) terdefinisi lengkap
-- [ ] Response sukses punya schema yang benar
-- [ ] Response error menggunakan shared `$ref` dari components/responses/
+- [ ] Create `docs/openapi/paths/{feature-slug}.yaml`
+- [ ] All endpoints of the feature are covered
+- [ ] Parameters (path, query, body) fully defined
+- [ ] Success responses use the correct schema
+- [ ] Error responses use shared `$ref` from components/responses/
 
 ## Schema Components
 
-- [ ] Buat schema entity baru jika belum ada di `components/schemas/`
-- [ ] Tidak ada duplikasi — gunakan `$ref` jika schema sudah ada
-- [ ] Semua field punya tipe yang benar (string, integer, boolean, dll.)
-- [ ] `required` array berisi field yang wajib ada
+- [ ] Create a new entity schema in `components/schemas/` if missing
+- [ ] No duplication — use `$ref` when a schema already exists
+- [ ] Every field has the correct type (string, integer, boolean, etc.)
+- [ ] `required` array lists the mandatory fields
 
 ## Entry File
 
-- [ ] `docs/openapi/openapi.yaml` diupdate dengan `$ref` ke path baru
-- [ ] Schema baru didaftarkan di `components.schemas`
-- [ ] File bisa di-parse oleh Swagger/Redoc tanpa error
+- [ ] `docs/openapi/openapi.yaml` updated with `$ref` to the new path
+- [ ] New schemas registered under `components.schemas`
+- [ ] File parses cleanly in Swagger/Redoc
 
-## Finalisasi
+## Finalization
 
-- [ ] Semua file diakhiri newline (EOF)
-- [ ] Tidak ada placeholder yang tersisa
+- [ ] Every file ends with a newline (EOF)
+- [ ] No remaining placeholders

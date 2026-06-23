@@ -1,11 +1,11 @@
 ---
 name: "web-code-review"
-description: "Melakukan code review frontend dengan standar senior lead yang tegas, fokus pada bug, regresi, risiko arsitektur, dan gap test di apps/web serta shared contract yang dipakai frontend."
+description: "Review frontend code with a firm senior-lead standard, focusing on bugs, regressions, architecture risks, and test gaps in apps/web and the shared contracts the frontend depends on."
 ---
 
-Source of truth ada di `.agents/skills/web-code-review/SKILL.md`.
+Source of truth lives at `.agents/skills/web-code-review/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/web-code-review/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/web-code-review/SKILL.md`.
+2. Follow the workflow and rules defined in that file.
+3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.

@@ -1,152 +1,145 @@
 {
-  "$schema": "Registry semua skill yang tersedia di project ini.",
+  "$schema": "Registry of all available skills in this project.",
   "skills": [
     {
       "name": "web-api-integrated",
-      "description": "Mengintegrasikan API ke frontend dengan Zod schema, response types, constants, dan react-query hooks. Gunakan saat implementasi endpoint dari API contract, Postman, atau Swagger.",
+      "description": "Integrate API endpoints into the frontend with Zod schemas, response types, constants, and react-query hooks. Use when implementing endpoints from an API contract, Postman, or Swagger.",
       "scope": "frontend",
       "path": ".agents/skills/web-api-integrated",
-      "whenToUse": "Integrasi endpoint ke frontend dengan schema, types, constants, dan hooks"
+      "whenToUse": "Integrate API endpoint to frontend with schema, types, constants, and hooks"
     },
     {
       "name": "web-bugfix",
-      "description": "Memperbaiki bug frontend dengan perubahan seminimal mungkin, menjaga surface lain tetap stabil, lalu memastikan schema, types, hooks, constants, tests, dan dokumentasi terkait ikut sinkron bila terdampak.",
+      "description": "Fix frontend bugs with minimum-touch changes, keep other surfaces stable, and sync schema, types, hooks, constants, tests, and related docs when impacted.",
       "scope": "frontend",
-      "whenToUse": "Fix bug frontend dengan perubahan minim touch dan sinkronisasi contract yang terdampak",
-      "path": ".agents/skills/web-bugfix"
+      "path": ".agents/skills/web-bugfix",
+      "whenToUse": "Fix frontend bug with minimal touch and sync impacted contracts"
     },
     {
       "name": "web-code-review",
-      "description": "Melakukan code review frontend dengan standar senior lead yang tegas, fokus pada bug, regresi, risiko arsitektur, dan gap test di apps/web serta shared contract yang dipakai frontend.",
+      "description": "Review frontend code with a firm senior-lead standard, focusing on bugs, regressions, architecture risks, and test gaps in apps/web and the shared contracts the frontend depends on.",
       "scope": "frontend",
-      "whenToUse": "Review kode frontend secara tegas sebelum merge atau saat audit kualitas implementasi",
-      "path": ".agents/skills/web-code-review"
+      "path": ".agents/skills/web-code-review",
+      "whenToUse": "Review frontend code strictly before merge or during quality audit"
     },
     {
       "name": "web-seo-geo-friendly",
-      "description": "Mengoptimalkan halaman publik Next.js App Router agar SEO-friendly dan GEO-friendly (Generative Engine Optimization). Gunakan saat user meminta optimasi SEO/GEO secara spesifik pada halaman publik.",
+      "description": "Optimize public Next.js App Router pages for SEO and GEO (Generative Engine Optimization). Use when the user explicitly requests SEO/GEO optimization on public pages.",
       "scope": "frontend",
       "path": ".agents/skills/web-seo-geo-friendly",
-      "whenToUse": "Optimasi SEO dan GEO untuk halaman publik Next.js"
+      "whenToUse": "SEO and GEO optimization for public Next.js pages"
     },
     {
       "name": "web-slicing",
-      "description": "Mengubah desain screenshot/Figma menjadi UI frontend pixel-perfect dengan komponen reusable. Gunakan saat task fokus pada implementasi tampilan dan layout halaman.",
+      "description": "Convert screenshot/Figma designs into pixel-perfect frontend UI with reusable components. Use when the task focuses on visual and layout implementation.",
       "scope": "frontend",
       "path": ".agents/skills/web-slicing",
-      "whenToUse": "Implementasi UI dari desain, screenshot, atau Figma"
+      "whenToUse": "Implement UI from design, screenshot, or Figma"
     },
     {
       "name": "api-bugfix",
-      "description": "Memperbaiki bug backend dengan perubahan seminimal mungkin, menjaga layer lain tetap stabil, lalu memastikan validator, DTO, OpenAPI, shared schema/types, tests, dan dokumentasi terkait ikut sinkron bila terdampak.",
+      "description": "Fix backend bugs with minimal touch, keep other layers stable, then sync validator, DTO, OpenAPI, shared schema/types, tests, and related docs when behavior is affected.",
       "scope": "backend",
-      "whenToUse": "Fix bug backend dengan perubahan minim touch dan sinkronisasi contract yang terdampak",
-      "path": ".agents/skills/api-bugfix"
+      "path": ".agents/skills/api-bugfix",
+      "whenToUse": "Fix backend bug with minimal touch and sync impacted contracts"
     },
     {
       "name": "api-code-review",
-      "description": "Melakukan code review backend dengan standar senior lead yang tegas, fokus pada bug, regresi, contract drift, risiko clean architecture, dan gap test di apps/api serta shared contract terkait.",
+      "description": "Review backend code with a senior lead standard, focused on bugs, regressions, contract drift, clean architecture risks, and test gaps in apps/api and related shared contracts.",
       "scope": "backend",
-      "whenToUse": "Review kode backend secara tegas sebelum merge atau saat audit kualitas implementasi",
-      "path": ".agents/skills/api-code-review"
+      "path": ".agents/skills/api-code-review",
+      "whenToUse": "Review backend code strictly before merge or during quality audit"
     },
     {
       "name": "api-feature",
-      "description": "Mengimplementasikan fitur backend baru mengikuti Clean Architecture. Gunakan saat ada task terkait endpoint baru, use case, entity, repository, atau perubahan layer aplikasi.",
+      "description": "Implement new backend features following Clean Architecture. Use for tasks involving new endpoints, use cases, entities, repositories, or application-layer changes.",
       "scope": "backend",
       "path": ".agents/skills/api-feature",
-      "whenToUse": "Implementasi fitur backend baru mengikuti Clean Architecture"
+      "whenToUse": "Implement new backend feature following Clean Architecture"
     },
     {
       "name": "db-prisma-schema",
-      "description": "Menulis atau mengubah apps/api/prisma/schema.prisma beserta langkah migrasi yang aman untuk PostgreSQL. Gunakan saat ada perubahan model database, relasi, index, enum, atau kebutuhan sinkronisasi schema dengan domain layer.",
+      "description": "Write or modify apps/api/prisma/schema.prisma and execute safe PostgreSQL migrations. Use for database model, relation, index, enum changes, or schema-to-domain-layer sync.",
       "scope": "backend",
       "path": ".agents/skills/db-prisma-schema",
-      "whenToUse": "Perubahan `schema.prisma` dan validasi migrasi PostgreSQL"
-    },
-    {
-      "name": "docs-api-contract",
-      "description": "Menyusun API contract FE-BE dari PRD/TRD, flow halaman, atau desain. Gunakan saat perlu endpoint list, request-response schema, validasi, dan error contract yang konsisten.",
-      "scope": "docs",
-      "path": ".agents/skills/docs-api-contract",
-      "whenToUse": "Menyusun contract API dari PRD, TRD, atau desain"
+      "whenToUse": "Changes to schema.prisma and PostgreSQL migration validation"
     },
     {
       "name": "docs-openapi",
-      "description": "Menulis atau memperbarui dokumentasi OpenAPI dalam format split per fitur di `docs/openapi`. Gunakan saat ada endpoint, request/response schema, atau contract API yang berubah.",
+      "description": "Write or update OpenAPI documentation in split-per-feature format under `docs/openapi`. Use when endpoints, request/response schemas, or API contracts change.",
       "scope": "docs",
       "path": ".agents/skills/docs-openapi",
-      "whenToUse": "Menulis atau memperbarui dokumentasi OpenAPI split per fitur"
+      "whenToUse": "Write or update split OpenAPI documentation per feature"
     },
     {
       "name": "ops-docker",
-      "description": "Menulis atau mengubah Dockerfile untuk backend ini agar siap deploy di Linux. Gunakan saat task terkait containerization, optimasi image, atau build/runtime issue di container. Docker Compose dikelola oleh server — jangan ubah.",
+      "description": "Write or modify Dockerfiles for this backend so it is ready to deploy on Linux. Use for tasks involving containerization, image optimization, or build/runtime issues in containers. Docker Compose is managed by the server — do not touch it.",
       "scope": "ops",
       "path": ".agents/skills/ops-docker",
-      "whenToUse": "Menulis atau mengubah Dockerfile backend siap deploy Linux"
+      "whenToUse": "Write or modify backend Dockerfile for Linux deployment"
     },
     {
       "name": "ops-mcp-setup",
-      "description": "Mengonfigurasi MCP server GitHub, Jira (Atlassian), Notion, dan Figma (opsional) di project ini agar skill flow dapat berjalan. Gunakan saat pertama kali setup project atau saat MCP belum terhubung.",
+      "description": "Configure the GitHub MCP server in this project so the agent can interact with the repository. Use on first-time project setup or when MCP is not yet connected.",
       "scope": "ops",
       "path": ".agents/skills/ops-mcp-setup",
-      "whenToUse": "Setup MCP GitHub, Jira, dan Notion untuk workflow repo ini"
-    },
-    {
-      "name": "flow-breakdown-feature",
-      "description": "Memecah ide fitur menjadi PRD dan TRD lengkap plus Feature ID terdaftar. Gunakan saat fitur baru belum terdokumentasi dan belum masuk registry.",
-      "scope": "flow",
-      "path": ".agents/skills/flow-breakdown-feature",
-      "whenToUse": "Pecah ide fitur menjadi PRD, TRD, dan registry entry"
-    },
-    {
-      "name": "flow-session-start",
-      "description": "Menangani perintah Mulai atau Start untuk onboarding repo: cek MCP, registry, memory, dan status kerja lalu arahkan user ke next step yang tepat.",
-      "scope": "flow",
-      "whenToUse": "Onboarding sesi saat user mengetik Mulai, Start, atau Mulai Vibe Coding",
-      "path": ".agents/skills/flow-session-start"
-    },
-    {
-      "name": "flow-task-completion",
-      "description": "Menyelesaikan issue GitHub atau task Jira end-to-end dari branching sampai PR dan status update. Gunakan saat user meminta eksekusi task implementasi lengkap berbasis tiket.",
-      "scope": "flow",
-      "path": ".agents/skills/flow-task-completion",
-      "whenToUse": "Eksekusi task delivery end-to-end dari ticket sampai PR"
-    },
-    {
-      "name": "flow-test-scenario",
-      "description": "Membuat test scenario manual QA dari PRD/TRD suatu fitur, mengupload hasilnya ke Notion, lalu mengupdate tiket Jira dan GitHub issue dengan link Notion. Gunakan setelah implementasi selesai atau paralel dengan task Backend.",
-      "scope": "flow",
-      "path": ".agents/skills/flow-test-scenario",
-      "whenToUse": "Susun manual QA scenario dan publish ke Notion/Jira/GitHub"
-    },
-    {
-      "name": "flow-workflow-bootstrap",
-      "description": "Menjalankan bootstrap work item Jira dan GitHub dari dokumen PRD/TRD feature. Gunakan setelah flow-breakdown-feature selesai dan perlu pembuatan tiket delivery secara terstruktur.",
-      "scope": "flow",
-      "path": ".agents/skills/flow-workflow-bootstrap",
-      "whenToUse": "Bootstrap Notion, Jira, dan GitHub issue dari PRD/TRD"
+      "whenToUse": "Setup GitHub MCP for this repo's workflow"
     },
     {
       "name": "meta-skill-hygiene",
-      "description": "Mengaudit, menyinkronkan, dan menjaga konsistensi metadata skill di repo ini. Gunakan saat ada perubahan skill, registry, wrapper, atau metadata agent.",
+      "description": "Audit, sync, and maintain skill metadata consistency across this repo. Use when skills, the registry, Claude wrappers, or agent metadata change.",
       "scope": "meta",
       "path": ".agents/skills/meta-skill-hygiene",
-      "whenToUse": "Audit dan hygiene metadata skill di repo ini"
+      "whenToUse": "Audit and maintain skill metadata consistency"
     },
     {
       "name": "skill-add-example",
-      "description": "Menambahkan contoh kode nyata ke .agents/examples/ agar bisa dijadikan referensi oleh skill lain. Gunakan saat ada pattern baru yang perlu dibakukan sebagai template atau referensi agent.",
+      "description": "Add real code examples to .agents/examples/ so other skills can reference them. Use when a new pattern needs to be standardized as a template or agent reference.",
       "scope": "meta",
       "path": ".agents/skills/skill-add-example",
-      "whenToUse": "Tambah example code yang reusable untuk skill lain"
+      "whenToUse": "Add reusable example code for other skills"
     },
     {
       "name": "skill-creator",
-      "description": "Membuat skill baru dari nol dengan struktur lengkap — SKILL.md, references, templates, openai.yaml, Claude wrapper, dan registrasi di manifest + AGENTS.md + CLAUDE.md. Gunakan saat user ingin menambahkan capability baru ke agent system.",
+      "description": "Create a new skill from scratch with full structure — SKILL.md, references, templates, openai.yaml, Claude wrapper, and registration in manifest + AGENTS.md + CLAUDE.md.",
       "scope": "meta",
       "path": ".agents/skills/skill-creator",
-      "whenToUse": "Membuat atau memperbarui skill repo ini dengan format yang konsisten"
+      "whenToUse": "Create or update skills with consistent format"
+    },
+    {
+      "name": "openspec-apply-change",
+      "description": "Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.",
+      "scope": "openspec",
+      "path": ".agents/skills/openspec-apply-change",
+      "whenToUse": "Implement tasks from an active OpenSpec change"
+    },
+    {
+      "name": "openspec-archive-change",
+      "description": "Archive a completed change in the experimental workflow. Use when the user wants to finalize and archive a change after implementation is complete.",
+      "scope": "openspec",
+      "path": ".agents/skills/openspec-archive-change",
+      "whenToUse": "Archive a completed OpenSpec change"
+    },
+    {
+      "name": "openspec-explore",
+      "description": "Enter explore mode - a thinking partner for exploring ideas, investigating problems, and clarifying requirements. Use when the user wants to think through something before or during a change.",
+      "scope": "openspec",
+      "path": ".agents/skills/openspec-explore",
+      "whenToUse": "Explore and think through ideas before committing to a change"
+    },
+    {
+      "name": "openspec-propose",
+      "description": "Propose a new change with all artifacts generated in one step. Use when the user wants to quickly describe what they want to build and get a complete proposal with design, specs, and tasks ready for implementation.",
+      "scope": "openspec",
+      "path": ".agents/skills/openspec-propose",
+      "whenToUse": "Start a new feature — turn an idea into proposal + specs + design + tasks"
+    },
+    {
+      "name": "openspec-sync-specs",
+      "description": "Sync delta specs from a change to main specs. Use when the user wants to update main specs with changes from a delta spec, without archiving the change.",
+      "scope": "openspec",
+      "path": ".agents/skills/openspec-sync-specs",
+      "whenToUse": "Sync delta specs to main specs"
     }
   ]
 }

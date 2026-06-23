@@ -1,13 +1,13 @@
 # Context: ops-docker
 
-## File Target
+## Target Files
 
 ```
 apps/api/Dockerfile
 apps/worker/Dockerfile
 ```
 
-## Monorepo Structure di Container
+## Monorepo Structure in Container
 
 ```
 /app/
@@ -22,23 +22,23 @@ apps/worker/Dockerfile
     └── worker/
 ```
 
-## Prisma di Docker
+## Prisma in Docker
 
-Jika `apps/api` menggunakan Prisma, tambahkan di builder stage:
+If `apps/api` uses Prisma, add to builder stage:
 
 ```dockerfile
 COPY apps/api/prisma ./apps/api/prisma
 RUN cd apps/api && bunx prisma generate
 ```
 
-Dan di runner stage, copy schema Prisma:
+And in runner stage, copy Prisma schema:
 ```dockerfile
 COPY --from=builder /app/apps/api/prisma ./prisma
 ```
 
 ## Environment Variables
 
-Jangan hardcode di Dockerfile. Inject saat `docker run` atau via orchestrator:
+Never hardcode in Dockerfile. Inject at `docker run` or via orchestrator:
 
 ```bash
 docker run \
@@ -51,20 +51,20 @@ docker run \
 ## Build Command
 
 ```bash
-# Dari root monorepo
+# From monorepo root
 docker build -f apps/api/Dockerfile -t my-api:latest .
 docker build -f apps/worker/Dockerfile -t my-worker:latest .
 ```
 
-Context build harus dari root agar `packages/` bisa di-copy.
+Build context must be the root so `packages/` can be copied.
 
 ## Layer Caching Tips
 
-Urutan COPY yang optimal untuk cache hit:
-1. `package.json` + `bun.lockb` (jarang berubah)
-2. `packages/` (jarang berubah)
-3. `bun install` (cache berdasarkan lockfile)
-4. Source code (sering berubah — taruh terakhir)
+Optimal COPY order for cache hits:
+1. `package.json` + `bun.lockb` (rarely change)
+2. `packages/` (rarely change)
+3. `bun install` (cache keyed by lockfile)
+4. Source code (changes often — place last)
 
 ## .dockerignore
 

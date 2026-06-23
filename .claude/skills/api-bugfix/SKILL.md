@@ -1,11 +1,11 @@
 ---
 name: "api-bugfix"
-description: "Memperbaiki bug backend dengan perubahan seminimal mungkin, menjaga layer lain tetap stabil, lalu memastikan validator, DTO, OpenAPI, shared schema/types, tests, dan dokumentasi terkait ikut sinkron bila terdampak."
+description: "Fix backend bugs with minimal touch, keep other layers stable, then sync validator, DTO, OpenAPI, shared schema/types, tests, and related docs when behavior is affected."
 ---
 
-Source of truth ada di `.agents/skills/api-bugfix/SKILL.md`.
+Source of truth lives at `.agents/skills/api-bugfix/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/api-bugfix/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/api-bugfix/SKILL.md`.
+2. Follow the workflow and rules defined in that file.
+3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.

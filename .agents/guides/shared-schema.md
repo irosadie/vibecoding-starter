@@ -117,6 +117,7 @@ export * from './notification-channel'
 
 ## Aturan Tambahan
 
+- **Jika field memiliki kumpulan nilai tetap (fixed set), WAJIB deklarasikan di sini sebagai `as const` array + type alias + `z.enum()`.** Ini adalah satu-satunya source of truth enum — Prisma, BE, dan FE semua import dari `packages/schemas/`. Nilai selalu `SCREAMING_SNAKE_CASE`.
 - Setiap schema file wajib punya test file (`*.test.ts`)
 - Export constant helper bila memang dibutuhkan bersama schema yang terkait
 - Type alias suffix: `SchemaProps` untuk form/payload (misal `PaymentMethodSchemaProps`)

@@ -1,30 +1,30 @@
 ---
 name: docs-openapi
-description: Menulis atau memperbarui dokumentasi OpenAPI dalam format split per fitur di `docs/openapi`. Gunakan saat ada endpoint, request/response schema, atau contract API yang berubah.
+description: Write or update OpenAPI documentation in split-per-feature format under `docs/openapi`. Use when endpoints, request/response schemas, or API contracts change.
 ---
 
 # Skill: Docs OpenAPI
 
-## Context Cepat (Wajib)
+## Context (Required)
 - Output folder: `docs/openapi/`
 - Entry file: `docs/openapi/openapi.yaml`
-- Split per fitur: `docs/openapi/paths/{feature-slug}.yaml`
+- Per-feature split: `docs/openapi/paths/{feature-slug}.yaml`
 
-Gunakan skill ini untuk menerjemahkan API contract menjadi spec OpenAPI yang konsisten, reusable, dan bisa diparse tooling.
+Use this skill to translate API contracts into consistent, reusable, tool-parseable OpenAPI specs.
 
-## Alur Kerja
+## Workflow
 
-1. Baca API contract atau endpoint final yang akan didokumentasikan.
-2. Tentukan apakah schema dan response shared sudah ada di `components/`.
-3. Tulis atau perbarui file `paths/{feature}.yaml` untuk endpoint fitur tersebut.
-4. Tambahkan `$ref` yang diperlukan ke `openapi.yaml`.
-5. Validasi bahwa semua `$ref` menunjuk file dan key yang benar.
+1. Read the API contract or finalized endpoints to document.
+2. Determine whether the required shared schemas and responses already exist in `components/`.
+3. Write or update `paths/{feature}.yaml` for the feature's endpoints.
+4. Add the required `$ref` entries in `openapi.yaml`.
+5. Validate that every `$ref` points to an existing file and key.
 
-## Struktur File
+## File Structure
 
 ```
 docs/openapi/
-├── openapi.yaml              ← entry, $ref ke paths + components
+├── openapi.yaml              ← entry, $ref to paths + components
 ├── paths/
 │   ├── payment-methods.yaml
 │   └── users.yaml
@@ -37,7 +37,7 @@ docs/openapi/
         └── Validation.yaml
 ```
 
-## Format openapi.yaml (Entry)
+## openapi.yaml Format (Entry)
 
 ```yaml
 openapi: "3.0.3"
@@ -60,7 +60,7 @@ components:
       $ref: "./components/responses/NotFound.yaml"
 ```
 
-## Format paths/{feature}.yaml
+## paths/{feature}.yaml Format
 
 ```yaml
 PaymentMethodsList:
@@ -129,26 +129,26 @@ PaymentMethodsList:
         $ref: "../components/responses/Validation.yaml"
 ```
 
-## Aturan
+## Rules
 
-- Gunakan OpenAPI 3.0.3
-- Split per fitur — jangan taruh semua endpoint di satu file
-- `$ref` untuk schema dan response yang dipakai lebih dari sekali
-- Tag = nama fitur (PascalCase)
-- Semua response error pakai shared `components/responses/`
+- Use OpenAPI 3.0.3
+- Split per feature — never dump all endpoints into one file
+- `$ref` for any schema or response used more than once
+- Tag = feature name (PascalCase)
+- Every error response uses the shared `components/responses/`
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** duplikasi schema yang sebenarnya bisa direferensikan dari `components/`.
-- **DILARANG** menaruh semua endpoint repo di satu file path.
-- **DILARANG** membiarkan response body tanpa schema yang eksplisit.
-- **DILARANG** menyisakan `$ref` rusak atau placeholder yang tidak valid.
+- **NEVER** duplicate schemas that can be referenced from `components/`.
+- **NEVER** place all repo endpoints in a single path file.
+- **NEVER** leave a response body without an explicit schema.
+- **NEVER** leave broken `$ref` entries or invalid placeholders.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] File `paths/{feature}.yaml` sudah mencakup semua endpoint fitur
-- [ ] `openapi.yaml` sudah mereferensikan path baru
-- [ ] Shared schemas dan responses dipakai ulang via `$ref`
-- [ ] Tidak ada placeholder atau `$ref` rusak
-- [ ] Spec bisa diparse tooling OpenAPI
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] `paths/{feature}.yaml` covers every endpoint of the feature
+- [ ] `openapi.yaml` references the new path
+- [ ] Shared schemas and responses are reused via `$ref`
+- [ ] No placeholders or broken `$ref` entries
+- [ ] Spec parses with standard OpenAPI tooling
+- [ ] Every file ends with a newline (EOF)

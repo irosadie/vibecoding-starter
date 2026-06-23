@@ -1,17 +1,17 @@
 # Checklist: DB Prisma Schema
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `references/context.md`
-- [ ] Baca `apps/api/prisma/schema.prisma` sebelum ubah apapun
-- [ ] Naming model: prefix sesuai kategori
-- [ ] `@@map` ada, format snake_case plural
-- [ ] `@map` ada di semua field yang perlu
-- [ ] Boolean fields: prefix `is` atau `has`
-- [ ] Enum values: SCREAMING_SNAKE_CASE
-- [ ] Field standar ada: id, createdAt, updatedAt
-- [ ] Relasi: `@relation(fields, references)` benar
-- [ ] Index: `@@index` untuk FK dan field yang sering diquery
-- [ ] `bunx prisma validate` pass
-- [ ] `bunx prisma format` dijalankan
-- [ ] `bunx prisma generate` dijalankan
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Read `.agents/settings.json`
+- [ ] Read `references/context.md`
+- [ ] Read `apps/api/prisma/schema.prisma` before any change
+- [ ] Model naming: prefix matches the category
+- [ ] `@@map` present, snake_case plural
+- [ ] `@map` present on every field that needs it
+- [ ] Boolean fields prefixed `is` or `has`
+- [ ] Enum values in SCREAMING_SNAKE_CASE
+- [ ] Standard fields present: id, createdAt, updatedAt
+- [ ] Relations: `@relation(fields, references)` correct
+- [ ] Indexes: `@@index` on FKs and frequently queried fields
+- [ ] `bunx prisma validate` passes
+- [ ] `bunx prisma format` run
+- [ ] `bunx prisma generate` run
+- [ ] Every file ends with a newline (EOF)

@@ -1,44 +1,4 @@
 export const queryKeys = {
-  auth: {
-    register: "authRegister",
-    login: "authLogin",
-    logout: "authLogout",
-    me: "authMe",
-  },
-  creatorApplications: {
-    index: "creatorApplicationsIndex",
-    get: "creatorApplicationsGet",
-    insert: "creatorApplicationsInsert",
-    update: "creatorApplicationsUpdate",
-    delete: "creatorApplicationsDelete",
-  },
-  creatorExams: {
-    index: "creatorExamsIndex",
-    get: "creatorExamsGet",
-    insert: "creatorExamsInsert",
-    update: "creatorExamsUpdate",
-    delete: "creatorExamsDelete",
-    insertQuestion: "creatorExamsInsertQuestion",
-    updateQuestion: "creatorExamsUpdateQuestion",
-    submitReview: "creatorExamsSubmitReview",
-  },
-  adminExamReviews: {
-    index: "adminExamReviewsIndex",
-    get: "adminExamReviewsGet",
-    approve: "adminExamReviewsApprove",
-    reject: "adminExamReviewsReject",
-  },
-  catalogExams: {
-    index: "catalogExamsIndex",
-    get: "catalogExamsGet",
-  },
-  commerce: {
-    cart: "commerceCart",
-    addToCart: "commerceAddToCart",
-    removeCartItem: "commerceRemoveCartItem",
-    checkout: "commerceCheckout",
-    orderStatus: "commerceOrderStatus",
-  },
   emailJobs: {
     template: "emailJobsTemplate",
     insert: "emailJobsInsert",

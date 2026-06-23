@@ -1,81 +1,80 @@
 ---
 name: api-bugfix
-description: Memperbaiki bug backend dengan perubahan seminimal mungkin, menjaga layer lain tetap stabil, lalu memastikan validator, DTO, OpenAPI, shared schema/types, tests, dan dokumentasi terkait ikut sinkron bila terdampak.
+description: Fix backend bugs with minimal touch, keep other layers stable, then sync validator, DTO, OpenAPI, shared schema/types, tests, and related docs when behavior is affected.
 ---
 
 # Skill: API Bugfix
 
-## Context Cepat (Wajib)
+## Context (Required)
 - Folder scope + impact map: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+- Execution checklist: `templates/checklist.md`
 
-Gunakan skill ini saat user meminta fix bug backend. Prinsip utamanya: **minimal touch**. Temukan akar masalah, ubah sekecil mungkin, jaga layering tetap bersih, lalu sinkronkan validator, DTO, OpenAPI, shared schema/types, dan test bila perilaku endpoint memang terdampak.
+Use this skill when the user asks to fix a backend bug. Core principle: **minimal touch**. Find the root cause, change as little as possible, keep layering clean, then sync validator, DTO, OpenAPI, shared schema/types, and tests when endpoint behavior is actually affected.
 
-## Alur Kerja
+## Workflow
 
-### 1. Reproduksi atau Definisikan Bug dengan Jelas
+### 1. Reproduce or Define the Bug Clearly
 
-Sebelum mengubah kode:
-- pahami gejala bug
-- cari failing behavior yang jelas di route, service, use case, queue, atau persistence
-- tentukan boundary bug: request validation, business rule, response mapping, repository, atau side effect
+Before changing code:
+- understand the symptom
+- identify the failing behavior in route, service, use case, queue, or persistence
+- locate the boundary: request validation, business rule, response mapping, repository, or side effect
 
-Jika bisa, tambahkan atau ubah test yang merepresentasikan bug tersebut.
+When possible, add or modify a test that represents the bug.
 
-### 2. Lokalisasi Root Cause
+### 2. Localize the Root Cause
 
-Cari root cause sekecil mungkin. Prioritaskan lokasi berikut:
-- route / validator jika bug ada di request parsing
-- controller / service jika bug ada di orchestration atau response shaping
-- use case jika bug adalah business logic
-- repository / infra jika bug ada di persistence atau external side effect
+Find the smallest possible root cause. Prioritize by location:
+- route / validator if the bug is in request parsing
+- controller / service if the bug is in orchestration or response shaping
+- use case if the bug is business logic
+- repository / infra if the bug is in persistence or external side effect
 
-Jangan merombak beberapa layer sekaligus jika satu layer cukup untuk memperbaiki bug.
+Do not rewrite multiple layers when one layer is enough to fix the bug.
 
-### 3. Terapkan Perbaikan Minimal
+### 3. Apply a Minimal Fix
 
-Aturan minimal touch:
-- sentuh file sesedikit mungkin
-- pertahankan boundary `route -> controller -> service -> use case`
-- jangan refactor unrelated layer
-- jangan ubah naming atau struktur hanya karena sedang berada di file itu
+Minimal touch rules:
+- touch as few files as possible
+- preserve the `route -> controller -> service -> use case` boundary
+- do not refactor unrelated layers
+- do not rename or restructure just because the file is open
 
-### 4. Sinkronkan Contract dan Dokumentasi yang Terdampak
+### 4. Sync Contract and Docs That Are Affected
 
-Jika bugfix mengubah perilaku endpoint, request shape, response shape, atau error semantics, update yang memang perlu:
-- validator dan DTO
+If the fix changes endpoint behavior, request shape, response shape, or error semantics, update what is actually needed:
+- validator and DTO
 - `packages/schemas`
 - `packages/types`
-- `docs/api-contracts`
-- split OpenAPI di `docs/openapi/`
+- split OpenAPI in `docs/openapi/`
 - merged spec via `bun run openapi:generate`
-- test yang relevan
+- relevant tests
 
-Jangan biarkan endpoint behavior berubah tetapi OpenAPI dan shared types tetap lama.
+Do not let endpoint behavior change while OpenAPI and shared types stay stale.
 
-### 5. Verifikasi Sempit tapi Teliti
+### 5. Verify Narrowly but Thoroughly
 
-Minimal verifikasi:
-- test yang mereproduksi atau melindungi bug
-- lint/typecheck untuk surface yang tersentuh
-- generate OpenAPI jika contract berubah
-- cek tidak ada drift baru antara code, shared contract, dan docs
+Minimum verification:
+- test that reproduces or guards the bug
+- lint/typecheck on the touched surface
+- generate OpenAPI if the contract changed
+- confirm no new drift between code, shared contract, and docs
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** refactor lintas layer saat tujuan user hanya fix bug.
-- **DILARANG** mengubah file lain hanya karena "sekalian dibereskan".
-- **DILARANG** membiarkan validator/DTO/OpenAPI/shared types drift bila bugfix mengubah behavior endpoint.
-- **DILARANG** memindahkan business logic ke layer HTTP hanya demi fix cepat.
-- **DILARANG** selesai tanpa verifikasi terarah.
+- **NEVER** refactor across layers when the user's goal is only a bugfix.
+- **NEVER** change unrelated files "while you're at it".
+- **NEVER** let validator/DTO/OpenAPI/shared types drift when the fix changes endpoint behavior.
+- **NEVER** move business logic into the HTTP layer for a quick fix.
+- **NEVER** finish without targeted verification.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Bug direproduksi atau perilaku salah didefinisikan jelas
-- [ ] Root cause dilokalisasi ke layer terkecil yang masuk akal
-- [ ] Perubahan tetap minimal touch
-- [ ] Validator/DTO/schema/type/docs/OpenAPI ikut diupdate bila memang terdampak
-- [ ] Test yang relevan ditambah atau diperbarui
-- [ ] `bun run openapi:generate` dijalankan jika contract berubah
-- [ ] Tidak ada drift baru di contract backend
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Bug reproduced or faulty behavior defined clearly
+- [ ] Root cause localized to the smallest reasonable layer
+- [ ] Changes remain minimal touch
+- [ ] Validator/DTO/schema/type/docs/OpenAPI updated when affected
+- [ ] Relevant tests added or updated
+- [ ] `bun run openapi:generate` run if contract changed
+- [ ] No new drift in backend contract
+- [ ] All files end with a newline (EOF)

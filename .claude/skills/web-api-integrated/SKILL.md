@@ -1,11 +1,11 @@
 ---
 name: "web-api-integrated"
-description: "Mengintegrasikan API ke frontend dengan Zod schema, response types, constants, dan react-query hooks. Gunakan saat implementasi endpoint dari API contract, Postman, atau Swagger."
+description: "Integrate API endpoints into the frontend with Zod schemas, response types, constants, and react-query hooks. Use when implementing endpoints from an API contract, Postman, or Swagger."
 ---
 
-Source of truth ada di `.agents/skills/web-api-integrated/SKILL.md`.
+Source of truth lives at `.agents/skills/web-api-integrated/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/web-api-integrated/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/web-api-integrated/SKILL.md`.
+2. Follow the workflow and rules defined in that file.
+3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.

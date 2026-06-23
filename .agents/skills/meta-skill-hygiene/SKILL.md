@@ -1,38 +1,38 @@
 ---
 name: meta-skill-hygiene
-description: Mengaudit, menyinkronkan, dan menjaga konsistensi metadata skill di repo ini. Gunakan saat ada perubahan skill, registry, wrapper, atau metadata agent.
+description: Audit, sync, and maintain skill metadata consistency across this repo. Use when skills, the registry, Claude wrappers, or agent metadata change.
 ---
 
 # Skill: Meta Skill Hygiene
 
-## Context Cepat (Wajib)
-- Scope + file target: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Scope + target files: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-Gunakan skill ini untuk menjaga semua assets skill tetap sinkron: `SKILL.md`, `manifest.json`, `agents/openai.yaml`, wrapper Claude, dan registry di `AGENTS.md` / `CLAUDE.md`.
+Use this skill to keep every skill asset in sync: `SKILL.md`, `manifest.json`, `agents/openai.yaml`, the Claude wrapper, and the registry sections in `AGENTS.md` / `CLAUDE.md`.
 
-## Alur Kerja
+## Workflow
 
-1. Identifikasi source of truth yang berubah:
-   - `SKILL.md` untuk nama dan deskripsi
-   - `manifest.json` untuk `scope`, `path`, dan `whenToUse`
-   - `agents/openai.yaml` untuk metadata Codex/OpenAI
-2. Jika ada skill baru atau rename, scaffold/update source of truth terlebih dahulu.
-3. Jalankan `bun run skills:sync` untuk regenerate registry dan wrapper Claude.
-4. Jalankan `bun run skills:validate` untuk memastikan tidak ada drift atau file yang hilang.
-5. Jika validasi gagal, perbaiki source of truth, lalu sync dan validate ulang.
+1. Identify which source of truth changed:
+   - `SKILL.md` for name and description
+   - `manifest.json` for `scope`, `path`, and `whenToUse`
+   - `agents/openai.yaml` for Codex/OpenAI metadata
+2. For new skills or renames, scaffold/update the source of truth first.
+3. Run `bun run skills:sync` to regenerate the registry and Claude wrapper.
+4. Run `bun run skills:validate` to confirm no drift or missing files.
+5. If validation fails, fix the source of truth, then sync and validate again.
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** menjadikan wrapper Claude atau section generated di registry sebagai source of truth.
-- **DILARANG** mengedit blok di antara marker `<!-- skill-registry:* -->` atau `<!-- skill-links:* -->` tanpa menjalankan sync ulang.
-- **DILARANG** memperbaiki drift dengan mengubah output generated saja; perbaiki file sumbernya.
-- **DILARANG** membiarkan `manifest.json` tanpa `whenToUse` untuk skill apa pun.
+- **NEVER** treat the Claude wrapper or the generated registry sections as the source of truth.
+- **NEVER** edit blocks between `<!-- skill-registry:* -->` or `<!-- skill-links:* -->` markers without re-running sync.
+- **NEVER** fix drift by editing the generated output only; fix the source file.
+- **NEVER** leave `manifest.json` without `whenToUse` for any skill.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Source of truth perubahan sudah jelas
-- [ ] `bun run skills:sync` sudah dijalankan
-- [ ] `bun run skills:validate` pass
-- [ ] Tidak ada drift antara manifest, wrapper, dan registry
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Source of truth for the change is clear
+- [ ] `bun run skills:sync` run
+- [ ] `bun run skills:validate` passes
+- [ ] No drift between manifest, wrapper, and registry
+- [ ] Every file ends with a newline (EOF)

@@ -1,52 +1,39 @@
 # Context: Web Slicing
 
-## Folder Target
+## Target Folder
 
 ```
 apps/web/
 ├── app/                  → page.tsx + *-content.tsx
-└── components/           → reusable UI (jika perlu share antar halaman)
+└── components/           → reusable UI (only when shared across pages)
 ```
 
-## Struktur Halaman (WAJIB)
+## Page Structure (Required)
 
 ```
 app/(group)/[feature]/
-├── page.tsx               → Server Component, Suspense wrapper saja
-└── [feature]-content.tsx  → Client Component, semua logic di sini
+├── page.tsx               → Server Component, Suspense wrapper only
+└── [feature]-content.tsx  → Client Component, all logic lives here
 ```
 
-**Tidak ada** `_components/` subfolder. Dialog, form, table — semua inline di content file.
+**No** `_components/` subfolder. Dialog, form, table — all inline in the content file.
 
-## Contoh Kode Nyata
+## Real Code Examples
 
-### Example 1 — CRUD Basic (Template)
-Lokasi: `.agents/examples/web-slicing/nextjs-app-router/examples/`
+### Example 1 — Basic CRUD (Template)
+Location: `.agents/examples/web-slicing/nextjs-app-router/examples/`
 
 Pattern: useDataTable + useQueryParam + debounce + SweetAlert preConfirm + ActionsDropdown
 
-File:
+Files:
 - `page.tsx` — Suspense wrapper
-- `examples-content.tsx` — semua logic: list, search, form dialog, delete confirm
+- `examples-content.tsx` — all logic: list, search, form dialog, delete confirm
 
-**Gunakan untuk:** halaman CRUD dengan field sederhana.
+**Use for:** CRUD pages with simple fields.
 
 ---
 
-### Example 2 — CRUD dengan Form Kompleks (REFERENSI UTAMA)
-Lokasi: `.agents/examples/web-slicing/nextjs-app-router/payment-methods/`
-
-Pattern: useDataTable + useQueryParam + debounce + SweetAlert preConfirm + Select component + RadioGroup + form dengan watch/setValue
-
-File:
-- `page.tsx` — Suspense wrapper
-- `payment-methods-content.tsx` — **Baca ini dulu** untuk pola lengkap
-
-**Gunakan untuk:** halaman dengan form kompleks (Select, RadioGroup, banyak field).
-
----
-
-## Pattern Penting
+## Key Patterns
 
 ### `page.tsx` — Suspense Wrapper
 
@@ -64,7 +51,7 @@ export default function FeaturePage() {
 }
 ```
 
-### Search dengan `useQueryParam` + `debounce`
+### Search with `useQueryParam` + `debounce`
 
 ```tsx
 const [tempQuery, setTempQuery] = useState(currentSearch)
@@ -154,15 +141,15 @@ const handleOnDelete = (id: string) => {
 />
 ```
 
-## Teknologi yang Dipakai
+## Tech Stack
 
-| Teknologi | Kegunaan |
-|-----------|---------|
+| Technology | Use |
+|-----------|-----|
 | Next.js App Router | Routing, layout, page |
 | Tailwind CSS | Styling |
-| react-hook-form + zodResolver | Form state + validasi |
-| SweetAlert2 | Konfirmasi delete |
-| react-hot-toast | Notifikasi sukses/error |
+| react-hook-form + zodResolver | Form state + validation |
+| SweetAlert2 | Delete confirmation |
+| react-hot-toast | Success/error notifications |
 | Lucide React | Icons |
-| useQueryParam | Filter & pagination di URL |
+| useQueryParam | Filter & pagination in URL |
 | debounce utility | Debounce search input |

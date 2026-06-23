@@ -1,81 +1,80 @@
 ---
 name: skill-add-example
-description: Menambahkan contoh kode nyata ke .agents/examples/ agar bisa dijadikan referensi oleh skill lain. Gunakan saat ada pattern baru yang perlu dibakukan sebagai template atau referensi agent.
+description: Add real code examples to .agents/examples/ so other skills can reference them. Use when a new pattern needs to be standardized as a template or agent reference.
 ---
 
 # Skill: Skill Add Example
 
-## Context Cepat (Wajib)
-- Folder scope + konvensi: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Scope folder + conventions: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-Tambahkan contoh kode nyata yang sudah terbukti ke `.agents/examples/` agar agent bisa merujuknya saat eksekusi skill.
+Add proven, real code examples to `.agents/examples/` so the agent can reference them when executing skills.
 
-## Alur Kerja
+## Workflow
 
-### 1. Tentukan Scope & Skill Target
-- Identifikasi skill mana yang akan menggunakan example ini (misal: `web-slicing`, `web-api-integrated`)
-- Tentukan nama subfolder yang deskriptif (kebab-case): misal `payment-methods`, `use-products`
+### 1. Determine Scope & Target Skill
+- Identify the skill that will use this example (e.g. `web-slicing`, `web-api-integrated`)
+- Pick a descriptive subfolder name (kebab-case): e.g. `use-products`
 
-### 2. Tentukan Lokasi Example
+### 2. Choose Example Location
 
 ```
 .agents/examples/
 └── {skill-name}/           → folder per skill
-    └── {subfolder}/        → konteks spesifik (framework, domain, dll.)
-        └── {example-name}/ → nama example (kebab-case, deskriptif)
-            ├── {file}.ts   → file kode nyata
-            └── {file}.tsx  → file kode nyata
+    └── {subfolder}/        → specific context (framework, domain, etc.)
+        └── {example-name}/ → example name (kebab-case, descriptive)
+            ├── {file}.ts   → real code file
+            └── {file}.tsx  → real code file
 ```
 
-Contoh lokasi yang sudah ada:
-- `.agents/examples/web-slicing/nextjs-app-router/examples/` — CRUD basic
-- `.agents/examples/web-slicing/nextjs-app-router/payment-methods/` — CRUD kompleks
-- `.agents/examples/web-api-integrated/hooks/use-examples/` — hooks CRUD
+Existing locations:
+- `.agents/examples/web-slicing/nextjs-app-router/examples/` — basic CRUD
+- `.agents/examples/web-api-integrated/hooks/use-examples/` — CRUD hooks
 
-### 3. Tulis File Example
+### 3. Write Example Files
 
-- Salin kode nyata dari codebase (bukan fabricated) — kalau belum ada, buat berdasarkan pattern yang sudah disepakati
-- Pastikan kode **bisa langsung dijadikan template** oleh agent
-- Hapus hardcoded business logic yang terlalu spesifik — ganti dengan placeholder yang jelas
-- Pertahankan nama variabel dan struktur asli agar mudah dipahami
+- Copy real code from the codebase (not fabricated) — if none exists, build from an established pattern
+- Ensure the code is **directly usable as a template** by the agent
+- Replace overly specific business logic with clear placeholders
+- Preserve original variable names and structure for clarity
 
-### 4. Update Referensi di Skill Terkait
+### 4. Update References in Related Skill
 
-Setelah example ditambahkan, perbarui `references/context.md` di skill yang memakai example ini:
+After adding the example, update `references/context.md` in the skill that uses it:
 
 ```markdown
-## Contoh Kode Nyata
+## Real Code Examples
 
-### Example N — {Nama Example}
-Lokasi: `.agents/examples/{skill-name}/{subfolder}/{example-name}/`
+### Example N — {Example Name}
+Location: `.agents/examples/{skill-name}/{subfolder}/{example-name}/`
 
-Pattern: {daftar pattern yang dicontohkan}
+Pattern: {list of patterns demonstrated}
 
-File:
-- `{file}.tsx` — {penjelasan singkat}
+Files:
+- `{file}.tsx` — {short description}
 
-**Gunakan untuk:** {skenario kapan example ini relevan}
+**Use for:** {scenario when this example is relevant}
 ```
 
-### 5. Pastikan Example Bisa Ditemukan
+### 5. Make Example Discoverable
 
-- Tambahkan komentar di baris pertama file: `// Example: {deskripsi singkat}`
-- Jika ada banyak file, tambahkan `README.md` singkat di folder example (opsional, hanya jika kompleks)
+- Add a comment on the first line of the file: `// Example: {short description}`
+- For multi-file examples, add a brief `README.md` in the example folder (optional, only if complex)
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** menambahkan example yang belum pernah dipakai di codebase nyata — validasi dulu di project.
-- **DILARANG** menyimpan secret, credential, atau data sensitif di file example.
-- **DILARANG** membuat example di root `.agents/examples/` tanpa subfolder skill.
-- **DILARANG** duplikasi example yang sudah ada — cek lebih dulu.
-- **DILARANG** skip update `references/context.md` di skill terkait.
+- **FORBIDDEN** to add examples that have not been used in real codebases — validate in the project first.
+- **FORBIDDEN** to store secrets, credentials, or sensitive data in example files.
+- **FORBIDDEN** to create examples at the root `.agents/examples/` without a skill subfolder.
+- **FORBIDDEN** to duplicate existing examples — check first.
+- **FORBIDDEN** to skip updating `references/context.md` in the related skill.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Scope dan skill target ditentukan
-- [ ] Lokasi folder dipilih sesuai konvensi (`{skill-name}/{subfolder}/{example-name}/`)
-- [ ] File example ditulis — kode nyata, bisa dijadikan template
-- [ ] Kode tidak mengandung secret atau data sensitif
-- [ ] `references/context.md` di skill terkait diperbarui dengan entry example baru
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Scope and target skill identified
+- [ ] Folder location chosen per convention (`{skill-name}/{subfolder}/{example-name}/`)
+- [ ] Example files written — real code, usable as template
+- [ ] No secrets or sensitive data in code
+- [ ] `references/context.md` in related skill updated with new example entry
+- [ ] All files end with newline (EOF)

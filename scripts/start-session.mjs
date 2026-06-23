@@ -18,15 +18,6 @@ function readJson(relativePath, fallbackValue) {
   }
 }
 
-function readText(relativePath) {
-  const absolutePath = path.join(repoRoot, relativePath)
-  if (!existsSync(absolutePath)) {
-    return null
-  }
-
-  return readFileSync(absolutePath, "utf8")
-}
-
 function runGitCommand(args) {
   try {
     return execFileSync("git", args, {
@@ -39,33 +30,10 @@ function runGitCommand(args) {
   }
 }
 
-function parseRegistryEntries(registryMarkdown) {
-  if (!registryMarkdown) {
-    return []
-  }
-
-  return registryMarkdown
-    .split("\n")
-    .map((line) => line.trim())
-    .filter((line) => line.startsWith("| FEAT-"))
-    .map((line) => line.split("|").map((segment) => segment.trim()))
-    .map((parts) => ({
-      id: parts[1] ?? "",
-      slug: parts[2] ?? "",
-      name: parts[3] ?? "",
-      status: parts[4] ?? "",
-      area: parts[5] ?? "",
-      createdDate: parts[6] ?? "",
-    }))
-}
-
 const settings = readJson(".agents/settings.json", {})
 const onboarding = settings.onboarding ?? {}
-const paths = settings.paths ?? {}
 const requiredMcpServers = settings.mcp?.required ?? []
 const branchConfig = settings.branch ?? {}
-const registryPath = paths.registry ?? "docs/features/REGISTRY.md"
-const memoryPath = onboarding.memoryPath ?? ".agents/MEMORY.md"
 const mcpConfigPath = onboarding.mcpConfigPath ?? ".mcp.json"
 
 const mcpConfig = readJson(mcpConfigPath, null)
@@ -76,17 +44,6 @@ const configuredMcpServers =
 const missingMcpServers = requiredMcpServers.filter(
   (serverName) => !configuredMcpServers.includes(serverName),
 )
-
-const registryEntries = parseRegistryEntries(readText(registryPath))
-const latestFeature = registryEntries.at(-1) ?? null
-const memoryText = readText(memoryPath)
-const memorySections = memoryText
-  ? memoryText
-      .split("\n")
-      .map((line) => line.trim())
-      .filter((line) => line.startsWith("## "))
-      .map((line) => line.replace(/^##\s+/, ""))
-  : []
 
 const currentBranch =
   runGitCommand(["symbolic-ref", "--quiet", "--short", "HEAD"]) ??
@@ -123,7 +80,7 @@ const suggestedNextStep = possibleFirstInit
   ? "setup-mcp"
   : hasInProgressWorkspace
     ? "resume-last-task"
-    : "breakdown-new-feature"
+    : "openspec-propose"
 
 const payload = {
   project: {
@@ -141,17 +98,6 @@ const payload = {
     required: requiredMcpServers,
     configured: configuredMcpServers,
     missing: missingMcpServers,
-  },
-  registry: {
-    path: registryPath,
-    featureCount: registryEntries.length,
-    latestFeature,
-  },
-  memory: {
-    path: memoryPath,
-    exists: memoryText !== null,
-    sectionCount: memorySections.length,
-    sections: memorySections,
   },
   workspace: {
     mainBranch,

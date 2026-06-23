@@ -1,32 +1,32 @@
 ---
 name: ops-docker
-description: Menulis atau mengubah Dockerfile untuk backend ini agar siap deploy di Linux. Gunakan saat task terkait containerization, optimasi image, atau build/runtime issue di container. Docker Compose dikelola oleh server — jangan ubah.
+description: Write or modify Dockerfiles for this backend so it is ready to deploy on Linux. Use for tasks involving containerization, image optimization, or build/runtime issues in containers. Docker Compose is managed by the server — do not touch it.
 ---
 
 # Skill: Ops Docker
 
-## Context Cepat (Wajib)
-- Target: Dockerfile di `apps/api/` dan/atau `apps/worker/`
+## Context (Required)
+- Target: Dockerfile in `apps/api/` and/or `apps/worker/`
 - Stack: Hono + Bun + TypeScript
-- **JANGAN sentuh docker-compose.yml** — dikelola oleh server
+- **Do NOT touch `docker-compose.yml`** — managed by the server
 
-## Prinsip
+## Principles
 
-- Multi-stage build untuk meminimalkan image size
-- Stage `builder`: install deps + compile
-- Stage `runner`: hanya artifact runtime
-- Gunakan `bun` sebagai runtime (bukan Node.js)
-- Jalankan sebagai non-root user
+- Multi-stage build to minimize image size
+- `builder` stage: install deps + compile
+- `runner` stage: runtime artifact only
+- Use `bun` as runtime (not Node.js)
+- Run as non-root user
 
-## Alur Kerja
+## Workflow
 
-1. Identifikasi app target dan kebutuhan runtime-nya.
-2. Pastikan dependency monorepo yang dibutuhkan ikut ter-copy di builder stage.
-3. Build artifact target di stage `builder`.
-4. Copy artifact minimum ke stage `runner`.
-5. Verifikasi `CMD`, port, dan kebutuhan Prisma/runtime lain sebelum selesai.
+1. Identify target app and its runtime needs.
+2. Copy required monorepo dependencies in the builder stage.
+3. Build target artifact in `builder` stage.
+4. Copy minimal artifact into `runner` stage.
+5. Verify `CMD`, port, and Prisma/other runtime requirements before finishing.
 
-## Template Dockerfile (Hono API)
+## Dockerfile Template (Hono API)
 
 ```dockerfile
 # Stage 1: Builder
@@ -60,7 +60,7 @@ EXPOSE 3000
 CMD ["bun", "run", "dist/index.js"]
 ```
 
-## Template Dockerfile (BullMQ Worker)
+## Dockerfile Template (BullMQ Worker)
 
 ```dockerfile
 FROM oven/bun:1-alpine AS builder
@@ -87,25 +87,25 @@ COPY --from=builder --chown=appuser:appgroup /app/apps/worker/package.json ./
 CMD ["bun", "run", "dist/index.js"]
 ```
 
-## Aturan
+## Rules
 
-- Selalu `--frozen-lockfile` saat install di CI/container
-- Jangan copy `.env` ke dalam image — inject via environment variable saat runtime
-- Jangan expose port yang tidak dipakai
-- Jika Prisma dipakai, pastikan `prisma generate` dijalankan di builder stage
+- Always use `--frozen-lockfile` when installing in CI/container
+- Never copy `.env` into the image — inject via environment variable at runtime
+- Never expose unused ports
+- If Prisma is used, ensure `prisma generate` runs in the builder stage
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** mengubah `docker-compose.yml`.
-- **DILARANG** menjalankan container sebagai root jika tidak benar-benar diperlukan.
-- **DILARANG** copy seluruh repo ke runner stage jika hanya sebagian artifact yang dibutuhkan.
-- **DILARANG** meninggalkan Dockerfile yang tidak bisa dibuild secara deterministik.
+- **FORBIDDEN** to modify `docker-compose.yml`.
+- **FORBIDDEN** to run container as root unless strictly required.
+- **FORBIDDEN** to copy the entire repo into the runner stage when only some artifacts are needed.
+- **FORBIDDEN** to leave a Dockerfile that cannot be built deterministically.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Dockerfile memakai multi-stage build
-- [ ] Runner stage hanya berisi artifact runtime minimum
-- [ ] User non-root dipakai
-- [ ] Port dan command runtime sesuai app target
-- [ ] Build container sudah diverifikasi atau alasannya dicatat
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Dockerfile uses multi-stage build
+- [ ] Runner stage contains only minimal runtime artifact
+- [ ] Non-root user is used
+- [ ] Port and runtime command match target app
+- [ ] Container build verified or reason documented
+- [ ] All files end with newline (EOF)

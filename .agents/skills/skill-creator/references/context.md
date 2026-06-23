@@ -1,6 +1,6 @@
 # Context: Skill Creator
 
-## Folder Target
+## Target Folder
 
 ```
 .agents/skills/{skill-name}/
@@ -10,24 +10,24 @@
 ├── templates/
 │   └── checklist.md
 └── agents/
-    └── openai.yaml         → metadata Codex/OpenAI
+    └── openai.yaml         → Codex/OpenAI metadata
 
 .claude/skills/{skill-name}/
-└── SKILL.md              → Claude wrapper (pointer ke source of truth)
+└── SKILL.md              → Claude wrapper (pointer to source of truth)
 ```
 
-## File yang Dimodifikasi
+## Files Modified
 
 ```
-.agents/skills/manifest.json   → tambah entry skill baru
-.agents/AGENTS.md              → tambah ke Skill Registry + referensi SKILL
-CLAUDE.md                      → tambah ke Skill Registry table
+.agents/skills/manifest.json   → add new skill entry
+.agents/AGENTS.md              → add to Skill Registry + SKILL references
+CLAUDE.md                      → add to Skill Registry table
 ```
 
 ## Commands
 
 ```bash
-bun run skills:create -- --name {scope}-{capability} --scope {scope} --description "{deskripsi}" --when "{kapan dipakai}"
+bun run skills:create -- --name {scope}-{capability} --scope {scope} --description "{description}" --when "{when used}"
 bun run skills:sync-registry
 bun run skills:sync-claude
 bun run skills:sync
@@ -36,98 +36,97 @@ bun run skills:validate
 
 ## Naming Convention
 
-| Komponen | Format | Contoh |
+| Component | Format | Example |
 |---|---|---|
-| Folder skill | `{scope}-{capability}` | `web-slicing`, `flow-breakdown-feature` |
+| Skill folder | `{scope}-{capability}` | `web-slicing`, `ops-docker` |
 | Scope | `frontend`, `backend`, `docs`, `ops`, `flow`, `meta` | `meta` |
-| Deskripsi | Kalimat aktif, kapan dipakai + output | "Membuat skill baru dari nol..." |
+| Description | Active sentence, when used + output | "Create a new skill from scratch..." |
 
-## Scope yang Tersedia
+## Available Scopes
 
-| Scope | Dipakai Untuk |
+| Scope | Used For |
 |---|---|
-| `frontend` | Skill yang menyentuh `apps/web/` |
-| `backend` | Skill yang menyentuh `apps/api/` atau `apps/worker/` |
-| `docs` | Skill yang menghasilkan dokumentasi |
-| `ops` | Skill infra/deploy (Dockerfile, CI/CD) |
-| `flow` | Skill orchestration (JIRA, GitHub, PRD/TRD) |
-| `meta` | Skill yang mengatur agent system itu sendiri |
+| `frontend` | Skills that touch `apps/web/` |
+| `backend` | Skills that touch `apps/api/` or `apps/worker/` |
+| `docs` | Skills that produce documentation |
+| `ops` | Infra/deploy skills (Dockerfile, CI/CD) |
+| `flow` | Orchestration skills (GitHub, OpenSpec) |
+| `meta` | Skills that govern the agent system itself |
 
-## Pattern `SKILL.md` (Template Minimal)
+## `SKILL.md` Pattern (Minimal Template)
 
 ```markdown
 ---
 name: {skill-name}
-description: {Deskripsi satu kalimat}
+description: {One-sentence description}
 ---
 
-# Skill: {Judul}
+# Skill: {Title}
 
-## Context Cepat (Wajib)
-- Folder scope + contoh kode: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Folder scope + code examples: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-{Paragraf tujuan}
+{Purpose paragraph}
 
-## Alur Kerja
+## Workflow
 
 1. ...
 2. ...
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** ...
+- **NEVER** ...
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
 - [ ] ...
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] All files end with a newline (EOF)
 ```
 
-## Pattern Claude Wrapper (`.claude/skills/{name}/SKILL.md`)
+## Claude Wrapper Pattern (`.claude/skills/{name}/SKILL.md`)
 
 ```markdown
 ---
 name: "{skill-name}"
-description: "{Deskripsi satu kalimat}"
+description: "{One-sentence description}"
 ---
 
-Source of truth ada di `.agents/skills/{skill-name}/SKILL.md`.
+Source of truth lives at `.agents/skills/{skill-name}/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/{skill-name}/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/{skill-name}/SKILL.md`.
+2. Follow the workflow and rules in that file.
+3. Read referenced child files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.
 ```
 
-## Pattern `agents/openai.yaml`
+## `agents/openai.yaml` Pattern
 
 ```yaml
 interface:
-  display_name: "{Judul Pendek Skill}"
-  short_description: "{Deskripsi singkat untuk picker skill}"
-  default_prompt: "Use $skill-name to {hasil utama skill ini}."
+  display_name: "{Short Skill Title}"
+  short_description: "{Short description for the skill picker}"
+  default_prompt: "Use $skill-name to {main outcome of this skill}."
 policy:
   allow_implicit_invocation: true
 ```
 
-## Pattern Entry `manifest.json`
+## `manifest.json` Entry Pattern
 
 ```json
 {
   "name": "{skill-name}",
-  "description": "{Deskripsi satu kalimat}",
+  "description": "{One-sentence description}",
   "scope": "{scope}",
-  "whenToUse": "{Teks Skill Registry}",
+  "whenToUse": "{Skill Registry text}",
   "path": ".agents/skills/{skill-name}"
 }
 ```
 
-## Contoh Skill yang Sudah Ada (Referensi)
+## Existing Skills (Reference)
 
-| Skill | Scope | Lihat di |
+| Skill | Scope | See |
 |---|---|---|
 | `web-slicing` | frontend | `.agents/skills/web-slicing/` |
 | `api-feature` | backend | `.agents/skills/api-feature/` |
-| `flow-breakdown-feature` | flow | `.agents/skills/flow-breakdown-feature/` |
 | `docs-openapi` | docs | `.agents/skills/docs-openapi/` |

@@ -1,38 +1,38 @@
 # Checklist: ops-docker
 
-## Persiapan
+## Preparation
 
-- [ ] Identifikasi target: `apps/api` dan/atau `apps/worker`
-- [ ] Cek apakah Prisma dipakai di target app
-- [ ] Cek port yang diexpose di source code
+- [ ] Identify target: `apps/api` and/or `apps/worker`
+- [ ] Check whether Prisma is used in target app
+- [ ] Check ports exposed in source code
 
 ## Dockerfile
 
 - [ ] Multi-stage build (builder + runner)
 - [ ] Base image: `oven/bun:1-alpine`
-- [ ] `--frozen-lockfile` saat `bun install`
-- [ ] Packages monorepo (`packages/`) di-copy di builder stage
-- [ ] Build artifact di-copy dari builder ke runner
-- [ ] Jika Prisma: `prisma generate` dijalankan di builder
-- [ ] Non-root user dibuat dan digunakan di runner stage
-- [ ] `ENV NODE_ENV=production` di runner stage
-- [ ] `EXPOSE` sesuai port yang dipakai
-- [ ] `CMD` menjalankan compiled artifact
+- [ ] `--frozen-lockfile` on `bun install`
+- [ ] Monorepo packages (`packages/`) copied in builder stage
+- [ ] Build artifact copied from builder to runner
+- [ ] If Prisma: `prisma generate` runs in builder
+- [ ] Non-root user created and used in runner stage
+- [ ] `ENV NODE_ENV=production` in runner stage
+- [ ] `EXPOSE` matches used port
+- [ ] `CMD` runs compiled artifact
 
-## Keamanan
+## Security
 
-- [ ] Tidak ada `.env` atau credential di dalam image
+- [ ] No `.env` or credentials in image
 - [ ] Non-root user
-- [ ] Tidak ada dev dependencies di runner stage
+- [ ] No dev dependencies in runner stage
 
-## Validasi
+## Validation
 
-- [ ] Build berhasil: `docker build -f apps/{app}/Dockerfile -t test:latest .`
-- [ ] Container berjalan: `docker run --rm -e ... test:latest`
-- [ ] Image size wajar (< 300MB untuk Bun Alpine)
+- [ ] Build succeeds: `docker build -f apps/{app}/Dockerfile -t test:latest .`
+- [ ] Container runs: `docker run --rm -e ... test:latest`
+- [ ] Reasonable image size (< 300MB for Bun Alpine)
 
-## Finalisasi
+## Finalization
 
-- [ ] Dockerfile diakhiri newline (EOF)
-- [ ] `.dockerignore` ada di root jika belum
-- [ ] **TIDAK mengubah docker-compose.yml**
+- [ ] Dockerfile ends with newline (EOF)
+- [ ] `.dockerignore` exists at root if not present
+- [ ] **Do NOT modify `docker-compose.yml`**

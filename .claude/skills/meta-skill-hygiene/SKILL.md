@@ -1,11 +1,11 @@
 ---
 name: "meta-skill-hygiene"
-description: "Mengaudit, menyinkronkan, dan menjaga konsistensi metadata skill di repo ini. Gunakan saat ada perubahan skill, registry, wrapper, atau metadata agent."
+description: "Audit, sync, and maintain skill metadata consistency across this repo. Use when skills, the registry, Claude wrappers, or agent metadata change."
 ---
 
-Source of truth ada di `.agents/skills/meta-skill-hygiene/SKILL.md`.
+Source of truth lives at `.agents/skills/meta-skill-hygiene/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/meta-skill-hygiene/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/meta-skill-hygiene/SKILL.md`.
+2. Follow the workflow and rules defined in that file.
+3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.

@@ -1,30 +1,29 @@
 # vibecoding-starter
 
-Starter monorepo untuk membangun produk dengan **vibe coding** — workflow di mana AI agent (Claude Code / Codex) mengerjakan task implementasi secara end-to-end, mulai dari breakdown fitur sampai PR siap merge.
+Starter monorepo for building products with **vibe coding** — a workflow where AI agents (Claude Code / Codex) handle implementation tasks end-to-end, from feature planning to merge-ready PRs.
 
-Repo ini menyediakan dua hal sekaligus:
-1. **Starter monorepo** siap pakai (Next.js + Hono + BullMQ + PostgreSQL lokal + Redis lokal)
-2. **Agent system** (`.agents/`) berisi skill, guide, dan contoh kode yang dipakai AI agent saat coding
+This repo provides two things:
+1. **Production-ready starter monorepo** (Next.js + Hono + BullMQ + local PostgreSQL + local Redis)
+2. **Agent system** (`.agents/`) containing skills, guides, and code examples used by AI agents during coding
 
-Status repo:
-- open source di bawah lisensi [MIT](./LICENSE)
-- boleh di-`clone`, di-`fork`, dipakai sebagai baseline project baru, dan di-`contribute` balik lewat pull request
-- source of truth workflow agent tetap ada di `.agents/`
+Status:
+- Open source under [MIT](./LICENSE) license
+- Clone, fork, use as a baseline for new projects, or contribute back via pull requests
+- Agent workflow source of truth lives in `.agents/`
 
 ## Table of Contents
 
 - [Open Source](#open-source)
-- [Apa Yang Sudah Included](#apa-yang-sudah-included)
-- [Dokumen Operasional](#dokumen-operasional)
+- [What's Included](#whats-included)
 - [Quick Start](#quick-start)
-- [Endpoint Penting](#endpoint-penting)
-- [OpenAPI dan Scalar](#openapi-dan-scalar)
+- [Key Endpoints](#key-endpoints)
+- [OpenAPI & Scalar](#openapi--scalar)
 - [Quality Checks](#quality-checks)
-- [Mulai / Start](#mulai--start)
-  - [Memanggil Skill Secara Eksplisit](#memanggil-skill-secara-eksplisit)
+- [Start a Session](#start-a-session)
+  - [Invoking Skills Explicitly](#invoking-skills-explicitly)
 - [Vibe Coding Flow](#vibe-coding-flow)
-- [Mengembangkan Agent System](#mengembangkan-agent-system)
-- [MCP Setup](#mcp-setup-untuk-ai-agent)
+- [Developing the Agent System](#developing-the-agent-system)
+- [MCP Setup](#mcp-setup-for-ai-agents)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -32,43 +31,43 @@ Stack:
 - `apps/web`: Next.js + Tailwind + Vitest
 - `apps/api`: Hono (clean architecture) + Prisma scaffold + Vitest
 - `apps/worker`: Worker scaffold + Redis + Vitest
-- `docker-compose.yml`: PostgreSQL + Redis untuk local development
-- `scripts/`: helper executable tingkat repo untuk bootstrap dan workflow operasional
-- `Turbo` untuk task orchestration
-- `Bun` untuk package manager dan script runner
-- `Biome` untuk lint/format
+- `docker-compose.yml`: PostgreSQL + Redis for local development
+- `scripts/`: repo-level helper executables for bootstrap and operations
+- `Turbo` for task orchestration
+- `Bun` as package manager and script runner
+- `Biome` for lint/format
 
 ## Open Source
 
-Repo ini memang ditujukan untuk dipakai publik:
-- boleh `clone` repo ini dan langsung pakai sebagai baseline project baru
-- boleh `fork` untuk versi internal atau custom workflow sendiri
-- boleh buka issue atau pull request untuk perbaikan, cleanup, atau fitur baru
-- lisensi repo ini adalah **MIT**, jadi penggunaan komersial maupun non-komersial diperbolehkan selama notice lisensi dipertahankan
+This repo is intended for public use:
+- Clone and use directly as a baseline for new projects
+- Fork for internal or custom workflow versions
+- Open issues or pull requests for fixes, cleanup, or new features
+- Licensed under **MIT** — commercial and non-commercial use allowed as long as the license notice is preserved
 
-## Apa Yang Sudah Included
+## What's Included
 
 ### Monorepo Runtime
-- `apps/web` untuk frontend Next.js App Router
-- `apps/api` untuk backend Hono dengan layering clean architecture
-- `apps/worker` untuk background worker berbasis Redis
-- `docker-compose.yml` untuk PostgreSQL + Redis lokal
-- `scripts/bootstrap-local.sh`, `scripts/compose.sh`, dan helper repo-level lain untuk bootstrap environment
+- `apps/web` — Next.js App Router frontend
+- `apps/api` — Hono backend with clean architecture layering
+- `apps/worker` — Redis-based background worker
+- `docker-compose.yml` — local PostgreSQL + Redis
+- `scripts/bootstrap-local.sh`, `scripts/compose.sh`, and other repo-level helpers
 
 ### Frontend Starter
-- baseline halaman App Router yang sudah jalan
-- `NextAuth` auth foundation berbasis credentials di `apps/web/auth.ts`
-- route handler auth App Router di `apps/web/app/api/(auth)/auth/[...nextauth]/route.ts`
-- BFF proxy internal di `apps/web/app/api/proxy/[...path]/route.ts` untuk forward request web ke backend
-- starter login page `/login` dan protected starter panel `/panel`
-- route protection dan redirect dasar via `apps/web/proxy.ts`
-- `SessionProvider` dan `QueryProvider`
-- query client service dan axios interceptors yang default-nya hit internal proxy `/api/proxy`
-- constants baseline untuk API router dan query keys
-- utility hooks: `useQueryParam`, `useNetworkInfo`, `useUserAgent`
-- utility helpers: `cn`, `objectToForm`, dan `rbacFilterMenu`
-- general frontend types untuk App Router, data table, dan NextAuth augmentation
-- UI kit reusable yang sudah cukup besar, termasuk:
+- App Router baseline pages
+- `NextAuth` credentials-based auth foundation in `apps/web/auth.ts`
+- Auth route handler at `apps/web/app/api/(auth)/auth/[...nextauth]/route.ts`
+- Internal BFF proxy at `apps/web/app/api/proxy/[...path]/route.ts`
+- Starter login page `/login` and protected panel `/panel`
+- Route protection and basic redirects via `apps/web/proxy.ts`
+- `SessionProvider` and `QueryProvider`
+- Query client service and axios interceptors defaulting to internal proxy `/api/proxy`
+- Baseline constants for API routes and query keys
+- Utility hooks: `useQueryParam`, `useNetworkInfo`, `useUserAgent`
+- Utility helpers: `cn`, `objectToForm`, `rbacFilterMenu`
+- General frontend types for App Router, data tables, and NextAuth augmentation
+- Comprehensive reusable UI kit including:
   - action dropdown, autocomplete, avatar, breadcrumb
   - button, input, textarea, select, radio, radio-group, datepicker, file upload
   - currency input, currency select, currency display, content title
@@ -77,69 +76,50 @@ Repo ini memang ditujukan untuk dipakai publik:
   - text editor, map, route card, stepper, loading spinner, loading overlay, content loading, display with skeleton, empty state, user menu
 
 ### Backend Starter
-- entrypoint API baseline dengan endpoint `/` dan `/health`
-- service + use case baseline untuk system info dan health check
-- controller, route, dan test baseline untuk system endpoint
-- `DomainError` foundation untuk error handling domain
-- env config terpisah di `infrastructure/config`
-- middleware foundation untuk JWT, advanced auth, validation, dan centralized error handling
-- util HTTP response/query parser dan helper OpenAPI merge
-- domain service skeleton untuk token dan storage
-- util JWT / token blacklist foundation untuk feature auth berikutnya
-- example use case test scaffold untuk pattern backend baru
-- Prisma scaffold dan database config siap dikembangkan
+- API entrypoint with `/` and `/health` endpoints
+- Service + use case baseline for system info and health check
+- Controller, route, and test baseline for system endpoints
+- `DomainError` foundation for domain error handling
+- Separate env config in `infrastructure/config`
+- Middleware foundation for JWT, advanced auth, validation, and centralized error handling
+- HTTP response/query parser utilities and OpenAPI merge helper
+- Domain service skeleton for token and storage
+- JWT / token blacklist foundation for future auth features
+- Example use case test scaffold for backend patterns
+- Prisma scaffold and database config ready for development
 
 ### Worker Starter
-- worker entrypoint yang sudah connect ke Redis
-- summary use case untuk mode idle/active worker
-- env config terpisah di `infrastructure/config`
-- queue bootstrap minimal untuk menyalakan worker pertama tanpa feature bisnis
+- Worker entrypoint connected to Redis
+- Summary use case for idle/active worker mode
+- Separate env config in `infrastructure/config`
+- Minimal queue bootstrap to start the first worker without business features
 
 ### Shared Packages
-- `packages/schemas` untuk Zod schema shared, termasuk auth/login starter
-- `packages/types` untuk shared response types baseline (`success`, `error`, dan auth response starter)
-- `packages/utils` untuk pure utility functions shared lintas app
+- `packages/schemas` — shared Zod schemas including auth/login starter
+- `packages/types` — shared response types baseline (`success`, `error`, auth response starter)
+- `packages/utils` — pure utility functions shared across apps
 
-Utility yang sudah ada di `packages/utils`:
-- currency format
-- date range
-- debounce
-- enum to object
-- string generator
-- masking
-- number helpers
-- path variable
-- point converter
-- time helpers
-- to-camel-case
+Utilities in `packages/utils`:
+- currency format, date range, debounce, enum to object, string generator
+- masking, number helpers, path variable, point converter, time helpers, to-camel-case
 
-### Docs dan DevEx
-- `docs/MAIN_PRD.md` sebagai konteks produk starter
-- `docs/features/REGISTRY.md` sebagai registry fitur
-- template `PRD.md` dan `TRD.md`
-- `docs/api-contracts/` untuk contract FE-BE
-- OpenAPI split source di `docs/openapi/`
-- merged OpenAPI spec di `docs/openapi.json`
-- config [Scalar](https://scalar.com/) di `apps/api/scalar.config.json` yang menunjuk ke merged spec repo ini
-- GitHub Actions untuk app CI dan skill hygiene
+### Docs & DevEx
+- OpenAPI split source in `docs/openapi/`
+- Merged OpenAPI spec at `docs/openapi.json`
+- [Scalar](https://scalar.com/) config at `apps/api/scalar.config.json` pointing to the merged spec
+- GitHub Actions for app CI and skill hygiene
 
 ### Agent Workflow
-- onboarding session via `bun run session:status`
-- flow breakdown → workflow bootstrap → implementasi → test scenario
-- skill registry dan entrypoint agent di `.agents/AGENTS.md`
-- source of truth skill di `.agents/skills/`
-- examples reusable di `.agents/examples/`
-- wrapper Claude yang di-generate dari source of truth skill
-
-## Dokumen Operasional
-- Operasional harian: `docs/OPERATIONS.md`
-- Konteks produk starter: `docs/MAIN_PRD.md`
-- Registry fitur: `docs/features/REGISTRY.md`
-- Template PRD/TRD: `docs/templates/`
+- Onboarding session via `bun run session:status`
+- Planning & specs via [OpenSpec](https://github.com/Fission-AI/OpenSpec) (`/opsx:propose`)
+- Skill registry and agent entrypoint in `.agents/AGENTS.md`
+- Source of truth skills in `.agents/skills/`
+- Reusable examples in `.agents/examples/`
+- Claude wrappers auto-generated from source of truth skills
 
 ## Quick Start
 
-Prasyarat:
+Prerequisites:
 - Bun `>= 1.3`
 - Docker
 
@@ -149,14 +129,25 @@ bun run bootstrap
 bun run dev
 ```
 
-Perintah `bun run bootstrap` akan:
-- copy `.env.example` menjadi `.env` jika belum ada
-- menyalakan PostgreSQL dan Redis
-- menunggu service siap
-- generate Prisma client
-- generate merged OpenAPI spec
+`bun run bootstrap` will:
+- Copy `.env.example` to `.env` if it doesn't exist
+- Start PostgreSQL and Redis
+- Wait for services to be ready
+- Generate Prisma client
+- Generate merged OpenAPI spec
 
-Perintah harian lain:
+After bootstrapping, initialize OpenSpec for the planning layer:
+
+```bash
+bunx openspec init
+```
+
+This sets up the `openspec/` directory and generates slash commands for your AI tool of choice:
+- **Claude Code** — commands are added to `.claude/commands/`
+- **Codex** — invoke skills with `$openspec-propose`, `$openspec-apply-change`, etc.
+- **OpenCode** — instructions are loaded via `opencode.md` and `.opencode.json`
+
+Daily commands:
 ```bash
 bun run stack:up
 bun run stack:down
@@ -168,7 +159,7 @@ bun run prisma:studio
 bun run openapi:generate
 ```
 
-## Endpoint Penting
+## Key Endpoints
 - Web: `http://localhost:3000`
 - Web login: `http://localhost:3000/login`
 - Web panel: `http://localhost:3000/panel`
@@ -180,25 +171,19 @@ bun run openapi:generate
 - Merged OpenAPI spec: `docs/openapi.json`
 - Scalar config source: `apps/api/scalar.config.json`
 
-Dokumen awal yang perlu dilihat:
-- `docs/MAIN_PRD.md`
-- `docs/features/REGISTRY.md`
-- `docs/templates/PRD.md`
-- `docs/templates/TRD.md`
+## OpenAPI & Scalar
 
-## OpenAPI dan Scalar
+The OpenAPI workflow is ready for docs tooling:
+- Split JSON source of truth in `docs/openapi/base.json`, `docs/openapi/paths/*.json`, and `docs/openapi/schemas/*.json`
+- Merged artifact at `docs/openapi.json`
+- Merge generator runs via `bun run openapi:generate`
+- Scalar config at `apps/api/scalar.config.json`
 
-Workflow OpenAPI di repo ini sudah siap untuk tooling docs:
-- source of truth split JSON ada di `docs/openapi/base.json`, `docs/openapi/paths/*.json`, dan `docs/openapi/schemas/*.json`
-- merged artifact ada di `docs/openapi.json`
-- generator merge dijalankan lewat `bun run openapi:generate`
-- config Scalar ada di `apps/api/scalar.config.json`
-
-Artinya:
-- Anda tidak perlu edit `docs/openapi.json` langsung
-- update spec dilakukan di folder split `docs/openapi/`
-- setelah itu generate ulang merged spec
-- file merged tersebut sudah siap dipakai oleh Scalar karena config repo menunjuk ke `./docs/openapi.json`
+This means:
+- Don't edit `docs/openapi.json` directly
+- Update specs in the split `docs/openapi/` folder
+- Regenerate the merged spec afterward
+- The merged file is ready for Scalar since the repo config points to `./docs/openapi.json`
 
 ## Quality Checks
 
@@ -206,7 +191,7 @@ Artinya:
 bun run check
 ```
 
-Perintah parsial:
+Partial commands:
 ```bash
 bun run lint
 bun run typecheck
@@ -219,189 +204,153 @@ Generate merged OpenAPI spec:
 bun run openapi:generate
 ```
 
-## Mulai / Start
+## Start a Session
 
-Cukup ketik **"Mulai"**, **"Start"**, atau **"Mulai Vibe Coding"** di Claude Code atau Codex.
+Type **"Start"** or **"Mulai Vibe Coding"** in Claude Code or Codex.
 
-Agent akan melakukan quick check terlebih dulu:
-- cek MCP repo-level (`.mcp.json`) dan service yang masih missing
-- cek registry fitur (`docs/features/REGISTRY.md`)
-- cek memory project (`.agents/MEMORY.md`)
-- cek branch aktif dan apakah ada pekerjaan yang belum selesai
+The agent will run a quick check:
+- Check repo-level MCP (`.mcp.json`) and missing services
+- Check active branch and whether there's work in progress
 
-Lalu agent akan mengarahkan sesi ke salah satu jalur:
-- setup MCP dulu
-- lanjut task terakhir
-- mulai breakdown fitur baru
+Then it will direct the session to one of:
+- Set up MCP first
+- Resume last task
+- Start a new feature via OpenSpec (`/opsx:propose`)
 
-Jika ingin menjalankan quick check yang sama secara manual:
+To run the same quick check manually:
 
 ```bash
 bun run session:status
 ```
 
-### Memanggil Skill Secara Eksplisit
+### Invoking Skills Explicitly
 
-Skill bisa dipanggil secara langsung tanpa harus tahu nama perintahnya — tapi jika ingin kontrol penuh:
+Skills can be invoked directly — use these if you want full control:
 
-**Claude Code** — gunakan prefix `/`:
+**Claude Code** — use `/` prefix:
 ```
 /web-slicing
 /api-feature
-/flow-breakdown-feature
+/web-api-integrated
 ```
 
-**Codex** — gunakan prefix `$`:
+**Codex** — use `$` prefix:
 ```
 $web-slicing
 $api-feature
-$flow-breakdown-feature
+$web-api-integrated
 ```
 
-Daftar semua skill tersedia di `.agents/AGENTS.md` pada section `Skill Registry`.
+Full skill list available in `.agents/AGENTS.md` under `Skill Registry`.
 
 ---
 
-## Mengembangkan Agent System
+## Developing the Agent System
 
-### Membuat Skill Baru
+### Creating a New Skill
 
-Gunakan skill `skill-creator` untuk menambahkan capability baru ke agent system.
+Use the `skill-creator` skill to add new capabilities to the agent system.
 
 **Claude:** `/skill-creator` &nbsp;|&nbsp; **Codex:** `$skill-creator`
 
-Atau jalankan generator langsung:
+Or run the generator directly:
 
 ```bash
 bun run skills:create -- \
   --name {scope}-{capability} \
   --scope {scope} \
-  --description "{Deskripsi satu kalimat}" \
-  --when "{Kapan dipakai}"
+  --description "{One-line description}" \
+  --when "{When to use}"
 ```
 
-Generator akan membuat struktur lengkap:
+The generator creates the full structure:
 
 ```
 .agents/skills/{name}/
-├── SKILL.md                → Definisi + alur kerja + larangan + checklist
-├── references/context.md   → Folder target + contoh kode + pattern
-├── templates/checklist.md  → Checklist step-by-step eksekusi
-└── agents/openai.yaml      → Metadata Codex/OpenAI
+├── SKILL.md                → Definition + workflow + constraints + checklist
+├── references/context.md   → Target folders + code examples + patterns
+├── templates/checklist.md  → Step-by-step execution checklist
+└── agents/openai.yaml      → Codex/OpenAI metadata
 .claude/skills/{name}/
-└── SKILL.md                → Wrapper Claude (auto-generated)
+└── SKILL.md                → Claude wrapper (auto-generated)
 ```
 
-Setelah membuat atau mengubah skill, jalankan:
+After creating or modifying skills:
 
 ```bash
-bun run skills:sync      # sinkronkan Claude wrapper dari source of truth
-bun run skills:validate  # validasi semua skill assets
+bun run skills:sync      # sync Claude wrappers from source of truth
+bun run skills:validate  # validate all skill assets
 ```
 
-### Menambah Training Data / Contoh Kode
+### Adding Training Data / Code Examples
 
-Gunakan skill `skill-add-example` untuk menambahkan contoh kode nyata sebagai referensi agent.
+Use the `skill-add-example` skill to add real code examples as agent references.
 
 **Claude:** `/skill-add-example` &nbsp;|&nbsp; **Codex:** `$skill-add-example`
 
-Contoh kode disimpan di `.agents/examples/` dengan struktur:
+Examples are stored in `.agents/examples/`:
 
 ```
 .agents/examples/
 └── {skill-name}/
-    └── {framework-atau-konteks}/
-        └── {nama-example}/
+    └── {framework-or-context}/
+        └── {example-name}/
             ├── page.tsx
             └── hooks/
 ```
 
-Setiap example yang ditambahkan wajib direferensikan di `references/context.md` skill terkait, agar agent bisa menemukannya saat mengeksekusi task.
+Each example must be referenced in the related skill's `references/context.md` so the agent can find it during execution.
 
 ---
 
 ## Vibe Coding Flow
 
-Cara kerja pengembangan fitur di repo ini menggunakan AI agent. Setiap tahap dipandu oleh **skill** — instruksi terstruktur yang dibaca agent sebelum mengeksekusi task.
+Feature development in this repo uses AI agents. Planning is handled by [OpenSpec](https://github.com/Fission-AI/OpenSpec), implementation is guided by **skills** — structured instructions the agent reads before executing tasks.
 
-### Tahap 1 — Breakdown Fitur
+### Phase 1 — Propose (OpenSpec)
 
-> Skill: `flow-breakdown-feature`
-
-Ubah ide fitur menjadi dokumen PRD dan TRD yang siap dieksekusi.
+Turn a feature idea into a proposal, specs, design, and task list.
 
 ```
-Trigger: "Buat breakdown fitur [nama fitur]"
-Output:  docs/features/{slug}/PRD.md
-         docs/features/{slug}/TRD.md
-         docs/features/REGISTRY.md (entry baru)
-```
-
-PRD berisi: problem, goals, non-goals, user stories, acceptance criteria.
-TRD berisi: data model, API contract overview, task breakdown per tiket.
-
----
-
-### Tahap 2 — Buat Tiket & Issue
-
-> Skill: `flow-workflow-bootstrap`
-> Prasyarat: PRD + TRD sudah ada, MCP GitHub + Jira + Notion aktif
-
-Dari TRD, agent secara otomatis membuat:
-- Halaman PRD di **Notion**
-- 3 tiket **Jira** (Story):
-  - Tiket 1: Slicing + API Contract
-  - Tiket 2: Backend Implementation
-  - Tiket 3: API Integration (FE)
-- **GitHub Issues** di monorepo ini, masing-masing linked ke tiket Jira
-- Update `REGISTRY.md` dengan semua link
-
-```
-Trigger: "Jalankan workflow bootstrap untuk fitur [slug]"
+Trigger: /opsx:propose "feature name"
+Output:  openspec/changes/{slug}/
+           proposal.md
+           specs/
+           design.md
+           tasks.md
 ```
 
 ---
 
-### Tahap 3 — Implementasi (per tiket)
+### Phase 2 — Implementation (per task)
 
-Setiap tiket dikerjakan dengan skill `flow-task-completion` yang di dalamnya memanggil skill implementasi sesuai tipe task.
+Execution order per feature:
 
-Urutan pengerjaan per fitur:
+#### 2a. FE Slicing
+> Skill: `web-slicing`
 
-#### 3a. Slicing FE
-> Skill di dalam: `web-slicing`
-
-Implementasi UI dari desain/deskripsi — belum ada data real, pakai dummy.
+Implement UI from design/description — no real data yet, use dummy.
 
 ```
 Target: apps/web/app/(group)/[feature]/
 Output: page.tsx + [feature]-content.tsx
 ```
 
-#### 3b. API Contract
-> Skill di dalam: `docs-api-contract`
+#### 2b. Backend + OpenAPI
+> Skill: `api-feature` + `docs-openapi`
 
-Susun contract endpoint lengkap: method, URL, request body, response schema, error codes.
-
-```
-Target: docs/api-contracts/
-```
-
-#### 3c. Backend + OpenAPI
-> Skill di dalam: `api-feature` + `docs-openapi`
-
-Implementasi Clean Architecture di Hono: entity → use case → repository → controller → route.
-Sekaligus tulis dokumentasi OpenAPI split per fitur.
+Implement Clean Architecture in Hono: entity → use case → repository → controller → route.
+Write split OpenAPI documentation alongside.
 
 ```
 Target: apps/api/src/
          docs/openapi/
 ```
 
-#### 3d. Integrasi FE ↔ API
-> Skill di dalam: `web-api-integrated`
+#### 2c. FE ↔ API Integration
+> Skill: `web-api-integrated`
 
-Buat Zod schema, response types, constants, dan react-query hooks. Hubungkan UI yang sudah di-slicing ke API yang sudah jadi.
+Create Zod schemas, response types, constants, and react-query hooks. Wire the sliced UI to the running API.
 
 ```
 Target: packages/schemas/
@@ -410,44 +359,51 @@ Target: packages/schemas/
          apps/web/constants/
 ```
 
-## MCP Setup Untuk AI Agent
+---
 
-MCP yang diwajibkan repo ini:
+### Phase 3 — Verify & Archive (OpenSpec)
+
+```
+Trigger: /opsx:verify     → validate implementation
+         /opsx:archive    → archive specs after completion
+```
+
+## MCP Setup for AI Agents
+
+Required MCP for this repo:
 - `github`
-- `atlassian`
-- `notion`
 
-Konfigurasinya dibaca dari `.mcp.json` di root repo. File ini sengaja di-ignore karena harus berisi token/credential project asli.
+Configuration is read from `.mcp.json` at the repo root. This file is gitignored since it contains real tokens/credentials.
 
-Kalau baru clone repo ini, urutan yang benar:
-1. siapkan `.mcp.json`
-2. isi `.agents/settings.json` untuk `repo.owner` dan `jira.projectKey`
-3. jalankan `bun run session:status`
-4. mulai flow dari breakdown atau resume task aktif
+If you just cloned this repo:
+1. Create `.mcp.json` with your GitHub token
+2. Fill in `.agents/settings.json` for `repo.owner` and `repo.name`
+3. Run `bun run session:status`
+4. Start with OpenSpec or resume an active task
 
 ## Contributing
 
-Kontribusi terbuka.
+Contributions welcome.
 
-Alur minimum yang disarankan:
-1. `fork` repo ini atau buat branch baru dari `main`
-2. jalankan `bun install`
-3. jalankan `bun run bootstrap`
-4. lakukan perubahan
-5. pastikan `bun run check` pass
-6. kalau menyentuh skill / `.agents`, jalankan juga `bun run skills:sync` dan `bun run skills:validate`
-7. buka pull request
+Recommended workflow:
+1. Fork or create a new branch from `main`
+2. Run `bun install`
+3. Run `bun run bootstrap`
+4. Make your changes
+5. Ensure `bun run check` passes
+6. If touching skills / `.agents`, also run `bun run skills:sync` and `bun run skills:validate`
+7. Open a pull request
 
-Untuk perubahan dokumentasi OpenAPI:
-1. edit file split di `docs/openapi/`
-2. jalankan `bun run openapi:generate`
-3. commit file split dan `docs/openapi.json`
+For OpenAPI documentation changes:
+1. Edit split files in `docs/openapi/`
+2. Run `bun run openapi:generate`
+3. Commit both split files and `docs/openapi.json`
 
-Untuk perubahan skill:
-1. ubah source of truth di `.agents/skills/*`
-2. jalankan `bun run skills:sync`
-3. validasi dengan `bun run skills:validate`
+For skill changes:
+1. Edit source of truth in `.agents/skills/*`
+2. Run `bun run skills:sync`
+3. Validate with `bun run skills:validate`
 
 ## License
 
-Repo ini menggunakan lisensi [MIT](./LICENSE).
+This repo is licensed under [MIT](./LICENSE).

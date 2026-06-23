@@ -1,6 +1,6 @@
 # Context: Web API Integrated
 
-## Folder Target
+## Target Folder
 
 ```
 packages/
@@ -9,7 +9,7 @@ packages/
 
 apps/web/
 ├── hooks/transactions/
-│   └── use-{domain}/     → satu folder per domain
+│   └── use-{domain}/     → one folder per domain
 │       ├── use-data-table.ts
 │       ├── use-get-one.ts
 │       ├── use-insert-one.ts
@@ -18,14 +18,14 @@ apps/web/
 │       └── index.ts
 └── constants/
     ├── api-routers.ts    → `:id` path variables
-    └── query-keys.ts     → flat string per operasi
+    └── query-keys.ts     → flat string per operation
 ```
 
-## Contoh Kode Nyata
+## Real Code Examples
 
-Lihat: `.agents/examples/web-api-integrated/hooks/use-examples/`
+See: `.agents/examples/web-api-integrated/hooks/use-examples/`
 
-## Pattern `useDataTable` (react-query hook — bukan TanStack Table)
+## `useDataTable` Pattern (react-query hook — not TanStack Table)
 
 ```typescript
 const useDataTable = (args?: UseDataTableProps) => {
@@ -50,22 +50,22 @@ const useDataTable = (args?: UseDataTableProps) => {
 }
 ```
 
-## Pattern Hook Export
+## Hook Export Pattern
 
 ```typescript
-// Setiap hook file: default export + named export alias
+// Each hook file: default export + named export alias
 export default useDataTable
 export { useDataTable as useExamplesDataTable }
 
-// index.ts: re-export semua dengan nama domain
+// index.ts: re-export everything with domain-prefixed names
 export { default as useExamplesDataTable } from './use-data-table'
 export { default as useExamplesGetOne } from './use-get-one'
 ```
 
-## Pattern Constants
+## Constants Pattern
 
 ```typescript
-// constants/api-routers.ts — pakai :id path variable
+// constants/api-routers.ts — use :id path variable
 export const apiRouters = {
   examples: {
     index: '/examples',
@@ -76,7 +76,7 @@ export const apiRouters = {
   },
 }
 
-// constants/query-keys.ts — flat string per operasi
+// constants/query-keys.ts — flat string per operation
 export const queryKeys = {
   examples: {
     index: 'examplesIndex',
@@ -88,7 +88,7 @@ export const queryKeys = {
 }
 ```
 
-## Pattern Schema
+## Schema Pattern
 
 ```typescript
 // packages/schemas/example.ts
@@ -115,7 +115,7 @@ export const exampleSchema = z.object({
 export type ExampleSchemaProps = z.infer<typeof exampleSchema>
 ```
 
-## Pattern Response Type
+## Response Type Pattern
 
 ```typescript
 // packages/types/example-response.ts

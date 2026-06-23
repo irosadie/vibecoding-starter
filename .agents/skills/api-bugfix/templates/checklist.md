@@ -1,23 +1,23 @@
 # Checklist: API Bugfix
 
-## Persiapan
+## Preparation
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `references/context.md`
-- [ ] Tuliskan gejala bug atau failing behavior
+- [ ] Read `.agents/settings.json`
+- [ ] Read `references/context.md`
+- [ ] Write down the bug symptom or failing behavior
 
-## Eksekusi
+## Execution
 
-- [ ] Root cause dilokalisasi ke layer terkecil
-- [ ] Perubahan tetap minimal touch
-- [ ] Validator/DTO/schema/type/docs/OpenAPI diupdate jika memang terdampak
-- [ ] Tidak ada refactor unrelated
-- [ ] Test reproduksi atau guard ditambah/diperbarui
+- [ ] Root cause localized to the smallest layer
+- [ ] Changes remain minimal touch
+- [ ] Validator/DTO/schema/type/docs/OpenAPI updated when affected
+- [ ] No unrelated refactor
+- [ ] Reproduction or guard test added/updated
 
-## Finalisasi
+## Finalization
 
-- [ ] Contract backend tetap sinkron
-- [ ] `bun run openapi:generate` dijalankan jika contract berubah
-- [ ] Lint/type/test relevan dijalankan
-- [ ] Tidak ada perubahan unrelated yang ikut terbawa
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Backend contract stays in sync
+- [ ] `bun run openapi:generate` run if contract changed
+- [ ] Lint/typecheck/relevant tests run
+- [ ] No unrelated changes carried along
+- [ ] All files end with a newline (EOF)

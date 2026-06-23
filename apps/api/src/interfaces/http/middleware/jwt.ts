@@ -39,14 +39,14 @@ export async function jwtMiddleware(c: Context, next: () => Promise<void>) {
     const payload = verifyAccessToken(token) as JwtPayload
 
     // Validate payload structure
-    if (!payload.id || !payload.email || !payload.type || !payload.status) {
+    if (!payload.id || !payload.email || !payload.type) {
       throw new HTTPException(401, {
         message: "Invalid token payload: missing required fields",
       })
     }
 
     // Validate user type
-    if (!["admin", "creator", "user"].includes(payload.type)) {
+    if (!["admin", "vendor", "driver", "user"].includes(payload.type)) {
       throw new HTTPException(401, {
         message: "Invalid token payload: invalid user type",
       })
@@ -56,11 +56,12 @@ export async function jwtMiddleware(c: Context, next: () => Promise<void>) {
     c.set("userId", payload.id)
     c.set("userEmail", payload.email)
     c.set("userType", payload.type)
-    c.set("userStatus", payload.status)
-    c.set("sessionId", payload.sessionId)
 
-    if (payload.type === "creator") {
-      c.set("creatorId", payload.id)
+    // For backward compatibility and specific access
+    if (payload.type === "vendor") {
+      c.set("vendorId", payload.id)
+    } else if (payload.type === "driver") {
+      c.set("driverId", payload.id)
     }
 
     await next()

@@ -1,21 +1,21 @@
 # Checklist: API Feature
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `.agents/guides/ARCHITECTURE.md` (bagian apps/api)
-- [ ] Baca `references/context.md`
-- [ ] Baca guide masing-masing folder sebelum menulis kode
-- [ ] DTO dibuat di `application/dtos/`
-- [ ] Validator schema dibuat di `application/validators/`
-- [ ] Entity dibuat di `domain/entities/`
-- [ ] Repository interface dibuat di `domain/repositories/`
-- [ ] Use case(s) dibuat di `domain/use-cases/` (satu file per operasi)
-- [ ] Service dibuat di `application/services/`
-- [ ] Prisma repository dibuat di `infrastructure/database/`
-- [ ] Controller dibuat di `interfaces/http/controllers/`
-- [ ] Route dibuat di `interfaces/http/routes/`
-- [ ] Route didaftarkan di `interfaces/http/create-app.ts`
-- [ ] Tidak ada `any`
-- [ ] Tidak ada business logic di Controller
-- [ ] Tidak ada Prisma/HTTP di Use Case
-- [ ] `bun run build` pass
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Read `.agents/settings.json`
+- [ ] Read `.agents/guides/ARCHITECTURE.md` (apps/api section)
+- [ ] Read `references/context.md`
+- [ ] Read the guide for each folder before writing code
+- [ ] DTO created in `application/dtos/`
+- [ ] Validator schema created in `application/validators/`
+- [ ] Entity created in `domain/entities/`
+- [ ] Repository interface created in `domain/repositories/`
+- [ ] Use case(s) created in `domain/use-cases/` (one file per operation)
+- [ ] Service created in `application/services/`
+- [ ] Prisma repository created in `infrastructure/database/`
+- [ ] Controller created in `interfaces/http/controllers/`
+- [ ] Route created in `interfaces/http/routes/`
+- [ ] Route registered in `interfaces/http/create-app.ts`
+- [ ] No `any`
+- [ ] No business logic in Controller
+- [ ] No Prisma/HTTP in Use Case
+- [ ] `bun run build` passes
+- [ ] All files end with a newline (EOF)

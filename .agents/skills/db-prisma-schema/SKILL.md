@@ -1,32 +1,45 @@
 ---
 name: db-prisma-schema
-description: Menulis atau mengubah apps/api/prisma/schema.prisma beserta langkah migrasi yang aman untuk PostgreSQL. Gunakan saat ada perubahan model database, relasi, index, enum, atau kebutuhan sinkronisasi schema dengan domain layer.
+description: Write or modify apps/api/prisma/schema.prisma and execute safe PostgreSQL migrations. Use for database model, relation, index, enum changes, or schema-to-domain-layer sync.
 ---
 
 # Skill: DB Prisma Schema
 
-## Context Cepat (Wajib)
-- Folder scope + contoh kode: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Folder scope + code samples: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-Ubah schema secara minimal dan aman.
+Apply schema changes minimally and safely.
 
-## Konvensi Penamaan
+## Naming Conventions
 
-### Model & Tabel
+### Models & Tables
 
-| Kategori | Prefix Model | Prefix `@@map` |
+| Category | Model Prefix | `@@map` Prefix |
 |----------|-------------|----------------|
-| Data master / referensi | `Master` | `master_` |
-| Data transaksi / bisnis | `Business` | `business_` |
-| Data membership | `Member` | `member_` |
-| Data user / auth | *(tanpa prefix)* | `users` |
-| Data config sistem | *(tanpa prefix)* | `configurations` |
+| Master / reference data | `Master` | `master_` |
+| Transaction / business data | `Business` | `business_` |
+| Membership data | `Member` | `member_` |
+| User / auth data | *(no prefix)* | `users` |
+| System config data | *(no prefix)* | `configurations` |
 
-### Field Boolean — prefix `is` atau `has`
+### Boolean Fields — prefix `is` or `has`
 ### Enum Values — SCREAMING_SNAKE_CASE
 
-### Field Standar Wajib
+If a field has a fixed set of values, **NEVER** declare a Prisma `enum`. Use `String` in Prisma and declare the enum in `packages/schemas/` as the shared source of truth. Validate via Zod on the BE (validator) and FE (form schema) layers.
+
+```typescript
+// packages/schemas/status.ts (source of truth)
+export const statuses = ['ACTIVE', 'INACTIVE', 'ON_PROGRESS'] as const
+export type Status = (typeof statuses)[number]
+```
+
+```prisma
+// Prisma — use String; validate at the application layer
+status String @default("ACTIVE")
+```
+
+### Required Standard Fields
 ```prisma
 id        String    @id @default(uuid()) @db.Uuid
 createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(6)
@@ -34,29 +47,29 @@ updatedAt DateTime  @default(now()) @map("updated_at") @db.Timestamp(6)
 deletedAt DateTime? @map("deleted_at") @db.Timestamp(6)
 ```
 
-## Alur Kerja
+## Workflow
 
-1. Baca `apps/api/prisma/schema.prisma`
-2. Identifikasi breaking vs non-breaking changes
-3. Tulis perubahan minimal
-4. Jalankan: `bunx prisma validate` → `bunx prisma format` → `bunx prisma generate`
+1. Read `apps/api/prisma/schema.prisma`
+2. Identify breaking vs non-breaking changes
+3. Write minimal diff
+4. Run: `bunx prisma validate` → `bunx prisma format` → `bunx prisma generate`
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** rename model, enum, atau field tanpa kebutuhan requirement yang jelas.
-- **DILARANG** hapus kolom atau relasi existing tanpa menuliskan dampak migrasinya.
-- **DILARANG** tinggalkan placeholder atau naming yang tidak sesuai konvensi prefix.
-- **DILARANG** ubah file di luar scope schema/migrasi jika tidak dibutuhkan task.
+- **NEVER** rename a model, enum, or field without a clear requirement.
+- **NEVER** drop an existing column or relation without documenting the migration impact.
+- **NEVER** leave placeholders or names that violate the prefix convention.
+- **NEVER** edit files outside the schema/migration scope unless the task requires it.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Naming model konsisten dengan prefix kategori
-- [ ] `@@map` ada (snake_case plural)
-- [ ] `@map` ada di semua field (snake_case)
-- [ ] Boolean fields prefix `is` atau `has`
-- [ ] Enum values SCREAMING_SNAKE_CASE
-- [ ] Field standar ada: id, createdAt, updatedAt
-- [ ] `bunx prisma validate` pass
-- [ ] `bunx prisma format` dijalankan
-- [ ] `bunx prisma generate` dijalankan
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Model naming follows the category prefix
+- [ ] `@@map` present (snake_case plural)
+- [ ] `@map` present on every field (snake_case)
+- [ ] Boolean fields prefixed `is` or `has`
+- [ ] Enum values in SCREAMING_SNAKE_CASE
+- [ ] Standard fields present: id, createdAt, updatedAt
+- [ ] `bunx prisma validate` passes
+- [ ] `bunx prisma format` run
+- [ ] `bunx prisma generate` run
+- [ ] Every file ends with a newline (EOF)

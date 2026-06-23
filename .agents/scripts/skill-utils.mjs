@@ -15,6 +15,7 @@ export const scopeLabels = {
   ops: 'Ops',
   flow: 'Flow',
   meta: 'Meta',
+  openspec: 'OpenSpec',
 };
 
 const manifestSortOrder = {
@@ -24,6 +25,7 @@ const manifestSortOrder = {
   ops: 3,
   flow: 4,
   meta: 5,
+  openspec: 6,
 };
 
 export function readText(filePath) {
@@ -123,18 +125,18 @@ export function createClaudeWrapperContent({ name, description }) {
     `description: "${description}"`,
     '---',
     '',
-    `Source of truth ada di \`.agents/skills/${name}/SKILL.md\`.`,
+    `Source of truth lives at \`.agents/skills/${name}/SKILL.md\`.`,
     '',
-    'Saat skill ini dipakai:',
-    `1. Baca \`.agents/skills/${name}/SKILL.md\`.`,
-    '2. Ikuti workflow dan aturan di file tersebut.',
-    '3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.',
+    'When this skill is used:',
+    `1. Read \`.agents/skills/${name}/SKILL.md\`.`,
+    '2. Follow the workflow and rules defined in that file.',
+    '3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.',
     '',
   ].join('\n');
 }
 
 export function createSkillSectionReference(name) {
-  return `- Untuk skill \`${name}\`: \`.agents/skills/${name}/SKILL.md\``;
+  return `- For skill \`${name}\`: \`.agents/skills/${name}/SKILL.md\``;
 }
 
 export function scopeLabel(scope) {
@@ -177,7 +179,7 @@ export function extractMarkedSection(markdown, startMarker, endMarker) {
 
 export function renderSkillRegistryTable(entries) {
   const lines = [
-    '| Skill | Scope | Kapan Dipakai |',
+    '| Skill | Scope | When to Use |',
     '|---|---|---|',
   ];
 
@@ -226,9 +228,9 @@ export function upsertTableRow(markdown, sectionHeading, rowKey, rowText) {
 
 export function upsertSkillReference(markdown, name, lineText) {
   const lines = markdown.split('\n');
-  const headingIndex = lines.findIndex((line) => line.trim() === '### SKILL (Hanya Baca Jika Kamu Butuh)');
+  const headingIndex = lines.findIndex((line) => line.trim() === '### SKILL (Read Only When Needed)');
   if (headingIndex === -1) {
-    throw new Error('Section not found: ### SKILL (Hanya Baca Jika Kamu Butuh)');
+    throw new Error('Section not found: ### SKILL (Read Only When Needed)');
   }
 
   let sectionEnd = lines.findIndex((line, index) => index > headingIndex && /^###\s+/.test(line.trim()));

@@ -1,20 +1,20 @@
 # Checklist: Meta Skill Hygiene
 
-## Persiapan
+## Preparation
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `references/context.md`
-- [ ] Identifikasi file source of truth yang berubah (`SKILL.md`, `manifest.json`, `openai.yaml`)
+- [ ] Read `.agents/settings.json`
+- [ ] Read `references/context.md`
+- [ ] Identify which source-of-truth file changed (`SKILL.md`, `manifest.json`, `openai.yaml`)
 
-## Eksekusi
+## Execution
 
-- [ ] Perubahan utama dilakukan di source of truth, bukan output generated
-- [ ] Jalankan `bun run skills:sync`
-- [ ] Jika hanya perlu salah satu output, jalankan sync spesifik yang sesuai
+- [ ] Core edits go into the source of truth, not the generated output
+- [ ] Run `bun run skills:sync`
+- [ ] If only one output needs regeneration, run the matching specific sync command
 
-## Finalisasi
+## Finalization
 
-- [ ] Jalankan `bun run skills:validate`
-- [ ] Tidak ada drift antara `manifest.json`, wrapper Claude, dan registry
-- [ ] Tidak ada placeholder atau marker section yang rusak
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Run `bun run skills:validate`
+- [ ] No drift between `manifest.json`, the Claude wrapper, and the registry
+- [ ] No placeholders or broken marker sections
+- [ ] Every file ends with a newline (EOF)

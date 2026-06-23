@@ -1,11 +1,11 @@
 ---
 name: "api-feature"
-description: "Mengimplementasikan fitur backend baru mengikuti Clean Architecture. Gunakan saat ada task terkait endpoint baru, use case, entity, repository, atau perubahan layer aplikasi."
+description: "Implement new backend features following Clean Architecture. Use for tasks involving new endpoints, use cases, entities, repositories, or application-layer changes."
 ---
 
-Source of truth ada di `.agents/skills/api-feature/SKILL.md`.
+Source of truth lives at `.agents/skills/api-feature/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/api-feature/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/api-feature/SKILL.md`.
+2. Follow the workflow and rules defined in that file.
+3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.

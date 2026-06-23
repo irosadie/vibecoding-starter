@@ -1,148 +1,148 @@
 ---
 name: skill-creator
-description: Membuat skill baru dari nol dengan struktur lengkap — SKILL.md, references, templates, openai.yaml, Claude wrapper, dan registrasi di manifest + AGENTS.md + CLAUDE.md. Gunakan saat user ingin menambahkan capability baru ke agent system.
+description: Create a new skill from scratch with full structure — SKILL.md, references, templates, openai.yaml, Claude wrapper, and registration in manifest + AGENTS.md + CLAUDE.md.
 ---
 
 # Skill: Skill Creator
 
-## Context Cepat (Wajib)
-- Folder scope + konvensi: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Folder scope + conventions: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-Buat skill baru yang lengkap dan terdaftar. `SKILL.md` tetap menjadi source of truth, sedangkan `agents/openai.yaml` hanya menyimpan metadata Codex/OpenAI seperti `interface`, `policy`, atau `dependencies`.
+Create a complete, registered skill. `SKILL.md` remains the source of truth; `agents/openai.yaml` only holds Codex/OpenAI metadata such as `interface`, `policy`, or `dependencies`.
 
-## Alur Kerja
+## Workflow
 
-### 1. Tentukan Identitas Skill
-- **Nama** (kebab-case): `{scope}-{capability}` — misal `web-slicing`, `api-feature`, `flow-breakdown-feature`
-- **Scope**: `frontend`, `backend`, `docs`, `ops`, `flow`, atau `meta`
-- **Deskripsi satu kalimat**: kapan dipakai dan apa outputnya
-- **Trigger**: kondisi/keyword yang mengaktifkan skill ini
+### 1. Define Skill Identity
+- **Name** (kebab-case): `{scope}-{capability}` — e.g. `web-slicing`, `api-feature`, `ops-docker`
+- **Scope**: `frontend`, `backend`, `docs`, `ops`, `flow`, or `meta`
+- **One-sentence description**: when it applies and what it outputs
+- **Trigger**: condition/keyword that activates this skill
 
-### 1a. Gunakan Generator Jika Bisa
+### 1a. Use the Generator When Possible
 
-Untuk scaffold awal yang langsung compliant, prioritaskan generator:
+For a compliant scaffold from the start, prefer the generator:
 
 ```bash
 bun run skills:create -- \
   --name {scope}-{capability} \
   --scope {scope} \
-  --description "{Deskripsi satu kalimat}" \
-  --when "{Kapan dipakai di Skill Registry}"
+  --description "{One-sentence description}" \
+  --when "{When used in Skill Registry}"
 ```
 
-Generator akan membuat folder skill, metadata `openai.yaml`, Claude wrapper, update `manifest.json`, dan menambah registry entries.
+The generator creates the skill folder, `openai.yaml` metadata, Claude wrapper, updates `manifest.json`, and adds registry entries.
 
-### 2. Buat Folder & File Skill
+### 2. Create Skill Folder & Files
 
-Struktur wajib di `.agents/skills/{skill-name}/`:
+Required structure in `.agents/skills/{skill-name}/`:
 
 ```
 .agents/skills/{skill-name}/
-├── SKILL.md                → Definisi skill (nama, deskripsi, alur kerja, larangan, checklist)
+├── SKILL.md                → Skill definition (name, description, workflow, prohibitions, checklist)
 ├── references/
-│   └── context.md          → Folder target, contoh kode, pattern penting
+│   └── context.md          → Target folder, real code examples, key patterns
 ├── templates/
-│   └── checklist.md        → Checklist step-by-step eksekusi
+│   └── checklist.md        → Step-by-step execution checklist
 └── agents/
-    └── openai.yaml         → Metadata Codex/OpenAI (interface, policy, dependencies)
+    └── openai.yaml         → Codex/OpenAI metadata (interface, policy, dependencies)
 ```
 
-#### Format `SKILL.md`
+#### `SKILL.md` Format
 ```markdown
 ---
 name: {skill-name}
-description: {Deskripsi satu kalimat}
+description: {One-sentence description}
 ---
 
-# Skill: {Judul}
+# Skill: {Title}
 
-## Context Cepat (Wajib)
-- Folder scope + contoh kode: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Folder scope + code examples: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-{Satu paragraf penjelasan tujuan skill}
+{One paragraph explaining the skill's purpose}
 
-## Alur Kerja
+## Workflow
 
 1. ...
 2. ...
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** ...
+- **NEVER** ...
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
 - [ ] ...
 ```
 
-#### Format `references/context.md`
+#### `references/context.md` Format
 ```markdown
-# Context: {Judul Skill}
+# Context: {Skill Title}
 
-## Folder Target
+## Target Folder
 
 \`\`\`
-{folder tree yang akan disentuh}
+{folder tree that will be touched}
 \`\`\`
 
-## Contoh Kode Nyata
+## Real Code Examples
 
-Lihat: `.agents/examples/{scope}/{subfolder}/`
+See: `.agents/examples/{scope}/{subfolder}/`
 
-## Pattern Penting
+## Key Patterns
 
-{Contoh kode inline untuk pattern utama}
+{Inline code examples for the main patterns}
 ```
 
-#### Format `templates/checklist.md`
+#### `templates/checklist.md` Format
 ```markdown
-# Checklist: {Judul Skill}
+# Checklist: {Skill Title}
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `.agents/guides/ARCHITECTURE.md`
-- [ ] Baca `references/context.md`
-- [ ] ...langkah spesifik skill...
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Read `.agents/settings.json`
+- [ ] Read `.agents/guides/ARCHITECTURE.md`
+- [ ] Read `references/context.md`
+- [ ] ...skill-specific steps...
+- [ ] All files end with a newline (EOF)
 ```
 
-#### Format `agents/openai.yaml`
+#### `agents/openai.yaml` Format
 ```yaml
 interface:
-  display_name: "{Judul Pendek Skill}"
-  short_description: "{Deskripsi singkat untuk picker skill}"
-  default_prompt: "Use $skill-name to {hasil utama skill ini}."
+  display_name: "{Short Skill Title}"
+  short_description: "{Short description for the skill picker}"
+  default_prompt: "Use $skill-name to {main outcome of this skill}."
 policy:
   allow_implicit_invocation: true
 ```
 
-### 3. Buat Claude Wrapper
+### 3. Create Claude Wrapper
 
-Buat file di `.claude/skills/{skill-name}/SKILL.md`:
+Create the file at `.claude/skills/{skill-name}/SKILL.md`:
 
 ```markdown
 ---
 name: "{skill-name}"
-description: "{Deskripsi satu kalimat}"
+description: "{One-sentence description}"
 ---
 
-Source of truth ada di `.agents/skills/{skill-name}/SKILL.md`.
+Source of truth lives at `.agents/skills/{skill-name}/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/{skill-name}/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/{skill-name}/SKILL.md`.
+2. Follow the workflow and rules in that file.
+3. Read referenced child files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.
 ```
 
-### 4. Daftarkan di `manifest.json`
+### 4. Register in `manifest.json`
 
-Tambahkan entry di `.agents/skills/manifest.json`:
+Add an entry to `.agents/skills/manifest.json`:
 
 ```json
 {
   "name": "{skill-name}",
-  "description": "{Deskripsi satu kalimat}",
+  "description": "{One-sentence description}",
   "scope": "{scope}",
   "path": ".agents/skills/{skill-name}"
 }
@@ -150,51 +150,51 @@ Tambahkan entry di `.agents/skills/manifest.json`:
 
 ### 5. Update `AGENTS.md`
 
-Di `.agents/AGENTS.md`, tambahkan:
-- Baris di **Skill Registry** table (nama, scope, kapan dipakai)
-- Link referensi di section **SKILL** (kapan baca SKILL.md-nya)
+In `.agents/AGENTS.md`, add:
+- A row to the **Skill Registry** table (name, scope, when used)
+- A reference link in the **SKILL** section (when to read its SKILL.md)
 
 ### 6. Update `CLAUDE.md`
 
-Di `CLAUDE.md` root:
-- Tambahkan baris di **Skill Registry** table
-- Tambahkan entry trigger di system-reminder (jika Claude SDK dipakai)
+In the root `CLAUDE.md`:
+- Add a row to the **Skill Registry** table
+- Add a trigger entry in system-reminder (if Claude SDK is used)
 
-### 7. Sinkronkan Claude Wrapper
+### 7. Sync Claude Wrapper
 
-Setelah skill baru dibuat atau diubah, jalankan:
+After creating or editing a skill, run:
 
 ```bash
 bun run skills:sync
 ```
 
-### 8. Validasi Skill Assets
+### 8. Validate Skill Assets
 
-Sebelum menganggap selesai, jalankan:
+Before considering the task done, run:
 
 ```bash
 bun run skills:validate
 ```
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** skip Claude wrapper — selalu buat `.claude/skills/{name}/SKILL.md`.
-- **DILARANG** buat skill tanpa registrasi di `manifest.json`.
-- **DILARANG** gunakan nama skill yang ambigu — harus `{scope}-{capability}`.
-- **DILARANG** duplikasi skill yang sudah ada — cek manifest dulu.
-- **DILARANG** menaruh instruksi utama skill di `agents/openai.yaml` — instruksi utama tetap di `SKILL.md`.
+- **NEVER** skip the Claude wrapper — always create `.claude/skills/{name}/SKILL.md`.
+- **NEVER** create a skill without registering it in `manifest.json`.
+- **NEVER** use an ambiguous skill name — must be `{scope}-{capability}`.
+- **NEVER** duplicate an existing skill — check the manifest first.
+- **NEVER** place main skill instructions in `agents/openai.yaml` — main instructions stay in `SKILL.md`.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Nama skill ditentukan (kebab-case, `{scope}-{capability}`)
-- [ ] `SKILL.md` dibuat dengan frontmatter + alur kerja + larangan + checklist
-- [ ] `references/context.md` dibuat dengan folder target + pattern
-- [ ] `templates/checklist.md` dibuat dengan step lengkap
-- [ ] `agents/openai.yaml` dibuat
-- [ ] `.claude/skills/{name}/SKILL.md` dibuat (Claude wrapper)
-- [ ] Entry ditambahkan di `manifest.json`
-- [ ] `manifest.json` memuat `whenToUse` untuk registry
-- [ ] Skill Registry di `.agents/AGENTS.md` dan `CLAUDE.md` tersinkron dari script
-- [ ] `bun run skills:sync` dijalankan
-- [ ] `bun run skills:validate` pass
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Skill name defined (kebab-case, `{scope}-{capability}`)
+- [ ] `SKILL.md` created with frontmatter + workflow + prohibitions + checklist
+- [ ] `references/context.md` created with target folder + patterns
+- [ ] `templates/checklist.md` created with full steps
+- [ ] `agents/openai.yaml` created
+- [ ] `.claude/skills/{name}/SKILL.md` created (Claude wrapper)
+- [ ] Entry added in `manifest.json`
+- [ ] `manifest.json` contains `whenToUse` for the registry
+- [ ] Skill Registry in `.agents/AGENTS.md` and `CLAUDE.md` synced from script
+- [ ] `bun run skills:sync` executed
+- [ ] `bun run skills:validate` passes
+- [ ] All files end with a newline (EOF)

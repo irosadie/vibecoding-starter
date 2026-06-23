@@ -1,23 +1,23 @@
 # Checklist: API Code Review
 
-## Persiapan
+## Preparation
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `references/context.md`
-- [ ] Tentukan file backend dan contract artefacts yang perlu direview
+- [ ] Read `.agents/settings.json`
+- [ ] Read `references/context.md`
+- [ ] Identify backend files and contract artifacts to review
 
-## Review Inti
+## Core Review
 
-- [ ] Cari bug/regresi endpoint dulu
-- [ ] Cek layering clean architecture
-- [ ] Cek drift validator/DTO/schema/type/OpenAPI bila relevan
-- [ ] Cek error handling dan status code behavior
-- [ ] Cek gap test untuk behavior penting
+- [ ] Hunt endpoint bugs/regressions first
+- [ ] Check clean architecture layering
+- [ ] Check validator/DTO/schema/type/OpenAPI drift when relevant
+- [ ] Check error handling and status code behavior
+- [ ] Check test gaps for important behavior
 
 ## Output
 
-- [ ] Findings ditulis lebih dulu, urut severity
-- [ ] Tidak ada nit stylistic yang tidak relevan
-- [ ] Open questions atau residual risks ditulis setelah findings
-- [ ] Jika tidak ada findings, hal itu disebut eksplisit
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Findings written first, ordered by severity
+- [ ] No irrelevant stylistic nits
+- [ ] Open questions or residual risks written after findings
+- [ ] If no findings, state that explicitly
+- [ ] All files end with a newline (EOF)

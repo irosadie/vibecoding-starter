@@ -58,15 +58,19 @@ export class JwtTokenService implements TokenService {
   generateTokenPair(payload: JwtPayload): TokenPair {
     const accessToken = jwt.sign(payload, getJwtSecret(), {
       expiresIn: ACCESS_TOKEN_EXPIRES,
-      issuer: "exam-app-api",
-      audience: "exam-app-client",
+      issuer: "reva-api",
+      audience: "reva-client",
     })
 
-    const refreshToken = jwt.sign(payload, getRefreshSecret(), {
-      expiresIn: REFRESH_TOKEN_EXPIRES,
-      issuer: "exam-app-api",
-      audience: "exam-app-client",
-    })
+    const refreshToken = jwt.sign(
+      { id: payload.id, email: payload.email, type: payload.type },
+      getRefreshSecret(),
+      {
+        expiresIn: REFRESH_TOKEN_EXPIRES,
+        issuer: "reva-api",
+        audience: "reva-client",
+      },
+    )
 
     return {
       accessToken,
@@ -81,8 +85,8 @@ export class JwtTokenService implements TokenService {
   generateAccessToken(payload: JwtPayload): string {
     return jwt.sign(payload, getJwtSecret(), {
       expiresIn: ACCESS_TOKEN_EXPIRES,
-      issuer: "exam-app-api",
-      audience: "exam-app-client",
+      issuer: "reva-api",
+      audience: "reva-client",
     })
   }
 

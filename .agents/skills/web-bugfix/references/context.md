@@ -1,11 +1,11 @@
 # Context: Web Bugfix
 
-## Folder Target
+## Target Folder
 
 ```
-apps/web/app/                          → page wrapper + content component utama
+apps/web/app/                          → page wrapper + main content component
 apps/web/hooks/transactions/           → query / mutation hooks
-apps/web/components/                   → reusable component bila benar-benar sumber bug
+apps/web/components/                   → reusable components when truly the bug source
 apps/web/constants/                    → api routers + query keys
 apps/web/services/axios/               → interceptor / response handling
 packages/schemas/                      → shared payload schema
@@ -14,21 +14,21 @@ packages/types/                        → shared response types
 
 ## Impact Map
 
-Gunakan urutan cek ini:
-1. apakah bug murni UI state?
-2. apakah bug ada di hook atau request handling?
-3. apakah bug berasal dari schema/type drift?
-4. apakah bug sebenarnya contract/backend issue?
+Check in this order:
+1. Is the bug pure UI state?
+2. Is the bug in a hook or request handling?
+3. Is the bug from schema/type drift?
+4. Is the bug actually a contract/backend issue?
 
-## Pattern Penting
+## Key Patterns
 
-- minimal touch lebih penting daripada refactor bersih-bersih
-- `page.tsx` tetap tipis
-- data flow tetap lewat hooks transaksi
-- update `packages/schemas` / `packages/types` hanya jika benar-benar terdampak
-- pure frontend bug tidak otomatis butuh OpenAPI update
+- minimum touch beats cosmetic cleanup
+- `page.tsx` stays thin
+- data flow goes through transaction hooks
+- update `packages/schemas` / `packages/types` only when actually impacted
+- a pure frontend bug does not automatically require an OpenAPI update
 
-## Contoh Surface Aktif
+## Active Surface Examples
 
 - `apps/web/app/`
 - `apps/web/hooks/transactions/`

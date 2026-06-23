@@ -1,42 +1,42 @@
 # Checklist: Skill Creator
 
-## Persiapan
+## Preparation
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `references/context.md`
-- [ ] Cek `.agents/skills/manifest.json` — pastikan skill belum ada
-- [ ] Tentukan nama skill: kebab-case, format `{scope}-{capability}`
-- [ ] Tentukan scope: `frontend` / `backend` / `docs` / `ops` / `flow` / `meta`
-- [ ] Tulis deskripsi satu kalimat: apa yang dilakukan + kapan dipakai
+- [ ] Read `.agents/settings.json`
+- [ ] Read `references/context.md`
+- [ ] Check `.agents/skills/manifest.json` — confirm the skill does not already exist
+- [ ] Define skill name: kebab-case, format `{scope}-{capability}`
+- [ ] Define scope: `frontend` / `backend` / `docs` / `ops` / `flow` / `meta`
+- [ ] Write a one-sentence description: what it does + when used
 
-## Buat File Skill (`.agents/skills/{name}/`)
+## Create Skill Files (`.agents/skills/{name}/`)
 
-- [ ] `SKILL.md` dibuat dengan frontmatter (`name`, `description`)
-- [ ] `SKILL.md` punya section: Context Cepat, Alur Kerja, Larangan, Checklist
-- [ ] `references/context.md` dibuat — folder target + pattern penting + tabel teknologi
-- [ ] `templates/checklist.md` dibuat — semua step terurut dan bisa di-ceklis
-- [ ] `agents/openai.yaml` dibuat — metadata Codex/OpenAI (`interface`, `policy`, `dependencies` jika perlu)
+- [ ] `SKILL.md` created with frontmatter (`name`, `description`)
+- [ ] `SKILL.md` has sections: Context, Workflow, Prohibitions, Checklist
+- [ ] `references/context.md` created — target folder + key patterns + technology table
+- [ ] `templates/checklist.md` created — all steps ordered and checkable
+- [ ] `agents/openai.yaml` created — Codex/OpenAI metadata (`interface`, `policy`, `dependencies` if needed)
 
-## Buat Claude Wrapper (`.claude/skills/{name}/`)
+## Create Claude Wrapper (`.claude/skills/{name}/`)
 
-- [ ] `.claude/skills/{name}/SKILL.md` dibuat
-- [ ] Isi: frontmatter + pointer ke source of truth + instruksi 3 langkah
+- [ ] `.claude/skills/{name}/SKILL.md` created
+- [ ] Contents: frontmatter + pointer to source of truth + 3-step instructions
 
-## Registrasi
+## Registration
 
-- [ ] Entry ditambahkan di `.agents/skills/manifest.json` (`name`, `description`, `scope`, `path`)
-- [ ] Baris ditambahkan di Skill Registry table di `.agents/AGENTS.md`
-- [ ] Link referensi ditambahkan di section SKILL di `.agents/AGENTS.md`
-- [ ] Baris ditambahkan di Skill Registry table di `CLAUDE.md`
-- [ ] Jalankan `bun run skills:create -- --help` jika butuh scaffold command yang benar
-- [ ] Field `whenToUse` ditulis di `manifest.json`
-- [ ] Jalankan `bun run skills:sync`
-- [ ] Jalankan `bun run skills:validate`
+- [ ] Entry added in `.agents/skills/manifest.json` (`name`, `description`, `scope`, `path`)
+- [ ] Row added to Skill Registry table in `.agents/AGENTS.md`
+- [ ] Reference link added in SKILL section of `.agents/AGENTS.md`
+- [ ] Row added to Skill Registry table in `CLAUDE.md`
+- [ ] Run `bun run skills:create -- --help` if you need the correct scaffold command
+- [ ] `whenToUse` field written in `manifest.json`
+- [ ] Run `bun run skills:sync`
+- [ ] Run `bun run skills:validate`
 
-## Validasi Akhir
+## Final Validation
 
-- [ ] Nama skill konsisten di semua file (SKILL.md, Claude wrapper, manifest)
-- [ ] Deskripsi konsisten di `SKILL.md`, Claude wrapper, dan manifest
-- [ ] `agents/openai.yaml` tidak menduplikasi instruksi utama skill
-- [ ] Tidak ada typo di path referensi
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Skill name consistent across all files (SKILL.md, Claude wrapper, manifest)
+- [ ] Description consistent across `SKILL.md`, Claude wrapper, and manifest
+- [ ] `agents/openai.yaml` does not duplicate the main skill instructions
+- [ ] No typos in reference paths
+- [ ] All files end with a newline (EOF)

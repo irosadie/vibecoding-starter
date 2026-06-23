@@ -1,11 +1,11 @@
 ---
 name: "web-bugfix"
-description: "Memperbaiki bug frontend dengan perubahan seminimal mungkin, menjaga surface lain tetap stabil, lalu memastikan schema, types, hooks, constants, tests, dan dokumentasi terkait ikut sinkron bila terdampak."
+description: "Fix frontend bugs with minimum-touch changes, keep other surfaces stable, and sync schema, types, hooks, constants, tests, and related docs when impacted."
 ---
 
-Source of truth ada di `.agents/skills/web-bugfix/SKILL.md`.
+Source of truth lives at `.agents/skills/web-bugfix/SKILL.md`.
 
-Saat skill ini dipakai:
-1. Baca `.agents/skills/web-bugfix/SKILL.md`.
-2. Ikuti workflow dan aturan di file tersebut.
-3. Baca file turunan yang direferensikan (`references/context.md`, `templates/checklist.md`) dari folder source of truth.
+When this skill is used:
+1. Read `.agents/skills/web-bugfix/SKILL.md`.
+2. Follow the workflow and rules defined in that file.
+3. Read the referenced sub-files (`references/context.md`, `templates/checklist.md`) from the source-of-truth folder.

@@ -1,22 +1,22 @@
 # Checklist: Web Bugfix
 
-## Persiapan
+## Preparation
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `references/context.md`
-- [ ] Tuliskan gejala bug atau langkah reproduksi
+- [ ] Read `.agents/settings.json`
+- [ ] Read `references/context.md`
+- [ ] Write down the bug symptoms or reproduction steps
 
-## Eksekusi
+## Execution
 
-- [ ] Root cause dilokalisasi ke file/area terkecil
-- [ ] Perubahan tetap minimal touch
-- [ ] Shared schema/types/hooks/constants diupdate jika memang terdampak
-- [ ] Tidak ada cleanup/refactor unrelated
-- [ ] Test reproduksi atau guard ditambah/diperbarui
+- [ ] Root cause localized to the smallest file/area
+- [ ] Change remains minimum touch
+- [ ] Shared schema/types/hooks/constants updated when actually impacted
+- [ ] No unrelated cleanup/refactor
+- [ ] Reproduction or guard test added/updated
 
-## Finalisasi
+## Finalization
 
-- [ ] Contract frontend tetap sinkron
-- [ ] Lint/type/test relevan dijalankan
-- [ ] Tidak ada perubahan unrelated yang ikut terbawa
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Frontend contract stays in sync
+- [ ] Relevant lint/type/test run
+- [ ] No unrelated changes snuck in
+- [ ] All files end with a newline (EOF)

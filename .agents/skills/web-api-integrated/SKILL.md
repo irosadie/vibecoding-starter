@@ -1,59 +1,59 @@
 ---
 name: web-api-integrated
-description: Mengintegrasikan API ke frontend dengan Zod schema, response types, constants, dan react-query hooks. Gunakan saat implementasi endpoint dari API contract, Postman, atau Swagger.
+description: Integrate API endpoints into the frontend with Zod schemas, response types, constants, and react-query hooks. Use when implementing endpoints from an API contract, Postman, or Swagger.
 ---
 
 # Skill: Web API Integrated
 
-## Context Cepat (Wajib)
-- Folder scope + contoh kode: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Folder scope + code examples: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-Integrasikan API ke frontend dengan arsitektur yang konsisten.
+Integrate APIs into the frontend with a consistent architecture.
 
-## Alur Kerja
+## Workflow
 
-### 0. Baca API Contract
-- Jika user memberikan API contract (Postman, Swagger, TRD), baca dan pahami seluruh endpoint: method, URL, payload, dan response.
-- Lihat `docs/features/{feature-slug}/TRD.md` jika tersedia.
+### 0. Read the API Contract
+- If the user provides an API contract (Postman, Swagger, TRD), read and understand every endpoint: method, URL, payload, and response.
+- Check `docs/features/{feature-slug}/TRD.md` if available.
 
-### 1. Buat Zod Schema (`packages/schemas/`)
-- Buat schema dengan pola: type constants + labels array + `get{Type}Label()` + Zod schema + type alias
-- Baca panduan: `.agents/guides/shared-schema.md`
+### 1. Create Zod Schema (`packages/schemas/`)
+- Follow the pattern: type constants + labels array + `get{Type}Label()` + Zod schema + type alias
+- Read guide: `.agents/guides/shared-schema.md`
 
-### 2. Buat Response Types (`packages/types/`)
-- Buat satu file per response type, mis. `packages/types/payment-method-response.ts`
-- Import dari frontend via `@vibecoding-starter/types/payment-method-response`
-- Re-export dari `packages/types/index.ts` bila memang perlu dipakai dari root package
+### 2. Create Response Types (`packages/types/`)
+- One file per response type, e.g. `packages/types/payment-method-response.ts`
+- Import from frontend via `@vibecoding-starter/types/payment-method-response`
+- Re-export from `packages/types/index.ts` if needed from the root package
 
-### 3. Daftarkan Constants
-- Tambahkan URL di `apps/web/constants/api-routers.ts` (gunakan `:id` path variables)
-- Tambahkan query key di `apps/web/constants/query-keys.ts` (flat strings)
-- Baca panduan: `.agents/guides/web-constant.md`
+### 3. Register Constants
+- Add URL to `apps/web/constants/api-routers.ts` (use `:id` path variables)
+- Add query key to `apps/web/constants/query-keys.ts` (flat strings)
+- Read guide: `.agents/guides/web-constant.md`
 
-### 4. Buat Custom Hooks (`apps/web/hooks/transactions/use-{domain}/`)
-- Satu folder per domain, satu file per operasi
-- Hooks call axios **langsung** — tidak perlu service function
-- Urutan file: `use-data-table.ts`, `use-get-one.ts`, `use-insert-one.ts`, `use-update-one.ts`, `use-delete-one.ts`, `index.ts`
-- Baca panduan: `.agents/guides/web-hook.md`
-- Lihat contoh: `.agents/examples/web-api-integrated/hooks/use-examples/`
+### 4. Create Custom Hooks (`apps/web/hooks/transactions/use-{domain}/`)
+- One folder per domain, one file per operation
+- Hooks call axios **directly** — no service function required
+- File order: `use-data-table.ts`, `use-get-one.ts`, `use-insert-one.ts`, `use-update-one.ts`, `use-delete-one.ts`, `index.ts`
+- Read guide: `.agents/guides/web-hook.md`
+- See example: `.agents/examples/web-api-integrated/hooks/use-examples/`
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** call `axios`/`fetch` langsung di komponen JSX/TSX.
-- **DILARANG** gunakan `any` sebagai type.
-- **DILARANG** skip Zod schema — semua payload harus tervalidasi.
-- **DILARANG** hardcode API URL — gunakan `apiRouters` dari constants.
-- **DILARANG** gunakan fungsi untuk URL — gunakan `:id` path variable + `pathVariable()`.
+- **FORBIDDEN** to call `axios`/`fetch` directly inside JSX/TSX components.
+- **FORBIDDEN** to use `any` as a type.
+- **FORBIDDEN** to skip Zod schema — every payload must be validated.
+- **FORBIDDEN** to hardcode API URLs — use `apiRouters` from constants.
+- **FORBIDDEN** to use functions for URL building — use `:id` path variable + `pathVariable()`.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Zod schema dibuat di `packages/schemas/` (pola lengkap: constants + labels + helper + schema + type)
-- [ ] Response type dibuat di `packages/types/` dengan file flat per domain + re-export root bila perlu
-- [ ] URL didaftarkan di `constants/api-routers.ts` (`:id` path variables)
-- [ ] Query key didaftarkan di `constants/query-keys.ts` (flat strings)
-- [ ] Custom hooks dibuat: `useDataTable`, `useGetOne`, `useInsertOne`, `useUpdateOne`, `useDeleteOne`
-- [ ] `index.ts` re-export semua hooks
-- [ ] Tidak ada `axios`/`fetch` langsung di komponen
-- [ ] Tidak ada `any`
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Zod schema created in `packages/schemas/` (full pattern: constants + labels + helper + schema + type)
+- [ ] Response type created in `packages/types/` as a flat file per domain + re-export from root if needed
+- [ ] URL registered in `constants/api-routers.ts` (`:id` path variables)
+- [ ] Query key registered in `constants/query-keys.ts` (flat strings)
+- [ ] Custom hooks created: `useDataTable`, `useGetOne`, `useInsertOne`, `useUpdateOne`, `useDeleteOne`
+- [ ] `index.ts` re-exports all hooks
+- [ ] No direct `axios`/`fetch` in components
+- [ ] No `any`
+- [ ] Every file ends with a newline (EOF)

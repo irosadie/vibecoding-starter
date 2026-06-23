@@ -1,33 +1,14 @@
 import { authConfig } from "$/configs/auth"
 import { serverAuthConfig } from "$/configs/auth-server"
-import { type LoginProps, loginSchema } from "@vibecoding-starter/schemas"
-import type {
-  AccountRole,
-  AccountStatus,
-  AuthLoginResponse,
-} from "@vibecoding-starter/types"
+import { loginSchema } from "@vibecoding-starter/schemas"
+import type { AuthLoginResponse } from "@vibecoding-starter/types"
 import axios from "axios"
 import type { NextAuthOptions, User } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 
 type AuthEnvelope<T> = T | { data: T }
 
-const ACCOUNT_ROLES: AccountRole[] = ["USER", "CREATOR", "ADMIN"]
-const ACCOUNT_STATUSES: AccountStatus[] = ["ACTIVE", "SUSPENDED"]
-
 const loginProxyUrl = `${serverAuthConfig.appBaseUrl}${authConfig.proxyApiBasePath}${authConfig.backendLoginPath}`
-const loginBackendUrl = `${serverAuthConfig.backendApiBaseUrl}${authConfig.backendLoginPath}`
-const loginUrls = [loginProxyUrl, loginBackendUrl]
-
-type AuthErrorBody = {
-  message?: string
-  error?: {
-    message?: string
-  }
-  errors?: Array<{
-    message?: string
-  }>
-}
 
 const unwrapData = <T>(payload: AuthEnvelope<T>): T => {
   if (
@@ -40,86 +21,6 @@ const unwrapData = <T>(payload: AuthEnvelope<T>): T => {
   }
 
   return payload as T
-}
-
-const normalizeAccountRole = (role: unknown): AccountRole => {
-  if (typeof role === "string" && ACCOUNT_ROLES.includes(role as AccountRole)) {
-    return role as AccountRole
-  }
-
-  return "USER"
-}
-
-const normalizeAccountStatus = (status: unknown): AccountStatus => {
-  if (
-    typeof status === "string" &&
-    ACCOUNT_STATUSES.includes(status as AccountStatus)
-  ) {
-    return status as AccountStatus
-  }
-
-  return "ACTIVE"
-}
-
-const getAuthErrorMessage = (error: unknown) => {
-  if (axios.isAxiosError(error)) {
-    const body = error.response?.data as AuthErrorBody | undefined
-
-    return (
-      body?.message ||
-      body?.error?.message ||
-      body?.errors?.[0]?.message ||
-      "Login failed"
-    )
-  }
-
-  if (error instanceof Error) {
-    return error.message
-  }
-
-  return "An unexpected error occurred"
-}
-
-const shouldRetryWithFallback = (error: unknown) => {
-  if (!axios.isAxiosError(error)) {
-    return false
-  }
-
-  if (!error.response) {
-    return true
-  }
-
-  return error.response.status >= 500 || error.response.status === 404
-}
-
-const loginByCredentials = async (
-  credentials: LoginProps,
-): Promise<AuthLoginResponse> => {
-  let lastError: unknown
-
-  for (const [index, loginUrl] of loginUrls.entries()) {
-    try {
-      const { data } = await axios.post<AuthEnvelope<AuthLoginResponse>>(
-        loginUrl,
-        credentials,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      )
-
-      return unwrapData<AuthLoginResponse>(data)
-    } catch (error) {
-      lastError = error
-
-      if (!shouldRetryWithFallback(error) || index === loginUrls.length - 1) {
-        break
-      }
-    }
-  }
-
-  throw new Error(getAuthErrorMessage(lastError))
 }
 
 export const authOptions: NextAuthOptions = {
@@ -142,7 +43,17 @@ export const authOptions: NextAuthOptions = {
         }
 
         try {
-          const result = await loginByCredentials(parsedCredentials.data)
+          const { data } = await axios.post<AuthEnvelope<AuthLoginResponse>>(
+            loginProxyUrl,
+            parsedCredentials.data,
+            {
+              headers: {
+                "Content-Type": "application/json",
+              },
+            },
+          )
+
+          const result = unwrapData(data)
 
           if (!result.user || !result.tokens) {
             throw new Error("Invalid response from auth server")
@@ -155,8 +66,7 @@ export const authOptions: NextAuthOptions = {
             email: result.user.email,
             name: result.user.name,
             photo: result.user.photo ?? undefined,
-            role: normalizeAccountRole(result.user.role),
-            status: normalizeAccountStatus(result.user.status),
+            companyId: result.user.companyId ?? 0,
             accessToken: result.tokens.accessToken,
             refreshToken: result.tokens.refreshToken,
             accessTokenExpires,
@@ -165,7 +75,19 @@ export const authOptions: NextAuthOptions = {
 
           return authUser
         } catch (error: unknown) {
-          throw new Error(getAuthErrorMessage(error))
+          if (axios.isAxiosError(error)) {
+            const errorMessage =
+              (error.response?.data as { message?: string })?.message ||
+              "Login failed"
+
+            throw new Error(errorMessage)
+          }
+
+          if (error instanceof Error) {
+            throw new Error(error.message)
+          }
+
+          throw new Error("An unexpected error occurred")
         }
       },
     }),
@@ -177,8 +99,7 @@ export const authOptions: NextAuthOptions = {
         token.name = user.name
         token.email = user.email
         token.photo = user.photo
-        token.role = user.role
-        token.status = user.status
+        token.companyId = user.companyId
         token.accessToken = user.accessToken
         token.refreshToken = user.refreshToken
         token.accessTokenExpires = user.accessTokenExpires
@@ -212,8 +133,7 @@ export const authOptions: NextAuthOptions = {
         email: token.email ?? undefined,
         name: token.name ?? undefined,
         photo: token.photo ?? undefined,
-        role: normalizeAccountRole(token.role),
-        status: normalizeAccountStatus(token.status),
+        companyId: (token.companyId as number | undefined) ?? 0,
       }
 
       return session

@@ -1,81 +1,81 @@
 ---
 name: web-bugfix
-description: Memperbaiki bug frontend dengan perubahan seminimal mungkin, menjaga surface lain tetap stabil, lalu memastikan schema, types, hooks, constants, tests, dan dokumentasi terkait ikut sinkron bila terdampak.
+description: Fix frontend bugs with minimum-touch changes, keep other surfaces stable, and sync schema, types, hooks, constants, tests, and related docs when impacted.
 ---
 
 # Skill: Web Bugfix
 
-## Context Cepat (Wajib)
+## Context (Required)
 - Folder scope + impact map: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+- Execution checklist: `templates/checklist.md`
 
-Gunakan skill ini saat user meminta fix bug frontend. Prinsip utamanya: **minimal touch**. Cari akar masalah, ubah sesedikit mungkin, jangan refactor area lain, lalu sinkronkan artefak yang memang terdampak. Jangan meninggalkan drift.
+Use this skill when the user asks to fix a frontend bug. Core principle: **minimum touch**. Find the root cause, change as little as possible, do not refactor unrelated areas, then sync artifacts that are actually impacted. Leave no drift behind.
 
-## Alur Kerja
+## Workflow
 
-### 1. Reproduksi atau Definisikan Bug dengan Jelas
+### 1. Reproduce or Define the Bug Clearly
 
-Sebelum mengubah kode:
-- pahami gejala bug
-- cari langkah reproduksi atau failing behavior yang jelas
-- tentukan boundary bug: page, hook, component, shared schema/type, atau integrasi API
+Before changing code:
+- understand the symptoms
+- find reproduction steps or a clear failing behavior
+- define the bug's boundary: page, hook, component, shared schema/type, or API integration
 
-Kalau bisa, tambahkan atau ubah test yang merepresentasikan bug tersebut.
+If possible, add or update a test that represents the bug.
 
-### 2. Lokalisasi Root Cause
+### 2. Localize the Root Cause
 
-Cari root cause sekecil mungkin. Prioritaskan lokasi berikut:
+Find the smallest viable root cause. Prioritize these locations:
 - `*-content.tsx`
-- hooks transaksi
-- shared schema/type yang dipakai frontend
+- transaction hooks
+- shared schema/type consumed by the frontend
 - constants (`api-routers`, `query-keys`)
-- reusable component yang benar-benar menjadi sumber bug
+- reusable components that are actually the source of the bug
 
-Jangan refactor besar hanya karena bug ditemukan di area yang jelek.
+Do not refactor large areas just because the bug surfaced in messy code.
 
-### 3. Terapkan Perbaikan Minimal
+### 3. Apply Minimum-Touch Fix
 
-Aturan minimal touch:
-- sentuh file sesedikit mungkin
-- ubah behavior yang salah tanpa mendesain ulang area lain
-- jangan mengganti pola arsitektur yang tidak relevan dengan bug
-- jangan membersihkan debt lama yang tidak terkait
+Minimum-touch rules:
+- touch as few files as possible
+- fix the wrong behavior without redesigning the surrounding area
+- do not replace architectural patterns unrelated to the bug
+- do not clean up unrelated old debt
 
-### 4. Sinkronkan Artefak yang Terdampak
+### 4. Sync Impacted Artifacts
 
-Jika bug menyentuh contract atau shape data, update yang memang perlu:
+If the bug touches a contract or data shape, update what truly needs updating:
 - `packages/schemas`
 - `packages/types`
-- hooks transaksi frontend
-- constants atau util terkait
-- test yang relevan
-- docs contract jika ekspektasi frontend terhadap API memang berubah
+- frontend transaction hooks
+- related constants or utils
+- relevant tests
+- contract docs if the frontend's expectation of the API genuinely changed
 
-Jika bug ternyata berasal dari backend contract yang salah, jangan sembunyikan masalah di frontend. Fix surface frontend seperlunya, lalu arahkan atau lanjutkan dengan skill backend yang tepat.
+If the bug actually originates from a wrong backend contract, do not hide the problem in the frontend. Patch the frontend surface as needed, then route or continue with the appropriate backend skill.
 
-### 5. Verifikasi Sempit tapi Teliti
+### 5. Verify Narrowly but Thoroughly
 
-Minimal verifikasi:
-- test yang mereproduksi atau melindungi bug
-- typecheck/lint untuk surface yang tersentuh
-- cek tidak ada contract drift baru
+Minimum verification:
+- test that reproduces or guards the bug
+- typecheck/lint on touched surfaces
+- confirm no new contract drift
 
-Jika bug ada di starter surface aktif, prioritaskan menjaga homepage, shared contract, dan hook transaksi yang dipakai tetap konsisten.
+If the bug lives in an active starter surface, prioritize keeping the homepage, shared contract, and transaction hooks consistent.
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** refactor besar saat tujuan user hanya fix bug.
-- **DILARANG** mengubah file lain hanya karena "sekalian dirapikan".
-- **DILARANG** membiarkan schema/type/hooks/docs drift bila bugfix mengubah shape data.
-- **DILARANG** menutup bug backend dengan workaround frontend yang menambah kebohongan state atau contract mismatch.
-- **DILARANG** selesai tanpa verifikasi terarah.
+- **NEVER** do large refactors when the user only asked for a bug fix.
+- **NEVER** change other files just because they look messy.
+- **NEVER** leave schema/type/hooks/docs drift when the fix changes data shape.
+- **NEVER** cover up a backend bug with a frontend workaround that adds state lies or contract mismatch.
+- **NEVER** finish without targeted verification.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Bug direproduksi atau perilaku salah didefinisikan jelas
-- [ ] Root cause dilokalisasi ke surface terkecil yang masuk akal
-- [ ] Perubahan tetap minimal touch
-- [ ] Shared schema/types/constants/hooks ikut diupdate bila memang terdampak
-- [ ] Test yang relevan ditambah atau diperbarui
-- [ ] Tidak ada drift baru di contract frontend
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Bug reproduced or wrong behavior defined clearly
+- [ ] Root cause localized to the smallest reasonable surface
+- [ ] Change remains minimum touch
+- [ ] Shared schema/types/constants/hooks updated if actually impacted
+- [ ] Relevant tests added or updated
+- [ ] No new drift in the frontend contract
+- [ ] All files end with a newline (EOF)

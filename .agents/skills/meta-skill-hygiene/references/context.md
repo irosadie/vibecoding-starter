@@ -1,27 +1,27 @@
 # Context: Meta Skill Hygiene
 
-## Folder Target
+## Target Files
 
-- `.agents/skills/*/SKILL.md` → source of truth nama + deskripsi + workflow skill
-- `.agents/skills/*/agents/openai.yaml` → metadata Codex/OpenAI
+- `.agents/skills/*/SKILL.md` → source of truth for skill name, description, workflow
+- `.agents/skills/*/agents/openai.yaml` → Codex/OpenAI metadata
 - `.agents/skills/manifest.json` → registry source of truth (`scope`, `path`, `whenToUse`)
-- `.agents/scripts/` → automation untuk create/sync/validate
-- `.claude/skills/*/SKILL.md` → generated wrapper dari source of truth
-- `.agents/AGENTS.md` dan `CLAUDE.md` → generated registry sections via markers
+- `.agents/scripts/` → automation for create/sync/validate
+- `.claude/skills/*/SKILL.md` → generated wrapper from the source of truth
+- `.agents/AGENTS.md` and `CLAUDE.md` → generated registry sections via markers
 
 ## Commands
 
 ```bash
-bun run skills:create -- --name {scope-capability} --scope {scope} --description "{deskripsi}" --when "{kapan dipakai}"
+bun run skills:create -- --name {scope-capability} --scope {scope} --description "{description}" --when "{whenToUse}"
 bun run skills:sync
 bun run skills:sync-registry
 bun run skills:sync-claude
 bun run skills:validate
 ```
 
-## Pattern Penting
+## Key Patterns
 
-- Perubahan registry harus berasal dari `manifest.json`, bukan edit manual table.
-- Wrapper Claude harus selalu diregenerate dari `SKILL.md`.
-- `openai.yaml` hanya menyimpan metadata interface/policy, bukan instruksi utama skill.
-- Validator harus dipakai sebelum merge perubahan di area `.agents/` atau `.claude/`.
+- Registry changes must originate from `manifest.json`, never manual table edits.
+- The Claude wrapper must always be regenerated from `SKILL.md`.
+- `openai.yaml` holds interface/policy metadata only — never the main skill instructions.
+- Run the validator before merging changes under `.agents/` or `.claude/`.

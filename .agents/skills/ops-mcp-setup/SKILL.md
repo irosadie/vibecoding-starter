@@ -1,50 +1,44 @@
 ---
 name: ops-mcp-setup
-description: Mengonfigurasi MCP server GitHub, Jira (Atlassian), Notion, dan Figma (opsional) di project ini agar skill flow dapat berjalan. Gunakan saat pertama kali setup project atau saat MCP belum terhubung.
+description: Configure the GitHub MCP server in this project so the agent can interact with the repository. Use on first-time project setup or when MCP is not yet connected.
 ---
 
 # Skill: Ops MCP Setup
 
-## Context Cepat (Wajib)
-- Detail token + format file: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+## Context (Required)
+- Token details + file format: `references/context.md`
+- Execution checklist: `templates/checklist.md`
 
-Hubungkan agent ke layanan eksternal yang dibutuhkan flow vibe coding: **GitHub**, **Jira (Atlassian)**, dan **Notion**. **Figma** bersifat opsional — hanya perlu jika workflow slicing menggunakan desain Figma.
+Connect the agent to the **GitHub** MCP so it can read issues, create PRs, and interact with the repository.
 
-## Prasyarat
+## Prerequisites
 
-- `bun` atau `npx` tersedia di PATH
-- `uv` tersedia (untuk Atlassian MCP) — jika belum: `curl -LsSf https://astral.sh/uv/install.sh | sh`
-- Akses ke akun GitHub, Atlassian, dan Notion workspace yang akan dipakai
+- `npx` available in PATH
+- Access to a GitHub account with the target repo
 
-## Alur Kerja
+## Workflow
 
-### 1. Tanya Informasi yang Dibutuhkan
+### 1. Ask for Required Information
 
-Sebelum membuat file, tanya user:
+Before creating files, ask the user:
 
 ```
-1. GitHub Personal Access Token (atau minta user generate dulu — lihat references/context.md)
-2. Jira URL (format: https://{org}.atlassian.net)
-3. Jira username (email akun Atlassian)
-4. Jira API Token (atau minta user generate dulu)
-5. Notion Integration Token (atau minta user generate dulu)
-6. [OPSIONAL] Figma Personal Access Token — tanya apakah perlu Figma MCP
+1. GitHub Personal Access Token (scope: repo, read:org)
 ```
 
-Jangan buat `.mcp.json` dengan placeholder — semua nilai harus real token dari user.
+Do not create `.mcp.json` with placeholders — value must be a real token from the user.
 
-### 2. Cek `.gitignore`
+### 2. Check `.gitignore`
 
-Pastikan `.mcp.json` sudah masuk ke `.gitignore`. Jika belum, tambahkan:
+Ensure `.mcp.json` is in `.gitignore`. If not, add:
 
 ```
 .mcp.json
 ```
 
-### 3. Buat `.mcp.json`
+### 3. Create `.mcp.json`
 
-Buat file di root project dengan token yang sudah dikonfirmasi:
+Create the file at project root with the confirmed token:
 
 ```json
 {
@@ -53,77 +47,46 @@ Buat file di root project dengan token yang sudah dikonfirmasi:
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
       "env": {
-        "GITHUB_PERSONAL_ACCESS_TOKEN": "{token dari user}"
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "{token from user}"
       }
-    },
-    "atlassian": {
-      "command": "uvx",
-      "args": ["mcp-atlassian"],
-      "env": {
-        "JIRA_URL": "{jira url dari user}",
-        "JIRA_USERNAME": "{email dari user}",
-        "JIRA_API_TOKEN": "{token dari user}"
-      }
-    },
-    "notion": {
-      "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server"],
-      "env": {
-        "OPENAPI_MCP_HEADERS": "{\"Authorization\": \"Bearer {token dari user}\", \"Notion-Version\": \"2022-06-28\"}"
-      }
-    },
-    "figma": {
-      "command": "npx",
-      "args": ["-y", "figma-developer-mcp", "--figma-api-key={token dari user}", "--stdio"]
     }
   }
 }
 ```
 
-> **Figma bersifat opsional.** Tambahkan hanya jika user ingin agent bisa membaca desain Figma langsung. Jika tidak, skip bagian `figma` dari `.mcp.json`.
-
 ### 4. Update `.agents/settings.json`
 
-Setelah MCP siap, update bagian `repo` dan `jira` di `.agents/settings.json` dengan nilai nyata:
+After MCP is ready, update the `repo` section in `.agents/settings.json`:
 
 ```json
 {
   "repo": {
     "owner": "{github org/username}",
-    "name": "{nama monorepo github}"
-  },
-  "jira": {
-    "projectKey": "{JIRA_PROJECT_KEY}"
+    "name": "{github repo name}"
   }
 }
 ```
 
-### 5. Verifikasi
+### 5. Verify
 
-Instruksikan user untuk:
+Instruct the user to:
 
-1. **Restart Claude Code** agar `.mcp.json` terbaca
-2. Cek di Claude Code bahwa MCP sudah aktif (biasanya ada indikator di status bar atau bisa test dengan perintah sederhana)
-3. Test masing-masing koneksi:
-   - GitHub: "List open issues di repo {repo-name}"
-   - Jira: "List tiket open di project {JIRA_KEY}"
-   - Notion: "List halaman di workspace"
+1. **Restart Claude Code / agent** so `.mcp.json` is loaded
+2. Test connection: "List open issues in repo {repo-name}"
 
-Jika ada yang gagal, tampilkan pesan error dan arahkan ke langkah troubleshoot di `references/context.md`.
+If it fails, surface the error and direct to the troubleshooting step in `references/context.md`.
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** menyimpan token di file selain `.mcp.json` (tidak ke `.env`, tidak ke `settings.json`).
-- **DILARANG** commit `.mcp.json` — pastikan ada di `.gitignore` sebelum file dibuat.
-- **DILARANG** buat `.mcp.json` dengan nilai placeholder — tunggu token nyata dari user.
-- **DILARANG** skip update `settings.json` — bagian `repo` dan `jira.projectKey` wajib diisi.
+- **FORBIDDEN** to store token in any file other than `.mcp.json`.
+- **FORBIDDEN** to commit `.mcp.json` — ensure it is in `.gitignore`.
+- **FORBIDDEN** to create `.mcp.json` with placeholder values.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] `.mcp.json` ada di `.gitignore`
-- [ ] Semua token dikonfirmasi dari user (bukan placeholder)
-- [ ] `.mcp.json` dibuat di root project dengan 3 MCP server wajib: `github`, `atlassian`, `notion`
-- [ ] [OPSIONAL] MCP `figma` ditambahkan jika user membutuhkan
-- [ ] `.agents/settings.json` diupdate: `repo.owner`, `repo.name`, `jira.projectKey`
-- [ ] User diinstruksikan restart Claude Code
-- [ ] User berhasil verifikasi koneksi ke layanan yang dikonfigurasi
+- [ ] `.mcp.json` is in `.gitignore`
+- [ ] Token confirmed from user (not a placeholder)
+- [ ] `.mcp.json` created at project root with `github` MCP server
+- [ ] `.agents/settings.json` updated: `repo.owner`, `repo.name`
+- [ ] User instructed to restart agent
+- [ ] User successfully verified GitHub connection
