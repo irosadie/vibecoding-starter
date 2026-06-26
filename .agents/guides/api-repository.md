@@ -1,20 +1,20 @@
 # Guide: API Repository Interface (`apps/api/src/domain/repositories/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Definisikan interface atau abstract class untuk repository
-- Method signature menggunakan Entity types
-- Optional filter/pagination types lokal per interface
+✅ Allowed:
+- Define interface or abstract class for repository
+- Method signature uses Entity types
+- Optional filter/pagination types local to each interface
 
-❌ Dilarang:
-- Implementasi konkret — itu di `infrastructure/database/`
+❌ Forbidden:
+- Concrete implementation — that goes in `infrastructure/database/`
 - Import Prisma
 - Business logic
 
 ---
 
-## Konvensi
+## Conventions
 
 ### Interface Pattern
 
@@ -47,15 +47,15 @@ export interface IUserRepository {
 
 ### Naming
 
-- Nama file: `I{Domain}Repository.ts` — prefix `I` untuk interface
-- Contoh: `IUserRepository.ts`, `IOrderRepository.ts`
-- Interface name = nama file
+- File name: `I{Domain}Repository.ts` — `I` prefix for interface
+- Example: `IUserRepository.ts`, `IOrderRepository.ts`
+- Interface name = file name
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Return type selalu Entity, bukan Prisma model
-- Method `findById` return `T | null` (nullable)
-- Method `delete` return `void`
-- File diakhiri newline
+- Return type is always Entity, not Prisma model
+- Method `findById` returns `T | null` (nullable)
+- Method `delete` returns `void`
+- File must end with newline

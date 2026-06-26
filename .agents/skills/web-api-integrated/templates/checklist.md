@@ -3,7 +3,7 @@
 - [ ] Read `.agents/settings.json`
 - [ ] Read `.agents/guides/ARCHITECTURE.md` (apps/web section)
 - [ ] Read `references/context.md`
-- [ ] Read the relevant API contract or TRD
+- [ ] Read the relevant API contract (OpenSpec specs, Postman, or Swagger)
 - [ ] Zod schema created in `packages/schemas/` (pattern: constants + labels + helper + schema + type)
 - [ ] Response type created in `packages/types/` as a flat file per domain + re-export from root if needed
 - [ ] URL registered in `constants/api-routers.ts` (`:id` path variables)

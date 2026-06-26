@@ -1,5 +1,5 @@
 {
-  "$schema": "Konfigurasi project-specific untuk agent. Ubah file ini saat copy ke project lain.",
+  "$schema": "Project-specific configuration for agents. Update this file when copying to another project.",
 
   "project": {
     "name": "vibecoding-starter",
@@ -22,7 +22,7 @@
 
   "branch": {
     "main": "main",
-    "format": "<type>/<issue-id>-<deskripsi-singkat>",
+    "format": "<type>/<issue-id>-<short-description>",
     "types": ["feature", "bugfix", "hotfix", "chore"],
     "examples": [
       "feature/GH-42-user-profile",

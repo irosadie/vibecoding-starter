@@ -2,30 +2,30 @@
 
 ## Test Runner
 
-Vitest + React Testing Library. Config di `apps/web/vitest.config.ts`.
+Vitest + React Testing Library. Config in `apps/web/vitest.config.ts`.
 
-## Kontrak
+## Contract
 
-✅ Boleh:
-- Unit test untuk hooks (mock react-query dan axios)
-- Unit test untuk utils (pure functions)
-- Mock axios dengan `vi.mock`
+✅ Allowed:
+- Unit tests for hooks (mock react-query and axios)
+- Unit tests for utils (pure functions)
+- Mock axios with `vi.mock`
 
-❌ Dilarang:
-- Test implementation detail (internal state, private method)
-- Gunakan `any` di test code
-- Skip test untuk logic yang penting
+❌ Forbidden:
+- Test implementation details (internal state, private methods)
+- Use `any` in test code
+- Skip tests for important logic
 
 ---
 
-## Konvensi
+## Conventions
 
-### Struktur File Test
+### Test File Structure
 
 ```
 hooks/transactions/use-payment-methods/
 ├── use-data-table.ts
-├── use-data-table.test.ts   → di sisi file yang ditest
+├── use-data-table.test.ts   → next to the file being tested
 └── ...
 
 utils/
@@ -92,8 +92,8 @@ describe('formatCurrency', () => {
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Test file di sebelah file yang ditest (bukan folder `__tests__` terpisah)
-- Gunakan `describe` untuk group, `it` untuk kasus individual
-- Run: `bun run test` di `apps/web/`
+- Test files next to the files being tested (not in a separate `__tests__` folder)
+- Use `describe` for groups, `it` for individual cases
+- Run: `bun run test` in `apps/web/`

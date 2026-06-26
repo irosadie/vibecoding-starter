@@ -38,7 +38,7 @@ COPY package.json bun.lockb ./
 COPY packages/ ./packages/
 RUN bun install --frozen-lockfile
 
-# Copy source dan build
+# Copy source and build
 COPY apps/api/ ./apps/api/
 RUN cd apps/api && bun run build
 
@@ -52,7 +52,7 @@ ENV NODE_ENV=production
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
-# Copy hanya yang dibutuhkan
+# Copy only what is needed
 COPY --from=builder --chown=appuser:appgroup /app/apps/api/dist ./dist
 COPY --from=builder --chown=appuser:appgroup /app/apps/api/package.json ./
 

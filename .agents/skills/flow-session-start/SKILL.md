@@ -1,95 +1,95 @@
 ---
 name: flow-session-start
-description: Menangani perintah Mulai atau Start untuk onboarding repo: cek MCP, registry, memory, dan status kerja lalu arahkan user ke next step yang tepat.
+description: Handle Start or Mulai commands for repo onboarding: check MCP, registry, memory, and work status then direct user to the appropriate next step.
 ---
 
 # Skill: Session Start
 
-## Context Cepat (Wajib)
+## Context (Required)
 - Folder scope + quick-check paths: `references/context.md`
-- Checklist eksekusi: `templates/checklist.md`
+- Execution checklist: `templates/checklist.md`
 
-Gunakan skill ini saat user hanya mengetik perintah seperti `Mulai`, `Start`, `Mulai Vibe Coding`, atau variasi sejenis tanpa task teknis spesifik. Tujuan skill ini adalah mengubah perintah singkat itu menjadi sesi onboarding yang cepat, interaktif, dan relevan terhadap kondisi repo saat ini.
+Use this skill when the user only types commands like `Mulai`, `Start`, `Mulai Vibe Coding`, or similar variants without a specific technical task. The purpose of this skill is to transform that short command into a fast, interactive onboarding session relevant to the current repo state.
 
-## Alur Kerja
+## Workflow
 
-### 1. Kenali Trigger Start
+### 1. Recognize Start Trigger
 
-Aktifkan skill ini jika user:
-- hanya menulis `Mulai`, `Start`, `Mulai Vibe Coding`, atau varian setara
-- meminta memulai sesi kerja dari nol
-- meminta agent mengecek kesiapan repo sebelum lanjut
+Activate this skill if the user:
+- only writes `Mulai`, `Start`, `Mulai Vibe Coding`, or equivalent variants
+- asks to start a work session from scratch
+- asks the agent to check repo readiness before continuing
 
-Jika user sudah memberi task implementasi spesifik, **jangan** pakai skill ini sebagai workflow utama.
+If the user has already given a specific implementation task, **do not** use this skill as the main workflow.
 
-### 2. Jalankan Quick Status Check
+### 2. Run Quick Status Check
 
-Sebelum bertanya apa pun, baca `.agents/settings.json` lalu jalankan status script:
+Before asking anything, read `.agents/settings.json` then run the status script:
 
 ```bash
 bun run session:status
 ```
 
-Ringkas hasilnya ke empat area:
-- status MCP (`.mcp.json`, required servers, missing servers)
-- status registry fitur (`docs/features/REGISTRY.md`)
-- status memory (`.agents/MEMORY.md`)
-- status workspace (`git branch`, worktree dirty/clean)
+Summarize the results into four areas:
+- MCP status (`.mcp.json`, required servers, missing servers)
+- OpenSpec changes status (`openspec/changes/`)
+- Serena memory status (check if onboarding completed)
+- workspace status (`git branch`, worktree dirty/clean)
 
-### 3. Klasifikasikan Kondisi Sesi
+### 3. Classify Session State
 
-Gunakan heuristik berikut:
-- Jika MCP belum lengkap, anggap ini **kemungkinan first-time init**
-- Jika branch bukan `main` atau worktree dirty, anggap ini **kemungkinan lanjut task terakhir**
-- Jika workspace bersih dan MCP sudah siap, anggap ini **siap mulai work item baru**
+Use the following heuristics:
+- If MCP is not complete, treat this as **likely first-time init**
+- If branch is not `main` or worktree is dirty, treat this as **likely resume last task**
+- If workspace is clean and MCP is ready, treat this as **ready to start new work item**
 
-### 4. Sampaikan Ringkasan Pendek
+### 4. Present a Short Summary
 
-Balas dengan ringkasan singkat, misalnya:
-- apakah MCP sudah siap atau belum
-- ada fitur apa saja di registry
-- apakah ada indikasi task yang sedang berjalan
+Reply with a brief summary, for example:
+- whether MCP is ready or not
+- what features are in the registry
+- whether there are signs of work in progress
 
-Jangan dump JSON mentah ke user kecuali diminta.
+Do not dump raw JSON to the user unless requested.
 
-### 5. Arahkan ke Next Step yang Tepat
+### 5. Direct to the Appropriate Next Step
 
-Setelah ringkasan, arahkan ke salah satu jalur berikut:
-- MCP belum siap → lanjut ke `ops-mcp-setup`
-- ada pekerjaan yang kemungkinan belum selesai → tawarkan lanjutkan task terakhir
-- repo siap dan user ingin mulai hal baru → lanjut ke `flow-breakdown-feature`
+After the summary, direct to one of the following paths:
+- MCP not ready → continue to `ops-mcp-setup`
+- work likely not finished → offer to resume last task with `openspec-apply-change`
+- repo ready and user wants to start something new → continue to `openspec-propose`
 
-Ajukan **satu pertanyaan next step yang jelas**, bukan daftar pertanyaan panjang.
+Ask **one clear next step question**, not a long list of questions.
 
-Contoh pola:
-- `MCP untuk GitHub, Jira, dan Notion belum lengkap. Mau saya setup MCP dulu?`
-- `Workspace menunjukkan branch kerja yang belum selesai. Mau saya lanjutkan task terakhir dari branch ini?`
-- `Repo bersih dan MCP sudah siap. Mau kita breakdown fitur baru sekarang?`
+Example patterns:
+- `MCP for GitHub, Jira, and Notion is not complete. Should I set up MCP first?`
+- `Workspace shows an unfinished work branch. Should I continue the last task from this branch?`
+- `Repo is clean and MCP is ready. Should we break down a new feature now?`
 
-### 6. Jangan Lompat ke Implementasi
+### 6. Don't Jump to Implementation
 
-Untuk perintah start yang masih umum:
-- jangan langsung menulis kode
-- jangan langsung membuat PRD/TRD
-- jangan langsung setup token MCP tanpa konfirmasi user
+For start commands that are still general:
+- don't immediately write code
+- don't immediately create proposals or specs
+- don't immediately set up MCP tokens without user confirmation
 
-Skill ini berhenti setelah status sesi jelas dan user memilih next step.
+This skill stops after the session status is clear and the user chooses the next step.
 
-## Larangan
+## Prohibitions
 
-- **DILARANG** menanggapi `Mulai` dengan jawaban generik yang tidak mengecek repo.
-- **DILARANG** langsung meminta banyak pertanyaan discovery sebelum quick-check dijalankan.
-- **DILARANG** menganggap MCP siap hanya dari asumsi; cek `.mcp.json` dan required servers dulu.
-- **DILARANG** langsung menulis `.mcp.json` dengan placeholder token.
-- **DILARANG** langsung memulai implementasi fitur tanpa konfirmasi jalur berikutnya dari user.
+- **FORBIDDEN** to respond to `Mulai` with a generic answer that does not check the repo.
+- **FORBIDDEN** to immediately ask many discovery questions before running the quick-check.
+- **FORBIDDEN** to assume MCP is ready without checking; verify `.mcp.json` and required servers first.
+- **FORBIDDEN** to immediately write `.mcp.json` with placeholder tokens.
+- **FORBIDDEN** to immediately start feature implementation without confirming the next path with the user.
 
-## Checklist Sebelum Selesai
+## Pre-Completion Checklist
 
-- [ ] Trigger memang cocok untuk onboarding start session
-- [ ] `.agents/settings.json` dibaca
-- [ ] `bun run session:status` dijalankan
-- [ ] MCP, registry, memory, dan workspace diringkas singkat
-- [ ] Kondisi sesi diklasifikasikan: first init, resume, atau work baru
-- [ ] User diberi satu pertanyaan next step yang jelas
-- [ ] Jika perlu, next step diarahkan ke skill yang benar (`ops-mcp-setup`, `flow-breakdown-feature`, atau `flow-task-completion`)
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] Trigger is appropriate for onboarding start session
+- [ ] `.agents/settings.json` read
+- [ ] `bun run session:status` executed
+- [ ] MCP, registry, memory, and workspace briefly summarized
+- [ ] Session state classified: first init, resume, or new work
+- [ ] User given one clear next step question
+- [ ] If needed, next step directed to correct skill (`ops-mcp-setup`, `openspec-propose`, or `openspec-apply-change`)
+- [ ] All files end with a newline (EOF)

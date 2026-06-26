@@ -36,17 +36,10 @@ export async function jwtWithRefreshMiddleware(
       })
     }
 
-    // Add user data to context based on type
+    // Add user data to context
     c.set("userId", payload.id)
     c.set("userEmail", payload.email)
     c.set("userType", payload.type)
-
-    // For backward compatibility and specific access
-    if (payload.type === "vendor") {
-      c.set("vendorId", payload.id)
-    } else if (payload.type === "driver") {
-      c.set("driverId", payload.id)
-    }
 
     await next()
   } catch (error) {
@@ -93,12 +86,6 @@ export async function optionalJwtMiddleware(
       c.set("userEmail", payload.email)
       c.set("userType", payload.type)
       c.set("isAuthenticated", true)
-
-      if (payload.type === "vendor") {
-        c.set("vendorId", payload.id)
-      } else if (payload.type === "driver") {
-        c.set("driverId", payload.id)
-      }
     } catch {
       // Invalid token, but we don't throw error - just mark as unauthenticated
       c.set("isAuthenticated", false)
@@ -111,50 +98,7 @@ export async function optionalJwtMiddleware(
 }
 
 /**
- * Middleware specifically for company users only
- */
-export async function vendorOnlyMiddleware(
-  c: Context,
-  next: () => Promise<void>,
-) {
-  const userType = c.get("userType") as string
-
-  if (!userType) {
-    throw new HTTPException(401, { message: "Authentication required" })
-  }
-
-  if (userType !== "vendor") {
-    throw new HTTPException(403, {
-      message: "Access denied. Vendor users only.",
-    })
-  }
-
-  await next()
-}
-
-/**
- * Middleware for driver users only
- */
-export async function driverOnlyMiddleware(
-  c: Context,
-  next: () => Promise<void>,
-) {
-  const userType = c.get("userType") as string
-
-  if (!userType) {
-    throw new HTTPException(401, { message: "Authentication required" })
-  }
-
-  if (userType !== "driver") {
-    throw new HTTPException(403, {
-      message: "Access denied. Driver users only.",
-    })
-  }
-
-  await next()
-}
-
-/** * Middleware for admin users only
+ * Middleware for admin users only
  */
 export async function adminOnlyMiddleware(
   c: Context,
@@ -175,7 +119,8 @@ export async function adminOnlyMiddleware(
   await next()
 }
 
-/** * Middleware for regular users only
+/**
+ * Middleware for regular users only
  */
 export async function userOnlyMiddleware(
   c: Context,

@@ -6,7 +6,9 @@
 export interface JwtPayload {
   id: string
   email: string
-  type: "admin" | "vendor" | "driver" | "user"
+  type: "admin" | "user"
+  status: "ACTIVE" | "SUSPENDED"
+  sessionId: string
 }
 
 export interface TokenPair {

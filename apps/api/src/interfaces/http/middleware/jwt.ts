@@ -46,23 +46,16 @@ export async function jwtMiddleware(c: Context, next: () => Promise<void>) {
     }
 
     // Validate user type
-    if (!["admin", "vendor", "driver", "user"].includes(payload.type)) {
+    if (!["admin", "user"].includes(payload.type)) {
       throw new HTTPException(401, {
         message: "Invalid token payload: invalid user type",
       })
     }
 
-    // Add user data to context based on type
+    // Add user data to context
     c.set("userId", payload.id)
     c.set("userEmail", payload.email)
     c.set("userType", payload.type)
-
-    // For backward compatibility and specific access
-    if (payload.type === "vendor") {
-      c.set("vendorId", payload.id)
-    } else if (payload.type === "driver") {
-      c.set("driverId", payload.id)
-    }
 
     await next()
   } catch (error) {

@@ -1,22 +1,22 @@
 # Guide: API Service (`apps/api/src/application/services/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Orchestrate satu atau lebih use case
-- Transform Entity ke DTO sebelum return ke controller
-- Inject dan panggil repository interface atau use case functions
-- Koordinasi side effect (send email via worker queue, dll.)
+✅ Allowed:
+- Orchestrate one or more use cases
+- Transform Entity to DTO before returning to controller
+- Inject and call repository interface or use case functions
+- Coordinate side effects (send email via worker queue, etc.)
 
-❌ Dilarang:
-- Business logic murni — itu di use case
-- Akses Prisma langsung — harus lewat repository interface
-- HTTP concern (status code, header, `c.json`)
-- `try/catch` untuk error domain — biarkan bubble
+❌ Forbidden:
+- Pure business logic — that goes in use cases
+- Access Prisma directly — must go through repository interface
+- HTTP concerns (status code, header, `c.json`)
+- `try/catch` for domain errors — let them bubble
 
 ---
 
-## Konvensi
+## Conventions
 
 ### Service Pattern
 
@@ -76,14 +76,14 @@ function toUserDto(user: User): UserDto {
 
 ### Naming
 
-- Nama file: `{Domain}Service.ts` — PascalCase dengan suffix `Service`
-- Contoh: `UserService.ts`, `OrderService.ts`
+- File name: `{Domain}Service.ts` — PascalCase with `Service` suffix
+- Example: `UserService.ts`, `OrderService.ts`
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- `toDto` mapper function ditulis di bawah class, tidak perlu di-export
-- Constructor hanya terima repository interface — bukan implementasi konkret
-- Service tidak tahu HTTP — tidak import `hono`
-- File diakhiri newline
+- `toDto` mapper function is written below the class, no need to export
+- Constructor only accepts repository interface — not concrete implementation
+- Service has no knowledge of HTTP — don't import `hono`
+- File must end with newline

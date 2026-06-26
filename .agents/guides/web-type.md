@@ -1,32 +1,32 @@
 # Guide: Web Type (`apps/web/types/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- TypeScript `type` dan `interface` yang FE-specific
-- Types untuk local state, component props yang kompleks, route params
-- `DataTableResponse<T>` dan tipe generals lain
-- Re-export `ErrorResponse<T>` dari `@vibecoding-starter/types` bila perlu
-- Re-export dari `index.ts` per subfolder
+✅ Allowed:
+- TypeScript `type` and `interface` that are FE-specific
+- Types for local state, complex component props, route params
+- `DataTableResponse<T>` and other general types
+- Re-export `ErrorResponse<T>` from `@vibecoding-starter/types` if needed
+- Re-export from `index.ts` per subfolder
 
-❌ Dilarang:
-- Gunakan `any`
-- Taruh API response types di sini — itu di `packages/types/`
-- Taruh form payload types di sini — itu di `packages/schemas/` via `z.infer<>`
-- Business logic atau runtime code
+❌ Forbidden:
+- Use `any`
+- Put API response types here — those belong in `packages/types/`
+- Put form payload types here — those belong in `packages/schemas/` via `z.infer<>`
+- Business logic or runtime code
 
 ---
 
-## Konvensi
+## Conventions
 
-### Struktur
+### Structure
 
 ```
 types/
 └── generals/
     ├── data-table.ts   → DataTableResponse<T>, pagination types
     ├── next-auth.d.ts  → NextAuth module augmentation
-    └── index.ts        → re-export semua
+    └── index.ts        → re-export all
 ```
 
 ### `DataTableResponse<T>`
@@ -66,9 +66,9 @@ export * from './data-table'
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Gunakan `type` untuk unions, intersections, dan aliases
-- Gunakan `interface` untuk object shapes yang mungkin di-extend
-- Tidak perlu `I` prefix untuk interface
-- File diakhiri newline
+- Use `type` for unions, intersections, and aliases
+- Use `interface` for object shapes that might be extended
+- No need for `I` prefix for interfaces
+- Files must end with newline

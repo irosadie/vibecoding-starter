@@ -14,8 +14,8 @@ Integrate APIs into the frontend with a consistent architecture.
 ## Workflow
 
 ### 0. Read the API Contract
-- If the user provides an API contract (Postman, Swagger, TRD), read and understand every endpoint: method, URL, payload, and response.
-- Check `docs/features/{feature-slug}/TRD.md` if available.
+- If the user provides an API contract (Postman, Swagger, OpenSpec specs), read and understand every endpoint: method, URL, payload, and response.
+- Check `openspec/changes/{slug}/specs/` for OpenSpec-based contracts.
 
 ### 1. Create Zod Schema (`packages/schemas/`)
 - Follow the pattern: type constants + labels array + `get{Type}Label()` + Zod schema + type alias

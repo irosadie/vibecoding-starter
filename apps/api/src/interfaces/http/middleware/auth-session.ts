@@ -6,7 +6,7 @@ import type { Context } from "hono"
 
 const AUTH_CONTEXT_KEY = "authSession"
 
-const JWT_USER_TYPES: JwtPayload["type"][] = ["admin", "creator", "user"]
+const JWT_USER_TYPES: JwtPayload["type"][] = ["admin", "user"]
 const USER_STATUSES: JwtPayload["status"][] = ["ACTIVE", "SUSPENDED"]
 
 export type AuthSessionContext = {

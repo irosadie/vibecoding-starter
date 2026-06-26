@@ -94,6 +94,7 @@ vibecoding-starter/
 | `docs-openapi` | Docs | Write or update split OpenAPI documentation per feature |
 | `ops-docker` | Ops | Write or modify backend Dockerfile for Linux deployment |
 | `ops-mcp-setup` | Ops | Setup GitHub MCP for this repo's workflow |
+| `flow-session-start` | Flow | Handle Start/Mulai command for repo onboarding |
 | `meta-skill-hygiene` | Meta | Audit and maintain skill metadata consistency |
 | `skill-add-example` | Meta | Add reusable example code for other skills |
 | `skill-creator` | Meta | Create or update skills with consistent format |
@@ -360,6 +361,7 @@ packages/utils/    → Pure TS utilities (used by all)
 - For skill `docs-openapi`: `.agents/skills/docs-openapi/SKILL.md`
 - For skill `ops-docker`: `.agents/skills/ops-docker/SKILL.md`
 - For skill `ops-mcp-setup`: `.agents/skills/ops-mcp-setup/SKILL.md`
+- For skill `flow-session-start`: `.agents/skills/flow-session-start/SKILL.md`
 - For skill `meta-skill-hygiene`: `.agents/skills/meta-skill-hygiene/SKILL.md`
 - For skill `skill-add-example`: `.agents/skills/skill-add-example/SKILL.md`
 - For skill `skill-creator`: `.agents/skills/skill-creator/SKILL.md`

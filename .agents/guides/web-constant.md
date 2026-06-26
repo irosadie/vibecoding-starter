@@ -1,25 +1,25 @@
 # Guide: Web Constant (`apps/web/constants/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- `api-routers.ts` — semua URL API endpoint (flat object, `:id` path variables)
-- `query-keys.ts` — semua react-query cache key (flat strings per operasi)
-- Constants lain yang benar-benar global (nav items, routes, dll.)
+✅ Allowed:
+- `api-routers.ts` — all API endpoint URLs (flat object, `:id` path variables)
+- `query-keys.ts` — all react-query cache keys (flat strings per operation)
+- Other truly global constants (nav items, routes, etc.)
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- Import dari hooks, services, atau komponen
-- Nilai yang seharusnya dari env (gunakan `configs/`)
-- Fungsi dinamis untuk URL — gunakan `pathVariable()` utility
+- Import from hooks, services, or components
+- Values that should come from env (use `configs/`)
+- Dynamic functions for URLs — use `pathVariable()` utility
 
 ---
 
-## Konvensi
+## Conventions
 
-### `api-routers.ts` — Flat Object dengan `:id` Path Variables
+### `api-routers.ts` — Flat Object with `:id` Path Variables
 
-URL path dengan parameter menggunakan `:key` placeholder. Gunakan `pathVariable()` utility saat memanggil URL dengan parameter.
+URL paths with parameters use `:key` placeholder. Use `pathVariable()` utility when calling URLs with parameters.
 
 ```typescript
 // constants/api-routers.ts
@@ -49,7 +49,7 @@ export const apiRouters = {
 }
 ```
 
-**Cara pakai** dengan `pathVariable()`:
+**Usage** with `pathVariable()`:
 
 ```typescript
 import { pathVariable } from '$/utils/path-variable'
@@ -66,9 +66,9 @@ const url = pathVariable(apiRouters.drivers.show, { vendorId: 'v1', id: 'd1' })
 
 ---
 
-### `query-keys.ts` — Flat String Values per Operasi
+### `query-keys.ts` — Flat String Values per Operation
 
-Setiap operasi punya key tersendiri sebagai plain string. Bukan array, bukan fungsi.
+Each operation has its own key as a plain string. Not an array, not a function.
 
 ```typescript
 // constants/query-keys.ts
@@ -100,23 +100,23 @@ export const queryKeys = {
 }
 ```
 
-**Cara pakai di hook:**
+**Usage in hooks:**
 
 ```typescript
-// Sebagai string key di queryKey array
+// As string key in queryKey array
 queryKey: [queryKeys.paymentMethods.index, { page, limit, filter }]
 
-// Atau sebagai mutationKey
+// Or as mutationKey
 mutationKey: [queryKeys.paymentMethods.insert]
 ```
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
 - Grouping per domain/resource
-- Key string mengikuti format: `{domain}{OperasiPascalCase}`
-  - Contoh: `paymentMethodsIndex`, `usersInsert`, `driversLocationHistory`
-- URL string tanpa trailing slash
-- Tambah entry baru di bawah group yang ada, bukan di tempat lain
-- File diakhiri newline
+- Key string follows format: `{domain}{OperationPascalCase}`
+  - Example: `paymentMethodsIndex`, `usersInsert`, `driversLocationHistory`
+- URL string without trailing slash
+- Add new entries under existing groups, not elsewhere
+- Files must end with newline

@@ -1,25 +1,25 @@
 # Guide: Web Page (`apps/web/app/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
+✅ Allowed:
 - `page.tsx` = thin Suspense wrapper (Server Component)
-- `_components/` = komponen private ke route tersebut (tidak dipakai route lain)
-- `*-page-content.tsx` = Client Component utama (state, hooks, layout)
-- Komponen dalam `_components/` seperti: `*-toolbar.tsx`, `*-table-card.tsx`, `*-form-dialog.tsx`, `*-drawer.tsx`
+- `_components/` = private components to that route (not used by other routes)
+- `*-page-content.tsx` = main Client Component (state, hooks, layout)
+- Components in `_components/` such as: `*-toolbar.tsx`, `*-table-card.tsx`, `*-form-dialog.tsx`, `*-drawer.tsx`
 - Export `generateMetadata`, `generateStaticParams`
-- Gunakan `Suspense`, `loading.tsx`, `error.tsx`
-- Route group `(group)/` untuk layout tanpa URL segment
+- Use `Suspense`, `loading.tsx`, `error.tsx`
+- Route group `(group)/` for layout without URL segment
 
-❌ Dilarang:
-- Panggil `axios` atau `fetch` langsung
-- Import dari `services/` langsung
-- Business logic atau state management di `page.tsx`
-- Share `_components/` antar route — jika reusable, pindah ke `$/components/`
+❌ Forbidden:
+- Call `axios` or `fetch` directly
+- Import from `services/` directly
+- Business logic or state management in `page.tsx`
+- Share `_components/` between routes — if reusable, move to `$/components/`
 
 ---
 
-## Struktur File per Route
+## File Structure per Route
 
 ```
 app/
@@ -29,14 +29,14 @@ app/
         ├── loading.tsx                     → Skeleton placeholder (optional)
         ├── error.tsx                       → Error boundary (optional)
         └── _components/
-            ├── users-page-content.tsx      → Client Component utama
-            ├── users-toolbar.tsx           → Search bar + filter + tombol add
-            ├── users-table-card.tsx        → Tabel dalam PanelCard
-            ├── users-form-dialog.tsx       → Dialog create/edit
+            ├── users-page-content.tsx      → Main Client Component
+            ├── users-toolbar.tsx           → Search bar + filter + add button
+            ├── users-table-card.tsx        → Table in PanelCard
+            ├── users-form-dialog.tsx       → Create/edit dialog
             └── users-page-loading.tsx      → Skeleton loading (optional)
 ```
 
-> Komponen yang **hanya** dipakai di route ini masuk `_components/`. Jika dipakai lebih dari satu route, pindah ke `$/components/`.
+> Components that are **only** used in this route go in `_components/`. If used in more than one route, move to `$/components/`.
 
 ### `page.tsx` — Thin Wrapper dengan Suspense
 
@@ -66,23 +66,23 @@ export default function Loading() {
 
 ---
 
-## Utamakan Reusable Components
+## Prioritize Reusable Components
 
-**Selalu** gunakan komponen dari `$/components/` — jangan tulis HTML primitif jika sudah ada komponennya.
+**Always** use components from `$/components/` — don't write primitive HTML if the component already exists.
 
-| Kebutuhan          | Komponen                                          |
-|--------------------|---------------------------------------------------|
-| Tombol             | `Button`                                          |
-| Input teks         | `Input`                                           |
+| Need          | Component                                          |
+|-------------------|----------------------------------------------------|
+| Button             | `Button`                                          |
+| Text input         | `Input`                                           |
 | Textarea           | `Textarea`                                        |
 | Dropdown select    | `Select`                                          |
 | Radio buttons      | `RadioGroup`                                      |
 | Checkbox           | `Checkbox`                                        |
-| Tabel + pagination | `Table`                                           |
+| Table + pagination | `Table`                                           |
 | Card container     | `PanelCard`                                       |
-| Modal              | `Dialog`, `DialogContent`, `DialogHeader`, dll.   |
-| Side panel/drawer  | `Sheet`, `SheetContent`, `SheetHeader`, dll.      |
-| Action menu baris  | `ActionsDropdown`                                 |
+| Modal              | `Dialog`, `DialogContent`, `DialogHeader`, etc.   |
+| Side panel/drawer  | `Sheet`, `SheetContent`, `SheetHeader`, etc.      |
+| Row action menu  | `ActionsDropdown`                                 |
 | Status label       | `StatusBadge`                                     |
 | Badge              | `Badge`                                           |
 | Loading            | `LoadingSpinner`                                  |
@@ -91,8 +91,8 @@ export default function Loading() {
 
 ## Query Params — `useSearchParams` vs `useQueryParam`
 
-**`useSearchParams`** (dari `next/navigation`) → hanya untuk **membaca** nilai dari URL.
-**`useQueryParam`** (custom hook `$/hooks/utility/use-query-param`) → untuk **mengubah** URL params.
+**`useSearchParams`** (from `next/navigation`) → only for **reading** values from URL.
+**`useQueryParam`** (custom hook `$/hooks/utility/use-query-param`) → for **changing** URL params.
 
 ```tsx
 'use client'
@@ -103,18 +103,18 @@ import { useQueryParam } from '$/hooks/utility/use-query-param'
 export function UsersPageContent() {
   const searchParams = useSearchParams()
 
-  // Baca dari URL
+  // Read from URL
   const currentPage = Number(searchParams.get('page') || '1')
   const currentSearch = searchParams.get('q') || ''
 
-  // Tulis ke URL
+  // Write to URL
   const { setQueryParams } = useQueryParam()
 
   function handlePageChange(newPage: number) {
     setQueryParams({ page: newPage })
   }
 
-  // undefined → hapus param dari URL
+  // undefined → remove param from URL
   function handleClearSearch() {
     setQueryParams({ q: undefined, page: 1 })
   }
@@ -125,11 +125,11 @@ export function UsersPageContent() {
 
 ```tsx
 import { useState, useEffect, useMemo } from 'react'
-import { debounce } from '$/utils/debounce'  // bukan useDebounce hook
+import { debounce } from '$/utils/debounce'  // not useDebounce hook
 
 const [tempQuery, setTempQuery] = useState(currentSearch)
 
-// Sync input saat URL berubah (misal: back button)
+// Sync input when URL changes (e.g.: back button)
 useEffect(() => {
   setTempQuery(currentSearch)
 }, [currentSearch])
@@ -142,30 +142,30 @@ const debouncedSearch = useMemo(
   [setQueryParams],
 )
 
-// Cleanup debounce saat unmount
+// Cleanup debounce on unmount
 useEffect(() => {
   return () => debouncedSearch.cancel()
 }, [debouncedSearch])
 
 const handleOnSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
   const value = e.target.value
-  setTempQuery(value)       // update input langsung (immediate feedback)
-  debouncedSearch(value)    // update URL setelah delay
+  setTempQuery(value)       // update input immediately (immediate feedback)
+  debouncedSearch(value)    // update URL after delay
 }
 ```
 
-**Aturan:**
-- `tempQuery` = local state untuk input (immediate UI feedback)
-- `currentSearch` = nilai dari URL (digunakan untuk API call)
-- `debounce` dari `$/utils/debounce` + `useMemo` — **bukan** `useDebounce` hook
+**Rules:**
+- `tempQuery` = local state for input (immediate UI feedback)
+- `currentSearch` = value from URL (used for API call)
+- `debounce` from `$/utils/debounce` + `useMemo` — **not** `useDebounce` hook
 
 ---
 
 ## Table + `useDataTable`
 
-`useDataTable` = react-query hook yang fetch data terpaginasi. **Bukan** TanStack Table wrapper — tidak ada `useReactTable` di sini.
+`useDataTable` = react-query hook that fetches paginated data. **Not** a TanStack Table wrapper — no `useReactTable` here.
 
-### 1. Definisikan Columns
+### 1. Define Columns
 
 ```tsx
 import { Table, type ColumnDef } from '$/components/table'
@@ -210,7 +210,7 @@ const columns: ColumnDef<UserResponseProps>[] = [
 ]
 ```
 
-### 2. Panggil Hook + Render Table
+### 2. Call Hook + Render Table
 
 ```tsx
 const { data, isLoading, refetch, pagination, limit } = useUsersDataTable({
@@ -242,18 +242,18 @@ return (
 )
 ```
 
-**Aturan:**
-- Selalu wrap `Table` dalam `PanelCard`
-- `isLoading` dari hook langsung di-pass ke prop `Table`
-- Gunakan `currentSearch` (dari URL) sebagai filter API — bukan `tempQuery`
+**Rules:**
+- Always wrap `Table` in `PanelCard`
+- `isLoading` from hook directly passed to `Table` prop
+- Use `currentSearch` (from URL) as API filter — not `tempQuery`
 
 ---
 
 ## Dialog (Modal)
 
-Dialog bisa diextract ke `_components/*-form-dialog.tsx` atau tetap inline di page-content — sesuaikan dengan kompleksitas.
+Dialog can be extracted to `_components/*-form-dialog.tsx` or kept inline in page-content — adjust based on complexity.
 
-### State dan Handlers (di page-content)
+### State and Handlers (in page-content)
 
 ```tsx
 const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -277,7 +277,7 @@ function handleCloseDialog() {
 }
 ```
 
-### Dialog dengan Form Scrollable (pattern standar)
+### Dialog with Scrollable Form (standard pattern)
 
 ```tsx
 import {
@@ -287,7 +287,7 @@ import {
 
 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
   <DialogContent className="w-[calc(100vw-2rem)] sm:min-w-[40%] sm:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col gap-0 p-0">
-    {/* Header fixed — tidak ikut scroll */}
+    {/* Header fixed — doesn't scroll */}
     <DialogHeader className="shrink-0 bg-white border-b border-gray-200 px-6 py-4 pr-12">
       <DialogTitle>{editingId ? 'Edit User' : 'Add User'}</DialogTitle>
       <DialogDescription>
@@ -296,7 +296,7 @@ import {
     </DialogHeader>
 
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-1 flex-col min-h-0">
-      {/* Area scrollable */}
+      {/* Scrollable area */}
       <div className="flex-1 min-h-0 overflow-y-auto px-6 pt-0 pb-6 space-y-4">
         <Input
           label="Name"
@@ -331,7 +331,7 @@ import {
         />
       </div>
 
-      {/* Footer fixed di bawah */}
+      {/* Footer fixed at bottom */}
       <DialogFooter className="shrink-0 bg-white border-t border-gray-200 px-6 py-4">
         <Button type="button" intent="warning" rounded="large" textOnly onClick={handleCloseDialog} disabled={isPending}>
           Cancel
@@ -345,11 +345,11 @@ import {
 </Dialog>
 ```
 
-**Aturan:**
-- `shrink-0` di header dan footer agar tidak ikut scroll
-- `flex-1 min-h-0 overflow-y-auto` di area konten form
-- `pr-12` di header untuk beri ruang tombol close bawaan dialog
-- `onOpenChange={setIsDialogOpen}` agar close saat klik backdrop
+**Rules:**
+- `shrink-0` on header and footer so they don't scroll
+- `flex-1 min-h-0 overflow-y-auto` on form content area
+- `pr-12` on header to make room for built-in dialog close button
+- `onOpenChange={setIsDialogOpen}` so it closes when clicking backdrop
 
 ### Edit via URL Param
 
@@ -369,8 +369,8 @@ if (isEditLoading) return null
 
 ## Drawer (Side Panel)
 
-Gunakan `Sheet` untuk panel dari samping — filter kompleks, detail view, atau form yang tidak butuh modal penuh.
-Bisa diextract ke `_components/*-drawer.tsx` atau inline di page-content.
+Use `Sheet` for side panels — complex filters, detail views, or forms that don't need a full modal.
+Can be extracted to `_components/*-drawer.tsx` or inline in page-content.
 
 ```tsx
 import {
@@ -397,7 +397,7 @@ const [activeFilter, setActiveFilter] = useState({ status: '', role: '' })
       <SheetTitle>Filter</SheetTitle>
     </SheetHeader>
 
-    {/* Konten scrollable */}
+    {/* Scrollable content */}
     <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-4">
       <Select
         label="Status"
@@ -444,11 +444,11 @@ const [activeFilter, setActiveFilter] = useState({ status: '', role: '' })
 </Sheet>
 ```
 
-**Aturan:**
-- `side="right"` untuk filter/detail panel
-- Struktur sama dengan Dialog: header + scrollable content + footer
-- Trigger dengan tombol — **bukan** via URL param
-- Apply filter → update URL params via `setQueryParams`, lalu tutup drawer
+**Rules:**
+- `side="right"` for filter/detail panels
+- Same structure as Dialog: header + scrollable content + footer
+- Trigger with button — **not** via URL param
+- Apply filter → update URL params via `setQueryParams`, then close drawer
 
 ---
 
@@ -457,13 +457,13 @@ const [activeFilter, setActiveFilter] = useState({ status: '', role: '' })
 ```tsx
 const handleOnDelete = (id: string) => {
   Swal.fire({
-    text: 'Apakah yakin menghapus data ini?',
+    text: 'Are you sure you want to delete this data?',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#e42c2c',
     cancelButtonColor: '#3278A0',
-    confirmButtonText: 'Ya, hapus!',
-    cancelButtonText: 'Batal',
+    confirmButtonText: 'Yes, delete!',
+    cancelButtonText: 'Cancel',
     preConfirm: () => {
       Swal.showLoading()
       return new Promise((resolve, reject) => {
@@ -475,7 +475,7 @@ const handleOnDelete = (id: string) => {
     },
     didOpen: () => {
       const cancelButton = Swal.getCancelButton()
-      cancelButton!.style.order = '-1'  // cancel di kiri
+      cancelButton!.style.order = '-1'  // cancel on left
     },
   })
     .then((result) => {
@@ -493,18 +493,18 @@ const handleOnDelete = (id: string) => {
 }
 ```
 
-**Aturan:**
-- `deleteMutate` = `mutate` (bukan `mutateAsync`) dari `useFeatureDeleteOne()`
-- `preConfirm` + `new Promise` — **jangan** `async/await` di level `Swal.fire()`
-- `.then()/.catch()` chain di luar
-- `toast.success()`/`toast.error()` dari `react-hot-toast` — Swal hanya untuk konfirmasi
+**Rules:**
+- `deleteMutate` = `mutate` (not `mutateAsync`) from `useFeatureDeleteOne()`
+- `preConfirm` + `new Promise` — **don't** use `async/await` at `Swal.fire()` level
+- `.then()/.catch()` chain outside
+- `toast.success()`/`toast.error()` from `react-hot-toast` — Swal only for confirmation
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- `'use client'` hanya di Client Components (biasanya di `_components/`)
-- `page.tsx` tidak perlu `'use client'`
-- Satu `_components/` per route — tidak dipakai bersama route lain
-- Nama komponen = PascalCase, nama file = kebab-case
-- Semua file diakhiri newline (EOF)
+- `'use client'` only in Client Components (usually in `_components/`)
+- `page.tsx` doesn't need `'use client'`
+- One `_components/` per route — not shared with other routes
+- Component name = PascalCase, file name = kebab-case
+- All files must end with newline (EOF)

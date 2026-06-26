@@ -5,6 +5,7 @@
     "moduleResolution": "Bundler",
     "types": ["node", "vitest/globals"],
     "noEmit": true,
+    "ignoreDeprecations": "5.0",
     "baseUrl": ".",
     "paths": {
       "@vibecoding-starter/schemas": ["../../packages/schemas/index.ts"],

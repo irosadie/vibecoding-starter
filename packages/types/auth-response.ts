@@ -17,3 +17,7 @@ export type AuthLoginResponse = {
   user: AuthUserResponse
   tokens: AuthTokensResponse
 }
+
+export type AuthRegisterResponse = AuthLoginResponse
+
+export type AuthCurrentUserResponse = AuthUserResponse

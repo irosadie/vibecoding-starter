@@ -59,7 +59,7 @@ This repo is intended for public use:
 - `NextAuth` credentials-based auth foundation in `apps/web/auth.ts`
 - Auth route handler at `apps/web/app/api/(auth)/auth/[...nextauth]/route.ts`
 - Internal BFF proxy at `apps/web/app/api/proxy/[...path]/route.ts`
-- Starter login page `/login` and protected panel `/panel`
+- Starter login page `/login` and register page `/register`
 - Route protection and basic redirects via `apps/web/proxy.ts`
 - `SessionProvider` and `QueryProvider`
 - Query client service and axios interceptors defaulting to internal proxy `/api/proxy`
@@ -162,7 +162,7 @@ bun run openapi:generate
 ## Key Endpoints
 - Web: `http://localhost:3000`
 - Web login: `http://localhost:3000/login`
-- Web panel: `http://localhost:3000/panel`
+- Web register: `http://localhost:3000/register`
 - Web auth route: `http://localhost:3000/api/auth/*`
 - Web internal proxy: `http://localhost:3000/api/proxy/*`
 - API root: `http://localhost:3001/`

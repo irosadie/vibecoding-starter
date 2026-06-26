@@ -1,6 +1,6 @@
 # Architecture: Layer Map + Folder Contracts
 
-Baca file ini di awal setiap sesi implementasi. Berisi peta layer lengkap dan kontrak per folder.
+Read this file at the start of each implementation session. Contains complete layer map and contracts per folder.
 
 ---
 
@@ -30,36 +30,36 @@ apps/web/
 │   └── (group)/
 │       └── feature/
 │           ├── page.tsx         → Server Component (thin Suspense wrapper)
-│           └── feature-content.tsx → Client Component (semua logic)
+│           └── feature-content.tsx → Client Component (all logic)
 ├── auth.ts                 → NextAuth credentials config (server-only)
-├── proxy.ts                → Route protection / redirect logic di edge layer
-├── components/             → Reusable UI components (dipakai >1 halaman)
+├── proxy.ts                → Route protection / redirect logic in edge layer
+├── components/             → Reusable UI components (used >1 page)
 ├── hooks/
 │   ├── transactions/       → Data-fetching hooks per domain
-│   │   └── use-{domain}/   → Satu folder per domain
+│   │   └── use-{domain}/   → One folder per domain
 │   │       ├── use-data-table.ts
 │   │       ├── use-get-one.ts
 │   │       ├── use-insert-one.ts
 │   │       ├── use-update-one.ts
 │   │       ├── use-delete-one.ts
 │   │       └── index.ts
-│   └── utility/            → Non-data hooks (useQueryParam, dll.)
+│   └── utility/            → Non-data hooks (useQueryParam, etc.)
 ├── services/
-│   └── axios/              → Axios instance dengan interceptors
+│   └── axios/              → Axios instance with interceptors
 ├── constants/
-│   ├── api-routers.ts      → Semua API URL constants (pakai :id path variable)
-│   └── query-keys.ts       → Semua react-query cache key constants (flat strings)
+│   ├── api-routers.ts      → All API URL constants (use :id path variable)
+│   └── query-keys.ts       → All react-query cache key constants (flat strings)
 ├── types/generals/         → FE-specific types not from API
 ├── configs/                → App-wide config (env, auth, etc.)
 ├── providers/              → React context providers
-└── utils/                  → FE-specific helper functions (debounce, pathVariable, dll.)
+└── utils/                  → FE-specific helper functions (debounce, pathVariable, etc.)
 ```
 
 ### Data Flow
 
 ```
 page.tsx (Server Component — thin Suspense wrapper)
-  └→ feature-content.tsx (Client Component — semua state, hooks, form, table, dialog)
+  └→ feature-content.tsx (Client Component — all state, hooks, form, table, dialog)
       └→ Custom Hook (hooks/transactions/use-{domain}/)
           └→ react-query useQuery / useMutation
               └→ axios instance (services/axios/)
@@ -71,167 +71,167 @@ page.tsx (Server Component — thin Suspense wrapper)
 
 #### `app/` — Pages & Layouts
 
-✅ Boleh:
-- `page.tsx` berisi hanya Suspense wrapper + import content component
-- Import `LoadingSpinner` atau skeleton component untuk Suspense fallback
+✅ Allowed:
+- `page.tsx` contains only Suspense wrapper + import content component
+- Import `LoadingSpinner` or skeleton component for Suspense fallback
 - Export `generateMetadata`, `generateStaticParams`
-- Route handler tipis untuk auth atau proxy boleh ada di bawah `app/api/`
+- Thin route handler for auth or proxy allowed under `app/api/`
 
-❌ Dilarang:
-- Panggil `axios` atau `fetch` langsung
-- Import dari `services/` langsung
-- Business logic atau state management
-- Buat `_components/` folder per route — semua logic di content file
+❌ Forbidden:
+- Call `axios` or `fetch` directly
+- Import from `services/` directly
+- Business logic or state management
+- Create `_components/` folder per route — all logic in content file
 
 ---
 
 #### `app/api/(auth)/auth/[...nextauth]/route.ts` — NextAuth Route Handler
 
-✅ Boleh:
-- Bungkus `NextAuth(authOptions)` dan export handler `GET`/`POST`
-- Tetap tipis dan hanya jadi entrypoint App Router untuk auth
+✅ Allowed:
+- Wrap `NextAuth(authOptions)` and export handler `GET`/`POST`
+- Stay thin and only be App Router entrypoint for auth
 
-❌ Dilarang:
-- Taruh business logic login langsung di route handler
-- Panggil backend auth langsung di sini jika logic sudah ada di `auth.ts`
+❌ Forbidden:
+- Put login business logic directly in route handler
+- Call backend auth directly here if logic already exists in `auth.ts`
 
 ---
 
 #### `app/api/proxy/[...path]/route.ts` — Internal BFF Proxy
 
-✅ Boleh:
-- Forward request browser ke backend API
-- Tambahkan bearer token dari session NextAuth
-- Refresh access token dan update session cookie saat diperlukan
-- Lewatkan endpoint auth publik seperti login/refresh tanpa bearer token
+✅ Allowed:
+- Forward browser request to backend API
+- Add bearer token from NextAuth session
+- Refresh access token and update session cookie when needed
+- Pass public auth endpoints like login/refresh without bearer token
 
-❌ Dilarang:
-- Menaruh business logic feature
-- Menambah transformasi response spesifik domain di level route ini
-- Menjadikan route ini tempat stateful cache atau orchestration bisnis
+❌ Forbidden:
+- Put feature business logic
+- Add domain-specific response transformation at this route level
+- Make this route a stateful cache or business orchestration point
 
 ---
 
 #### `proxy.ts` — Edge Route Protection
 
-✅ Boleh:
-- Redirect guest ke halaman login untuk route protected
-- Redirect user yang sudah login dari `/login` ke halaman default
-- Baca cookie/session token untuk guard ringan
-- Baca config dari `auth.ts` dan `configs/auth-server.ts`
+✅ Allowed:
+- Redirect guest to login page for protected routes
+- Redirect logged-in user from `/login` to default page
+- Read cookie/session token for lightweight guard
+- Read config from `auth.ts` and `configs/auth-server.ts`
 
-❌ Dilarang:
-- Business logic aplikasi
-- Fetch data bisnis atau panggil API internal untuk render halaman
-- Menaruh auth config utama di sini — tetap di `auth.ts`
+❌ Forbidden:
+- Application business logic
+- Fetch business data or call internal API to render page
+- Put main auth config here — keep it in `auth.ts`
 
 ---
 
-#### `*-content.tsx` — Client Component Utama
+#### `*-content.tsx` — Main Client Component
 
-✅ Boleh:
-- Semua `useState`, `useEffect`, hooks
-- Import dan panggil hooks dari `hooks/`
-- Definisikan `columns` array untuk table
-- Form handling dengan react-hook-form
-- Dialog state dan logic
+✅ Allowed:
+- All `useState`, `useEffect`, hooks
+- Import and call hooks from `hooks/`
+- Define `columns` array for table
+- Form handling with react-hook-form
+- Dialog state and logic
 - Query params via `useQueryParam`
 - Delete confirmation via SweetAlert2
 
-❌ Dilarang:
-- Panggil `axios` atau `fetch` langsung
-- Import dari `services/` langsung
+❌ Forbidden:
+- Call `axios` or `fetch` directly
+- Import from `services/` directly
 
 ---
 
 #### `components/` — Reusable UI Components
 
-✅ Boleh:
-- Terima props, render JSX
-- Import komponen UI library (Button, Input, Dialog, Table, dll.)
-- `useState`, `useEffect` untuk local UI state
+✅ Allowed:
+- Accept props, render JSX
+- Import UI library components (Button, Input, Dialog, Table, etc.)
+- `useState`, `useEffect` for local UI state
 
-❌ Dilarang:
-- Panggil `axios` atau `fetch` langsung
-- Import data-fetching hooks dari `hooks/`
-- Hardcode API URL atau query key
+❌ Forbidden:
+- Call `axios` or `fetch` directly
+- Import data-fetching hooks from `hooks/`
+- Hardcode API URL or query key
 
 ---
 
 #### `hooks/transactions/use-{domain}/` — Custom React Hooks
 
-✅ Boleh:
-- Wrap `useQuery`, `useMutation` dari react-query
-- Panggil `axios` instance langsung (tidak perlu service function terpisah)
-- Gunakan `queryKeys` dan `apiRouters` dari `constants/`
-- `useDataTable` = react-query `useQuery` untuk fetch paginated list data
+✅ Allowed:
+- Wrap `useQuery`, `useMutation` from react-query
+- Call `axios` instance directly (no need for separate service function)
+- Use `queryKeys` and `apiRouters` from `constants/`
+- `useDataTable` = react-query `useQuery` to fetch paginated list data
 
-❌ Dilarang:
-- Berisi JSX
-- Satu hook untuk semua operasi — pisah per file
-- Hardcode URL — gunakan `apiRouters` dari constants
+❌ Forbidden:
+- Contains JSX
+- One hook for all operations — separate per file
+- Hardcode URL — use `apiRouters` from constants
 
 ---
 
 #### `hooks/utility/` — Utility Hooks
 
-✅ Boleh:
+✅ Allowed:
 - `useQueryParam` — wrap `useSearchParams` + `useRouter` + `usePathname`
 
-❌ Dilarang:
-- Berisi data-fetching atau business logic
+❌ Forbidden:
+- Contains data-fetching or business logic
 
 ---
 
 #### `services/axios/` — Axios Instance
 
-✅ Boleh:
-- Setup axios instance dengan base URL internal proxy dari `configs/env.ts`
-- Response interceptor untuk unwrap data dan redirect ringan `401` ke login
-- Response interceptor unwrap `{ meta, data }` → `DataTableResponse` untuk list
+✅ Allowed:
+- Setup axios instance with internal proxy base URL from `configs/env.ts`
+- Response interceptor to unwrap data and lightweight `401` redirect to login
+- Response interceptor unwrap `{ meta, data }` → `DataTableResponse` for list
 
-❌ Dilarang:
-- Service function per endpoint — itu langsung di hook
+❌ Forbidden:
+- Service function per endpoint — that goes directly in hook
 - Business logic
-- Inject bearer token browser-side jika request memang lewat internal proxy
+- Inject bearer token browser-side if request goes through internal proxy
 
 ---
 
 #### `constants/` — Application Constants
 
-✅ Boleh:
-- `api-routers.ts`: flat object dengan `:id` path variables (misal `/users/:id`)
-- `query-keys.ts`: flat string values per operasi (misal `index: 'usersIndex'`)
+✅ Allowed:
+- `api-routers.ts`: flat object with `:id` path variables (e.g. `/users/:id`)
+- `query-keys.ts`: flat string values per operation (e.g. `index: 'usersIndex'`)
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- Fungsi untuk path variable — gunakan `pathVariable()` utility
-- Nilai dari env (gunakan `configs/`)
+- Function for path variable — use `pathVariable()` utility
+- Values from env (use `configs/`)
 
 ---
 
 #### `packages/schemas/` — Zod Schemas (Shared)
 
-✅ Boleh:
+✅ Allowed:
 - Type constants array + labels array + `get{Type}Label()` helper
-- Zod schema untuk form payload
+- Zod schema for form payload
 - Export `type Props = z.infer<typeof schema>`
 
-❌ Dilarang:
-- Import library khusus FE atau BE
-- Business logic atau API call
+❌ Forbidden:
+- Import FE or BE-specific library
+- Business logic or API call
 
 ---
 
 #### `packages/types/` — API Response Types (Shared)
 
-✅ Boleh:
-- TypeScript `type` untuk API response
-- Re-export dari `index.ts`
+✅ Allowed:
+- TypeScript `type` for API response
+- Re-export from `index.ts`
 
-❌ Dilarang:
-- Gunakan `any`
-- Request/payload types (gunakan `packages/schemas/`)
+❌ Forbidden:
+- Use `any`
+- Request/payload types (use `packages/schemas/`)
 
 ---
 
@@ -253,7 +253,7 @@ apps/api/src/
 │   ├── entities/           → Domain models (plain objects/classes)
 │   └── repositories/       → Repository interfaces (contracts)
 └── infrastructure/
-    ├── config/             → Runtime config (env, database config, dll.)
+    ├── config/             → Runtime config (env, database config, etc.)
     └── database/           → Prisma repository implementations
 ```
 
@@ -261,8 +261,8 @@ apps/api/src/
 
 ```
 HTTP Request
-  → routes/         (validasi Zod, delegate ke controller)
-  → controllers/    (parse req, panggil service, format response)
+  → routes/         (Zod validation, delegate to controller)
+  → controllers/    (parse req, call service, format response)
   → services/       (orchestrate use cases, Entity → DTO)
   → use-cases/      (business logic, throw DomainError)
   → domain/repos/   (interface contract)
@@ -287,86 +287,86 @@ DomainError → errorHandler middleware
 
 #### `interfaces/http/routes/` — HTTP Routes
 
-✅ Boleh:
-- Definisikan HTTP method + path
-- Validasi request body/query dengan Zod schema dari `validators/`
-- Delegate ke controller handler
+✅ Allowed:
+- Define HTTP method + path
+- Validate request body/query with Zod schema from `validators/`
+- Delegate to controller handler
 - Set middleware per route (auth, rate-limit)
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- Panggil use case atau repository langsung
-- Format response sendiri
+- Call use case or repository directly
+- Format response manually
 
 ---
 
 #### `interfaces/http/controllers/` — Controllers
 
-✅ Boleh:
+✅ Allowed:
 - Parse `c.req` (body, params, query)
-- Panggil service method
-- Format dan return HTTP response (`c.json(...)`)
+- Call service method
+- Format and return HTTP response (`c.json(...)`)
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- Panggil use case atau repository langsung — harus lewat service
-- Throw `DomainError` — itu tugas use case
-- `try/catch` untuk error domain — biarkan bubble ke errorHandler
+- Call use case or repository directly — must go through service
+- Throw `DomainError` — that's use case's job
+- `try/catch` for domain error — let it bubble to errorHandler
 
 ---
 
 #### `application/services/` — Application Services
 
-✅ Boleh:
-- Orchestrate satu atau lebih use case
-- Transform Entity ke DTO sebelum return ke controller
-- Inject dan panggil repository atau use case
+✅ Allowed:
+- Orchestrate one or more use cases
+- Transform Entity to DTO before returning to controller
+- Inject and call repository or use case
 
-❌ Dilarang:
-- Business logic — itu di use case
-- Akses Prisma langsung — harus lewat repository interface
+❌ Forbidden:
+- Business logic — that's in use case
+- Access Prisma directly — must go through repository interface
 - HTTP concern (status code, header)
-- `try/catch` untuk error domain
+- `try/catch` for domain error
 
 ---
 
 #### `application/use-cases/` — Use Cases
 
-✅ Boleh:
-- Berisi satu operasi business logic
-- Throw `DomainError` untuk error yang diharapkan
-- Panggil repository interface
-- Satu file per operasi: `create-user.ts`, `get-user.ts`, dll.
+✅ Allowed:
+- Contains one business logic operation
+- Throw `DomainError` for expected errors
+- Call repository interface
+- One file per operation: `create-user.ts`, `get-user.ts`, etc.
 
-❌ Dilarang:
-- Akses Prisma atau database langsung
-- HTTP concern (import dari `hono` untuk response/exception)
-- Throw `HTTPException` — gunakan `DomainError`
+❌ Forbidden:
+- Access Prisma or database directly
+- HTTP concern (import from `hono` for response/exception)
+- Throw `HTTPException` — use `DomainError`
 
 ---
 
 #### `domain/entities/` — Domain Entities
 
-✅ Boleh:
-- Plain TypeScript type atau class
-- Field sesuai domain model
-- Method domain murni (tanpa dependency eksternal)
+✅ Allowed:
+- Plain TypeScript type or class
+- Fields matching domain model
+- Pure domain methods (without external dependency)
 
-❌ Dilarang:
-- Import Prisma types langsung
-- HTTP atau database dependency
+❌ Forbidden:
+- Import Prisma types directly
+- HTTP or database dependency
 
 ---
 
 #### `domain/repositories/` — Repository Interfaces
 
-✅ Boleh:
-- Definisikan interface/abstract class
+✅ Allowed:
+- Define interface/abstract class
 - Method signature: `findById(id: string): Promise<Entity | null>`
-- Gunakan Entity types dari `domain/entities/`
+- Use Entity types from `domain/entities/`
 
-❌ Dilarang:
-- Implementasi konkret — itu di `infrastructure/database/`
+❌ Forbidden:
+- Concrete implementation — that's in `infrastructure/database/`
 - Import Prisma
 - Business logic
 
@@ -374,28 +374,28 @@ DomainError → errorHandler middleware
 
 #### `infrastructure/database/` — Prisma Repositories
 
-✅ Boleh:
-- Implement repository interface dari `domain/repositories/`
-- Akses Prisma client
-- Map Prisma model ke domain Entity
+✅ Allowed:
+- Implement repository interface from `domain/repositories/`
+- Access Prisma client
+- Map Prisma model to domain Entity
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- Return Prisma model mentah — harus di-map ke Entity
+- Return raw Prisma model — must map to Entity
 - HTTP concern
 
 ---
 
 #### `infrastructure/config/` — Runtime Config
 
-✅ Boleh:
-- Parse env dengan Zod
-- Setup config aplikasi yang dibutuhkan saat bootstrap runtime
+✅ Allowed:
+- Parse env with Zod
+- Setup application config needed at runtime bootstrap
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- Utility generic lintas app — pindah ke `packages/*`
-- Membuat folder `shared/` di level app untuk config serupa
+- Generic cross-app utility — move to `packages/*`
+- Create `shared/` folder at app level for similar config
 
 ---
 
@@ -405,7 +405,7 @@ DomainError → errorHandler middleware
 
 ```
 apps/worker/src/
-├── infrastructure/config/  → Runtime config (env, Redis config, dll.)
+├── infrastructure/config/  → Runtime config (env, Redis config, etc.)
 ├── infrastructure/queue/   → Worker setup, consume BullMQ job
 ├── application/use-cases/  → Process job logic
 └── domain/entities/        → Job entity types
@@ -422,9 +422,9 @@ BullMQ Queue (job data defined in packages/schemas/)
 
 ### Worker Notes
 
-- Jangan buat folder `shared/` di level app worker
-- Shared lintas app tetap di `packages/*`
-- Env worker masuk ke `apps/worker/src/infrastructure/config/`
+- Don't create `shared/` folder at worker app level
+- Shared across apps stays in `packages/*`
+- Worker env goes into `apps/worker/src/infrastructure/config/`
 
 ---
 
@@ -434,37 +434,37 @@ BullMQ Queue (job data defined in packages/schemas/)
 
 #### `packages/schemas/` — Zod Schemas
 
-✅ Boleh:
-- Zod schema untuk form payload, request body, job data
+✅ Allowed:
+- Zod schema for form payload, request body, job data
 - `z.infer<>` types
 - Shared enum/constant values
 
-❌ Dilarang:
-- FE atau BE specific imports
+❌ Forbidden:
+- FE or BE specific imports
 - Business logic, side effects
 
 ---
 
 #### `packages/types/` — API Response Types
 
-✅ Boleh:
-- TypeScript `type`/`interface` untuk API responses
-- Re-export dari `index.ts`
+✅ Allowed:
+- TypeScript `type`/`interface` for API responses
+- Re-export from `index.ts`
 
-❌ Dilarang:
+❌ Forbidden:
 - `any`
 - Zod dependency
-- Request/payload types (gunakan `packages/schemas/`)
+- Request/payload types (use `packages/schemas/`)
 
 ---
 
 #### `packages/utils/` — Pure Utilities
 
-✅ Boleh:
-- Pure functions tanpa side effect
+✅ Allowed:
+- Pure functions without side effects
 - Format, transform, parse helpers
 
-❌ Dilarang:
-- Import library khusus FE (React) atau BE (Hono, Prisma)
+❌ Forbidden:
+- Import FE-specific (React) or BE-specific (Hono, Prisma) library
 - State management
 - API calls

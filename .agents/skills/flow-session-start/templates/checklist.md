@@ -1,29 +1,29 @@
 # Checklist: Session Start
 
-## Persiapan
+## Preparation
 
-- [ ] Baca `.agents/settings.json`
-- [ ] Baca `references/context.md`
-- [ ] Validasi bahwa trigger user memang berupa perintah start/onboarding
+- [ ] Read `.agents/settings.json`
+- [ ] Read `references/context.md`
+- [ ] Validate that the user trigger is indeed a start/onboarding command
 
 ## Quick Check
 
-- [ ] Jalankan `bun run session:status`
-- [ ] Ringkas status MCP
-- [ ] Ringkas registry fitur
-- [ ] Ringkas status memory
-- [ ] Ringkas branch dan worktree
+- [ ] Run `bun run session:status`
+- [ ] Summarize MCP status
+- [ ] Summarize active OpenSpec changes
+- [ ] Summarize memory status
+- [ ] Summarize branch and worktree
 
-## Arahkan Next Step
+## Direct Next Step
 
-- [ ] Tentukan apakah ini first init, resume, atau work baru
-- [ ] Jika MCP belum siap, arahkan ke `ops-mcp-setup`
-- [ ] Jika ada task berjalan, tawarkan lanjut task terakhir
-- [ ] Jika repo siap untuk task baru, arahkan ke `flow-breakdown-feature`
-- [ ] Ajukan satu pertanyaan next step yang jelas
+- [ ] Determine whether this is first init, resume, or new work
+- [ ] If MCP is not ready, direct to `ops-mcp-setup`
+- [ ] If there is work in progress, offer to continue last task with `openspec-apply-change`
+- [ ] If repo is ready for new task, direct to `openspec-propose`
+- [ ] Ask one clear next step question
 
-## Finalisasi
+## Finalization
 
-- [ ] Tidak ada asumsi palsu soal MCP atau task terakhir
-- [ ] Tidak ada implementasi fitur yang dimulai tanpa konfirmasi user
-- [ ] Semua file diakhiri newline (EOF)
+- [ ] No false assumptions about MCP or last task
+- [ ] No feature implementation started without user confirmation
+- [ ] All files end with a newline (EOF)
