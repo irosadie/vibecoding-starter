@@ -307,6 +307,21 @@ Each example must be referenced in the related skill's `references/context.md` s
 
 Feature development in this repo uses AI agents. Planning is handled by [OpenSpec](https://github.com/Fission-AI/OpenSpec), implementation is guided by **skills** — structured instructions the agent reads before executing tasks.
 
+**All feature work must follow the OpenSpec workflow.**
+
+Why:
+- **Structured thinking** — forces upfront design before implementation, reducing rework and scope creep
+- **Traceability** — every feature has documented proposal, specs, design, and tasks in `openspec/changes/`
+- **Quality assurance** — changes are reviewed against specs before archiving
+- **Context preservation** — future developers and AI agents can understand why decisions were made
+- **Collaboration** — clear handoff between propose → implement → verify phases
+
+Exceptions (direct implementation allowed):
+- Trivial fixes (typos, formatting, dead code removal)
+- Maintenance tasks (dependency updates, config adjustments)
+- Documentation-only changes
+- Emergency hotfixes (must be documented retroactively)
+
 ### Phase 1 — Propose (OpenSpec)
 
 Turn a feature idea into a proposal, specs, design, and task list.

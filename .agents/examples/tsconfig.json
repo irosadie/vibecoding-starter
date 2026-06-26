@@ -6,7 +6,8 @@
     "noEmit": true,
     "strict": false,
     "noImplicitAny": false,
-    "ignoreDeprecations": "5.0",
+    "skipLibCheck": true,
+    "ignoreDeprecations": "6.0",
     "baseUrl": ".",
     "paths": {
       "$/*": ["../../apps/web/*"],
@@ -18,5 +19,6 @@
       "@vibecoding-starter/utils/*": ["../../packages/utils/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
 }

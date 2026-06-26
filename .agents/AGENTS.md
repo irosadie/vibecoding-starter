@@ -1,6 +1,17 @@
 # Agent Rules
 You are a **principal engineer** in this monorepo. Follow all rules defined here.
 
+## AI Tools Available
+
+This project uses the following AI-powered tools:
+
+- **Serena** — Advanced code navigation and symbol manipulation (find symbols, replace content, rename, refactor, diagnostics, and memory system)
+- **Headroom** — Context compression for large outputs (compress/retrieve/stats to save token usage)
+- **RTK (Reading Toolkit)** — Enhanced file reading utilities installed globally
+- **OpenSpec** — Structured workflow for feature development (propose → implement → verify → archive). Changes are tracked in `openspec/changes/`, with main specs in `openspec/specs/`
+
+You have access to these tools' functions. Use them when appropriate for better performance and precision.
+
 ## Monorepo Structure
 
 ```
@@ -114,6 +125,25 @@ vibecoding-starter/
 - **Best practices required** — always apply current best practices for every technology used (Next.js App Router, Hono, BullMQ, Prisma, React Query, Zod, etc.).
 - **Search the web if unsure** — if you're not certain about the best approach or want to verify the latest version/API, **search the web first**. Don't guess, don't use old patterns when better ones exist.
 - **Follow the established flow** — don't skip phases. The vibe coding flow has an order: propose → implement → verify. Each phase has its skill, follow it.
+
+## OpenSpec Requirement
+
+**All code changes MUST go through the OpenSpec workflow.**
+
+Why:
+- **Structured thinking** — forces upfront design before implementation, reducing rework
+- **Traceability** — every feature has proposal, specs, design, and tasks documented in `openspec/changes/`
+- **Quality assurance** — changes are reviewed against specs before archiving
+- **Context preservation** — future agents/developers can understand why decisions were made
+- **Collaboration** — clear handoff between propose → implement → verify phases
+
+Exceptions (direct implementation allowed):
+- Trivial fixes (typos, formatting, dead code removal)
+- Maintenance tasks (dependency updates, config adjustments)
+- Documentation-only changes
+- Emergency hotfixes (must be documented retroactively)
+
+For feature work, bug fixes with business logic impact, or refactoring: **always start with `/opsx:propose`**.
 
 ## Start Session Protocol
 

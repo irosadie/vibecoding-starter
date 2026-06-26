@@ -20,3 +20,9 @@ coverage
 
 # macOS
 .DS_Store
+
+# Serena cache
+.serena/
+
+# vscode
+.vscode/
