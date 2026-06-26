@@ -1,23 +1,23 @@
 # Guide: Web Util (`apps/web/utils/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Pure functions tanpa side effect
-- Format, transform, parse helper yang FE-specific
-- Helper yang terikat React/browser API boleh di sini (bukan di `packages/utils/`)
+✅ Allowed:
+- Pure functions without side effects
+- Format, transform, parse helpers that are FE-specific
+- Helpers tied to React/browser API belong here (not in `packages/utils/`)
 
-❌ Dilarang:
-- Axios atau fetch call
-- Import React hooks di sini — pindah ke `hooks/`
+❌ Forbidden:
+- Axios or fetch calls
+- Import React hooks here — move to `hooks/`
 - State management
-- Business logic yang berubah sesuai requirement
+- Business logic that changes according to requirements
 
 ---
 
-## Konvensi
+## Conventions
 
-### `debounce` — Utility dengan `.cancel()`
+### `debounce` — Utility with `.cancel()`
 
 ```typescript
 // utils/debounce.ts
@@ -48,7 +48,7 @@ export function debounce<T extends (...args: unknown[]) => unknown>(
 }
 ```
 
-**Cara pakai dengan `useMemo`:**
+**Usage with `useMemo`:**
 
 ```tsx
 const debouncedSearch = useMemo(
@@ -58,7 +58,7 @@ const debouncedSearch = useMemo(
   [setQueryParams],
 )
 
-// Cleanup saat unmount
+// Cleanup on unmount
 useEffect(() => {
   return () => debouncedSearch.cancel()
 }, [debouncedSearch])
@@ -79,7 +79,7 @@ export function pathVariable<T extends Record<string, string>>(
 }
 ```
 
-**Cara pakai:**
+**Usage:**
 
 ```typescript
 pathVariable('/payment-methods/:id', { id: '123' })
@@ -104,8 +104,8 @@ export function formatCurrency(amount: number, currency = 'IDR'): string {
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Satu fungsi per file, atau group fungsi terkait dalam satu file
-- Tidak perlu class — gunakan fungsi biasa
-- File diakhiri newline
+- One function per file, or group related functions in one file
+- No need for classes — use plain functions
+- Files must end with newline

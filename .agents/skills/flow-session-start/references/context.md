@@ -1,44 +1,45 @@
 # Context: Session Start
 
-## Folder Target
+## Target Folder
 
 ```
 .agents/settings.json                → source of truth trigger + onboarding config
-.agents/MEMORY.md                   → konteks penting antar sesi
-docs/features/REGISTRY.md           → ringkasan fitur yang sudah pernah dibuat
-scripts/start-session.mjs           → quick status check untuk start session
-.mcp.json                           → indikasi MCP repo-level sudah dikonfigurasi atau belum
+openspec/changes/                   → active OpenSpec changes
+scripts/start-session.mjs           → quick status check for start session
+.mcp.json                           → indicates whether MCP repo-level is configured or not
 ```
 
-## Script Wajib
+Note: Serena memories are the system for persistent context across sessions. Check if Serena onboarding completed.
 
-Jalankan ini saat skill dipakai:
+## Required Script
+
+Run this when the skill is used:
 
 ```bash
 bun run session:status
 ```
 
-Output script akan merangkum:
-- status MCP required vs configured
-- jumlah fitur di registry + fitur terakhir
-- section memory yang tersedia
-- branch aktif + jumlah file berubah
+Script output will summarize:
+- MCP status required vs configured
+- active OpenSpec changes
+- Serena memory status
+- active branch + number of changed files
 
-## Pattern Penting
+## Important Patterns
 
-- Untuk first init: arahkan ke skill `ops-mcp-setup`
-- Untuk fitur baru: arahkan ke skill `flow-breakdown-feature`
-- Untuk lanjutan task existing: arahkan ke skill `flow-task-completion`
+- For first init: direct to skill `ops-mcp-setup`
+- For new feature: direct to OpenSpec `/opsx:propose`
+- For continuing existing task: direct to OpenSpec `/opsx:apply`
 
-## Ringkasan yang Baik
+## Good Summary
 
-Format ringkasan ke user harus pendek dan operasional. Cukup sampaikan:
-1. MCP siap atau belum
-2. registry sudah berisi apa
-3. ada indikasi task yang sedang berjalan atau tidak
-4. satu pertanyaan next step
+Summary format to user should be short and operational. Simply convey:
+1. Whether MCP is ready or not
+2. Active OpenSpec changes
+3. Whether there are signs of work in progress or not
+4. One next step question
 
-Hindari:
-- dump JSON mentah
-- menanyakan banyak pertanyaan sekaligus
-- langsung memulai implementasi
+Avoid:
+- dumping raw JSON
+- asking many questions at once
+- immediately starting implementation

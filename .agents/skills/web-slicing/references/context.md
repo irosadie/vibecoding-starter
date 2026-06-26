@@ -75,13 +75,13 @@ const handleOnSearch = (e) => {
 ```tsx
 const handleOnDelete = (id: string) => {
   Swal.fire({
-    text: 'Apakah yakin menghapus data ini?',
+    text: 'Are you sure you want to delete this data?',
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#e42c2c',
     cancelButtonColor: '#3278A0',
-    confirmButtonText: 'Ya, hapus!',
-    cancelButtonText: 'Batal',
+    confirmButtonText: 'Yes, delete it!',
+    cancelButtonText: 'Cancel',
     preConfirm: () => {
       Swal.showLoading()
       return new Promise((resolve, reject) => {

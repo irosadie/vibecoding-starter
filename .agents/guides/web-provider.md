@@ -1,20 +1,20 @@
 # Guide: Web Provider (`apps/web/providers/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
+✅ Allowed:
 - React Context provider wrappers
-- Global state yang perlu di-share antar komponen (theme, auth session, toast, dll.)
-- Wrap library provider (ReactQueryProvider, ThemeProvider, dll.)
+- Global state that needs to be shared between components (theme, auth session, toast, etc.)
+- Wrap library providers (ReactQueryProvider, ThemeProvider, etc.)
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- API call langsung
-- UI rendering yang tidak berkaitan dengan provide context
+- Direct API calls
+- UI rendering unrelated to providing context
 
 ---
 
-## Konvensi
+## Conventions
 
 ### Root Provider
 
@@ -84,8 +84,8 @@ export function useSidebar() {
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Provider root (`app-providers.tsx`) diimport di `app/layout.tsx`
-- Custom context hook (`useSidebar`) selalu export bareng providernya
-- File diakhiri newline
+- Root provider (`app-providers.tsx`) is imported in `app/layout.tsx`
+- Custom context hook (`useSidebar`) always exports alongside its provider
+- Files must end with newline

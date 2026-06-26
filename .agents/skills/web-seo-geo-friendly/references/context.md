@@ -18,19 +18,19 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'Page Title | Brand',
-  description: 'Deskripsi 150-160 karakter',
+  description: 'Description 150-160 characters',
   alternates: { canonical: 'https://example.com/page' },
   openGraph: {
     type: 'website',
     title: 'Page Title | Brand',
-    description: 'Deskripsi OG',
+    description: 'OG Description',
     url: 'https://example.com/page',
     images: [{ url: 'https://example.com/og/page.jpg', width: 1200, height: 630 }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Page Title | Brand',
-    description: 'Deskripsi Twitter',
+    description: 'Twitter Description',
     images: ['https://example.com/og/page.jpg'],
   },
 }

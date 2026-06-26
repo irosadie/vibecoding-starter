@@ -1,25 +1,25 @@
 # Guide: Shared Schema (`packages/schemas/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
+✅ Allowed:
 - Type constants array + labels array + `get{Type}Label()` helper
-- Zod schema untuk form payload, request body, job data
-- `z.infer<>` types dari schema
+- Zod schema for form payload, request body, job data
+- `z.infer<>` types from schema
 - Shared enum/constant values
-- Export dari `index.ts`
+- Export from `index.ts`
 
-❌ Dilarang:
-- Import library khusus FE (React) atau BE (Hono, Prisma)
-- Business logic, side effect, API call
-- Response types — itu di `packages/types/`
-- Gunakan `any`
+❌ Forbidden:
+- Import FE-specific libraries (React) or BE-specific libraries (Hono, Prisma)
+- Business logic, side effects, API calls
+- Response types — those belong in `packages/types/`
+- Use `any`
 
 ---
 
-## Konvensi
+## Conventions
 
-### Schema File — Pola Lengkap
+### Schema File — Complete Pattern
 
 ```typescript
 // packages/schemas/payment-method.ts
@@ -34,7 +34,7 @@ export const paymentMethodTypes = [
   'COD',
 ] as const
 
-// 2. Labels array (untuk dropdown/select)
+// 2. Labels array (for dropdown/select)
 export const paymentMethodLabels = [
   { label: 'Bank Transfer', value: 'BANK_TRANSFER' },
   { label: 'E-Wallet', value: 'E_WALLET' },
@@ -43,7 +43,7 @@ export const paymentMethodLabels = [
   { label: 'Cash on Delivery', value: 'COD' },
 ]
 
-// 3. Helper function untuk display label
+// 3. Helper function for display label
 export const getPaymentMethodLabel = (value: typeof paymentMethodTypes[number]) => {
   const method = paymentMethodLabels.find((m) => m.value === value)
   return method ? method.label : value
@@ -63,7 +63,7 @@ export const paymentMethodSchema = z.object({
 export type PaymentMethodSchemaProps = z.infer<typeof paymentMethodSchema>
 ```
 
-### Schema Sederhana (tanpa labels)
+### Simple Schema (without labels)
 
 ```typescript
 // packages/schemas/user.ts
@@ -115,10 +115,10 @@ export * from './notification-channel'
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- **Jika field memiliki kumpulan nilai tetap (fixed set), WAJIB deklarasikan di sini sebagai `as const` array + type alias + `z.enum()`.** Ini adalah satu-satunya source of truth enum — Prisma, BE, dan FE semua import dari `packages/schemas/`. Nilai selalu `SCREAMING_SNAKE_CASE`.
-- Setiap schema file wajib punya test file (`*.test.ts`)
-- Export constant helper bila memang dibutuhkan bersama schema yang terkait
-- Type alias suffix: `SchemaProps` untuk form/payload (misal `PaymentMethodSchemaProps`)
-- File diakhiri newline
+- **If a field has a fixed set of values, it MUST be declared here as an `as const` array + type alias + `z.enum()`.** This is the single source of truth for enums — Prisma, BE, and FE all import from `packages/schemas/`. Values are always `SCREAMING_SNAKE_CASE`.
+- Each schema file must have a test file (`*.test.ts`)
+- Export constant helpers only if they are needed alongside the related schema
+- Type alias suffix: `SchemaProps` for form/payload (e.g., `PaymentMethodSchemaProps`)
+- File must end with newline

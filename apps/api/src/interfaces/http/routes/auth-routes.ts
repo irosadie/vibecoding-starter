@@ -36,12 +36,12 @@ export const authRoutes = new Hono()
   .post(
     "/logout",
     authSessionMiddleware,
-    requireRoles(["admin", "creator", "user"]),
+    requireRoles(["admin", "user"]),
     authController.logout,
   )
   .get(
     "/me",
     authSessionMiddleware,
-    requireRoles(["admin", "creator", "user"]),
+    requireRoles(["admin", "user"]),
     authController.me,
   )

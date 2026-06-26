@@ -104,13 +104,9 @@ function hashSessionToken(token: string): string {
   return createHash("sha256").update(token).digest("hex")
 }
 
-function toJwtType(role: User["role"]): "admin" | "creator" | "user" {
+function toJwtType(role: User["role"]): "admin" | "user" {
   if (role === "ADMIN") {
     return "admin"
-  }
-
-  if (role === "CREATOR") {
-    return "creator"
   }
 
   return "user"

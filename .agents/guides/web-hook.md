@@ -1,44 +1,44 @@
 # Guide: Web Hook (`apps/web/hooks/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Wrap `useQuery`, `useMutation` dari react-query
-- Panggil `axios` instance **langsung** di hook (tidak perlu service function terpisah)
-- Gunakan `queryKeys` dan `apiRouters` dari `constants/`
-- Return data, loading state, error state, dan mutation handlers
-- Utility hooks di `hooks/utility/` (useQueryParam, dll.)
+✅ Allowed:
+- Wrap `useQuery`, `useMutation` from react-query
+- Call `axios` instance **directly** in hooks (no need for separate service functions)
+- Use `queryKeys` and `apiRouters` from `constants/`
+- Return data, loading state, error state, and mutation handlers
+- Utility hooks in `hooks/utility/` (useQueryParam, etc.)
 
-❌ Dilarang:
-- Berisi JSX atau render logic
-- Satu hook untuk semua operasi — pisah per file
-- Hardcode URL — gunakan `apiRouters` dari constants
-- Gunakan `any` sebagai type
+❌ Forbidden:
+- Contains JSX or render logic
+- One hook for all operations — separate per file
+- Hardcode URLs — use `apiRouters` from constants
+- Use `any` as type
 
 ---
 
-## Konvensi
+## Conventions
 
-### Struktur Folder
+### Folder Structure
 
 ```
 hooks/
 ├── transactions/
-│   └── use-{domain}/          → satu folder per domain/resource
+│   └── use-{domain}/          → one folder per domain/resource
 │       ├── use-data-table.ts  → fetch paginated list
 │       ├── use-get-one.ts     → fetch single item by id
 │       ├── use-insert-one.ts  → create mutation
 │       ├── use-update-one.ts  → update mutation
 │       ├── use-delete-one.ts  → delete mutation
-│       └── index.ts           → re-export semua hooks
+│       └── index.ts           → re-export all hooks
 └── utility/
     └── use-query-param/
         └── use-query-param.ts → wrap searchParams + router
 ```
 
-### Penamaan (Wajib Ikuti)
+### Naming (Required to Follow)
 
-| Operasi | Hook | File |
+| Operation | Hook | File |
 |---------|------|------|
 | Fetch list + pagination | `useDataTable` | `use-data-table.ts` |
 | Fetch single by ID | `useGetOne` | `use-get-one.ts` |
@@ -46,14 +46,14 @@ hooks/
 | Update | `useUpdateOne` | `use-update-one.ts` |
 | Delete | `useDeleteOne` | `use-delete-one.ts` |
 
-Export alias dengan nama domain: `usePaymentMethodsDataTable`, `usePaymentMethodsInsertOne`, dll.
+Export alias with domain name: `usePaymentMethodsDataTable`, `usePaymentMethodsInsertOne`, etc.
 
 ---
 
-### `useDataTable` — React-Query Hook untuk Paginated List
+### `useDataTable` — React-Query Hook for Paginated List
 
-`useDataTable` adalah **react-query `useQuery` hook** yang mem-fetch paginated data dari API.
-Bukan TanStack Table wrapper.
+`useDataTable` is a **react-query `useQuery` hook** that fetches paginated data from the API.
+Not a TanStack Table wrapper.
 
 ```typescript
 // hooks/transactions/use-payment-methods/use-data-table.ts
@@ -135,7 +135,7 @@ export default useDataTable
 export { useDataTable as usePaymentMethodsDataTable }
 ```
 
-**Cara pakai di content:**
+**Usage in content:**
 
 ```tsx
 const { data: methods, isLoading, refetch, pagination, limit } = usePaymentMethodsDataTable({
@@ -344,17 +344,17 @@ export { useQueryParam }
 
 ---
 
-## Cara Pakai di Content File
+## Usage in Content File
 
 ```tsx
-// Insert + update pakai mutateAsync (bisa await, bisa callback)
+// Insert + update use mutateAsync (can await, can use callbacks)
 const { mutateAsync: insertMutateAsync, isPending: isInsertPending } = useFeatureInsertOne()
 const { mutateAsync: updateMutateAsync, isPending: isUpdatePending } = useFeatureUpdateOne()
 
-// Delete pakai mutate (karena dipakai dalam SweetAlert preConfirm Promise)
+// Delete uses mutate (because it's used in SweetAlert preConfirm Promise)
 const { mutate: deleteMutate } = useFeatureDeleteOne()
 
-// Cara submit
+// How to submit
 insertMutateAsync(data, {
   onSuccess: () => toast.success('Created successfully'),
   onError: ({ message }) => toast.error(message || 'Failed'),
@@ -364,9 +364,9 @@ insertMutateAsync(data, {
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Satu file = satu hook
-- Nama file = kebab-case dari nama hook
-- Default export + named export alias setiap hook file
-- File diakhiri newline
+- One file = one hook
+- File name = kebab-case of hook name
+- Default export + named export alias for each hook file
+- Files must end with newline

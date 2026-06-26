@@ -1,22 +1,22 @@
 # Guide: API Entity (`apps/api/src/domain/entities/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Plain TypeScript `type` atau `class` yang merepresentasikan domain model
-- Field sesuai domain — bukan database column
-- Method domain murni (kalkulasi, validasi internal)
+✅ Allowed:
+- Plain TypeScript `type` or `class` that represents a domain model
+- Domain-specific fields — not database columns
+- Pure domain methods (calculations, internal validation)
 
-❌ Dilarang:
-- Import Prisma types atau Prisma client
-- HTTP atau database dependency
-- Business logic yang berubah sesuai use case — taruh di use case
+❌ Forbidden:
+- Import Prisma types or Prisma client
+- HTTP or database dependencies
+- Business logic that changes per use case — put that in use cases
 
 ---
 
-## Konvensi
+## Conventions
 
-### Entity sebagai Type
+### Entity as Type
 
 ```typescript
 // domain/entities/User.ts
@@ -31,7 +31,7 @@ export type User = {
 }
 ```
 
-### Entity sebagai Class (jika ada domain method)
+### Entity as Class (if domain methods exist)
 
 ```typescript
 // domain/entities/Order.ts
@@ -55,15 +55,15 @@ export class Order {
 
 ### Naming
 
-- Nama file: `{Domain}.ts` — PascalCase tanpa suffix
-- Nama type/class: sama dengan nama file
-- Contoh: `User.ts`, `Order.ts`, `ProductCategory.ts`
+- File name: `{Domain}.ts` — PascalCase without suffix
+- Type/class name: same as file name
+- Example: `User.ts`, `Order.ts`, `ProductCategory.ts`
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Entity adalah source of truth domain — bukan mirror dari Prisma schema
-- Jika Prisma model punya field `is_active` (`snake_case`), Entity pakai `isActive` (`camelCase`)
-- Gunakan primitive types — bukan Prisma scalar types
-- File diakhiri newline
+- Entity is the source of truth for the domain — not a mirror of Prisma schema
+- If Prisma model has field `is_active` (`snake_case`), Entity uses `isActive` (`camelCase`)
+- Use primitive types — not Prisma scalar types
+- File must end with newline

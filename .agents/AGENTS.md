@@ -1,6 +1,17 @@
 # Agent Rules
 You are a **principal engineer** in this monorepo. Follow all rules defined here.
 
+## AI Tools Available
+
+This project uses the following AI-powered tools:
+
+- **Serena** — Advanced code navigation and symbol manipulation (find symbols, replace content, rename, refactor, diagnostics, and memory system)
+- **Headroom** — Context compression for large outputs (compress/retrieve/stats to save token usage)
+- **RTK (Reading Toolkit)** — Enhanced file reading utilities installed globally
+- **OpenSpec** — Structured workflow for feature development (propose → implement → verify → archive). Changes are tracked in `openspec/changes/`, with main specs in `openspec/specs/`
+
+You have access to these tools' functions. Use them when appropriate for better performance and precision.
+
 ## Monorepo Structure
 
 ```
@@ -94,6 +105,7 @@ vibecoding-starter/
 | `docs-openapi` | Docs | Write or update split OpenAPI documentation per feature |
 | `ops-docker` | Ops | Write or modify backend Dockerfile for Linux deployment |
 | `ops-mcp-setup` | Ops | Setup GitHub MCP for this repo's workflow |
+| `flow-session-start` | Flow | Handle Start/Mulai command for repo onboarding |
 | `meta-skill-hygiene` | Meta | Audit and maintain skill metadata consistency |
 | `skill-add-example` | Meta | Add reusable example code for other skills |
 | `skill-creator` | Meta | Create or update skills with consistent format |
@@ -113,6 +125,25 @@ vibecoding-starter/
 - **Best practices required** — always apply current best practices for every technology used (Next.js App Router, Hono, BullMQ, Prisma, React Query, Zod, etc.).
 - **Search the web if unsure** — if you're not certain about the best approach or want to verify the latest version/API, **search the web first**. Don't guess, don't use old patterns when better ones exist.
 - **Follow the established flow** — don't skip phases. The vibe coding flow has an order: propose → implement → verify. Each phase has its skill, follow it.
+
+## OpenSpec Requirement
+
+**All code changes MUST go through the OpenSpec workflow.**
+
+Why:
+- **Structured thinking** — forces upfront design before implementation, reducing rework
+- **Traceability** — every feature has proposal, specs, design, and tasks documented in `openspec/changes/`
+- **Quality assurance** — changes are reviewed against specs before archiving
+- **Context preservation** — future agents/developers can understand why decisions were made
+- **Collaboration** — clear handoff between propose → implement → verify phases
+
+Exceptions (direct implementation allowed):
+- Trivial fixes (typos, formatting, dead code removal)
+- Maintenance tasks (dependency updates, config adjustments)
+- Documentation-only changes
+- Emergency hotfixes (must be documented retroactively)
+
+For feature work, bug fixes with business logic impact, or refactoring: **always start with `/opsx:propose`**.
 
 ## Start Session Protocol
 
@@ -360,6 +391,7 @@ packages/utils/    → Pure TS utilities (used by all)
 - For skill `docs-openapi`: `.agents/skills/docs-openapi/SKILL.md`
 - For skill `ops-docker`: `.agents/skills/ops-docker/SKILL.md`
 - For skill `ops-mcp-setup`: `.agents/skills/ops-mcp-setup/SKILL.md`
+- For skill `flow-session-start`: `.agents/skills/flow-session-start/SKILL.md`
 - For skill `meta-skill-hygiene`: `.agents/skills/meta-skill-hygiene/SKILL.md`
 - For skill `skill-add-example`: `.agents/skills/skill-add-example/SKILL.md`
 - For skill `skill-creator`: `.agents/skills/skill-creator/SKILL.md`

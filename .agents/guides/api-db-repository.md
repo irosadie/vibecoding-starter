@@ -1,20 +1,20 @@
 # Guide: API Prisma Repository (`apps/api/src/infrastructure/database/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Implement repository interface dari `domain/repositories/`
-- Akses Prisma client
-- Map Prisma model ke domain Entity
+✅ Allowed:
+- Implement repository interface from `domain/repositories/`
+- Access Prisma client
+- Map Prisma model to domain Entity
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- Return Prisma model mentah — selalu map ke Entity
-- HTTP concern
+- Return raw Prisma model — always map to Entity
+- HTTP concerns
 
 ---
 
-## Konvensi
+## Conventions
 
 ### Prisma Repository Pattern
 
@@ -93,14 +93,14 @@ export const prisma = new PrismaClient()
 
 ### Naming
 
-- Nama file: `Prisma{Domain}Repository.ts` — PascalCase dengan prefix `Prisma`
-- Contoh: `PrismaUserRepository.ts`, `PrismaOrderRepository.ts`
+- File name: `Prisma{Domain}Repository.ts` — PascalCase with `Prisma` prefix
+- Example: `PrismaUserRepository.ts`, `PrismaOrderRepository.ts`
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- `toEntity` mapper ditulis sebagai fungsi lokal di bawah class — tidak perlu export
-- Gunakan `Promise.all` untuk count + data query bersamaan (pagination)
-- Filter `where` object dirakit secara kondisional — hindari nilai `undefined` di Prisma
-- File diakhiri newline
+- `toEntity` mapper is written as a local function below the class — no need to export
+- Use `Promise.all` for concurrent count + data queries (pagination)
+- Build `where` object conditionally — avoid `undefined` values in Prisma
+- File must end with newline

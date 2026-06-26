@@ -1,21 +1,21 @@
 # Guide: Web Config (`apps/web/configs/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Konfigurasi app-wide: env variables, auth config, feature flags
-- Export typed config objects dari env
+✅ Allowed:
+- App-wide configuration: env variables, auth config, feature flags
+- Export typed config objects from env
 - Public-safe auth config
 - Server-only auth config
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
 - API calls
-- Berisi UI component
+- Contains UI components
 
 ---
 
-## Konvensi
+## Conventions
 
 ### Env Config
 
@@ -40,7 +40,7 @@ export const env = {
 // configs/auth.ts
 export const authConfig = {
   loginPath: "/login",
-  defaultRedirectPath: "/panel",
+  defaultRedirectPath: "/",
   authApiBasePath: "/api/auth",
   proxyApiBasePath:
     process.env.NEXT_PUBLIC_API_PROXY_BASE_URL ?? "/api/proxy",
@@ -91,9 +91,9 @@ export const authOptions: NextAuthOptions = {
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Tidak boleh akses `process.env` langsung di komponen — gunakan config object ini
-- `configs/auth-server.ts` hanya boleh dipakai server-side
-- Route handler auth tetap tipis di `app/api/(auth)/auth/[...nextauth]/route.ts`; source of truth auth ada di `auth.ts`
-- File diakhiri newline
+- Cannot access `process.env` directly in components — use this config object
+- `configs/auth-server.ts` can only be used server-side
+- Auth route handler stays thin in `app/api/(auth)/auth/[...nextauth]/route.ts`; source of truth for auth is in `auth.ts`
+- Files must end with newline

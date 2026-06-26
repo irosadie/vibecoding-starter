@@ -1,21 +1,21 @@
 # Guide: API Route (`apps/api/src/interfaces/http/routes/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Definisikan HTTP method + path
-- Validasi request dengan Zod schema dari `validators/`
+✅ Allowed:
+- Define HTTP method + path
+- Validate request with Zod schema from `validators/`
 - Attach middleware per route (auth, rate-limit)
-- Delegate ke controller handler
+- Delegate to controller handler
 
-❌ Dilarang:
+❌ Forbidden:
 - Business logic
-- Panggil use case atau repository langsung
-- Format response sendiri
+- Call use case or repository directly
+- Format response directly
 
 ---
 
-## Konvensi
+## Conventions
 
 ### Route Pattern
 
@@ -42,7 +42,7 @@ export const userRoutes = new Hono()
   .delete('/:id', userController.delete)
 ```
 
-### Registrasi di `create-app.ts`
+### Registration in `create-app.ts`
 
 ```typescript
 // interfaces/http/create-app.ts
@@ -53,13 +53,13 @@ app.route('/users', userRoutes)
 
 ### Naming
 
-- Nama file: `{domain}Routes.ts` — camelCase dengan suffix `Routes`
-- Contoh: `userRoutes.ts`, `orderRoutes.ts`, `authRoutes.ts`
+- File name: `{domain}Routes.ts` — camelCase with `Routes` suffix
+- Example: `userRoutes.ts`, `orderRoutes.ts`, `authRoutes.ts`
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Instansiasi dependency (repository, service, controller) di dalam file route
-- Gunakan `zValidator` dari `@hono/zod-validator` untuk validasi otomatis
-- File diakhiri newline
+- Instantiate dependencies (repository, service, controller) inside the route file
+- Use `zValidator` from `@hono/zod-validator` for automatic validation
+- File must end with newline

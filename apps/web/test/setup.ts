@@ -11,14 +11,14 @@ vi.mock("$/configs/env", () => ({
     appBaseUrl: "http://localhost:3000",
     apiBaseUrl: "/api/proxy",
     authBaseUrl: "/api/auth",
-    defaultAuthRedirectPath: "/panel",
+    defaultAuthRedirectPath: "/",
   },
 }))
 
 vi.mock("$/configs/auth", () => ({
   authConfig: {
     loginPath: "/login",
-    defaultRedirectPath: "/panel",
+    defaultRedirectPath: "/",
     authApiBasePath: "/api/auth",
     proxyApiBasePath: "/api/proxy",
     backendLoginPath: "/auth/login",

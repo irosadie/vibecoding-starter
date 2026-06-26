@@ -1,18 +1,18 @@
 # Guide: API Error (`apps/api/src/domain/errors/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Definisikan `DomainError` class dan error code enum
-- Export dari satu `index.ts`
+✅ Allowed:
+- Define `DomainError` class and error code enum
+- Export from a single `index.ts`
 
-❌ Dilarang:
-- Import dari `hono` atau HTTP library
-- Error handling HTTP di sini — itu di errorHandler middleware
+❌ Forbidden:
+- Import from `hono` or HTTP library
+- HTTP error handling here — that goes in errorHandler middleware
 
 ---
 
-## Konvensi
+## Conventions
 
 ### DomainError
 
@@ -65,7 +65,7 @@ export async function errorHandler(err: Error, c: Context) {
 }
 ```
 
-### Penggunaan di Use Case
+### Usage in Use Case
 
 ```typescript
 import { DomainError } from '@/domain/errors'
@@ -77,8 +77,8 @@ throw new DomainError('FORBIDDEN', 'Insufficient permissions')
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Selalu import `DomainError` dari `@/domain/errors` (index re-export)
-- Jangan throw `HTTPException` dari use case — gunakan `DomainError`
-- File diakhiri newline
+- Always import `DomainError` from `@/domain/errors` (index re-export)
+- Don't throw `HTTPException` from use case — use `DomainError`
+- File must end with newline

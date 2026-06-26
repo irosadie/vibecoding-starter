@@ -30,7 +30,7 @@ vi.mock("next-auth/react", () => ({
 vi.mock("$/configs/auth", () => ({
   authConfig: {
     loginPath: "/login",
-    defaultRedirectPath: "/panel",
+    defaultRedirectPath: "/",
     authApiBasePath: "/api/auth",
     proxyApiBasePath: "/api/proxy",
     backendLoginPath: "/auth/login",

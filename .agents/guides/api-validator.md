@@ -1,20 +1,20 @@
 # Guide: API Validator (`apps/api/src/application/validators/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Zod schema untuk validasi request (body, query, params)
-- Export inferred types dari schema
-- Group per domain dalam satu file
+✅ Allowed:
+- Zod schema for request validation (body, query, params)
+- Export inferred types from schema
+- Group by domain in a single file
 
-❌ Dilarang:
-- Business logic atau database query
-- Import dari `domain/` atau `infrastructure/`
-- Gunakan `any`
+❌ Forbidden:
+- Business logic or database queries
+- Import from `domain/` or `infrastructure/`
+- Use `any`
 
 ---
 
-## Konvensi
+## Conventions
 
 ### Validator Pattern
 
@@ -48,15 +48,15 @@ export type ListUserQuery = z.infer<typeof listUserQuerySchema>
 
 ### Naming
 
-- Nama file: `{domain}.schemas.ts` — kebab-case dengan suffix `.schemas`
-- Contoh: `user.schemas.ts`, `order.schemas.ts`
+- File name: `{domain}.schemas.ts` — kebab-case with `.schemas` suffix
+- Example: `user.schemas.ts`, `order.schemas.ts`
 - Schema name: `{action}{Domain}Schema` — camelCase
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Gunakan `z.coerce.number()` untuk query params (selalu string dari HTTP)
-- Export inferred type bersamaan dengan schema di file yang sama
-- Untuk enum, gunakan `z.enum([...])` bukan `z.string()` jika nilai dibatasi
-- File diakhiri newline
+- Use `z.coerce.number()` for query params (always string from HTTP)
+- Export inferred type alongside schema in the same file
+- For enums, use `z.enum([...])` instead of `z.string()` if values are constrained
+- File must end with newline

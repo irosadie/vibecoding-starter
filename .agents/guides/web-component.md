@@ -1,23 +1,23 @@
 # Guide: Web Component (`apps/web/components/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- Terima props, render JSX
-- `useState`, `useEffect` untuk local UI state
-- Import dari `utils/`, `types/`, `constants/`
+✅ Allowed:
+- Accept props, render JSX
+- `useState`, `useEffect` for local UI state
+- Import from `utils/`, `types/`, `constants/`
 
-❌ Dilarang:
-- Panggil `axios` atau `fetch` langsung
-- Import data-fetching hooks dari `hooks/`
-- Hardcode API URL atau query key
+❌ Forbidden:
+- Call `axios` or `fetch` directly
+- Import data-fetching hooks from `hooks/`
+- Hardcode API URL or query key
 - Business logic
 
 ---
 
-## Struktur Folder
+## Folder Structure
 
-Semua komponen flat di `components/` — tidak ada subfolder.
+All components are flat in `components/` — no subfolders.
 
 ```
 components/
@@ -37,9 +37,9 @@ components/
 
 ---
 
-## Tipe Komponen
+## Component Types
 
-### 1. Wrapper (primitif + project props)
+### 1. Wrapper (primitive + project props)
 
 ```tsx
 // components/button.tsx
@@ -90,7 +90,7 @@ export function Input({ label, error, leftIcon, ...props }: InputProps) {
 }
 ```
 
-### 2. Composite (gabungan beberapa elemen)
+### 2. Composite (combination of multiple elements)
 
 ```tsx
 // components/actions-dropdown.tsx
@@ -103,7 +103,7 @@ interface Action {
 }
 
 export function ActionsDropdown({ actions }: { actions: Action[] }) {
-  // dropdown menu dengan daftar actions
+  // dropdown menu with list of actions
 }
 ```
 
@@ -128,18 +128,18 @@ export function StatusBadge({ status, activeLabel = 'Active', inactiveLabel = 'I
 
 ---
 
-## Kapan Taruh di Mana
+## When to Put Where
 
-| Kondisi | Lokasi |
+| Condition | Location |
 |---|---|
-| Komponen hanya dipakai 1 route | `app/**/_components/` |
-| Komponen dipakai >1 route | `components/` |
+| Component used in only 1 route | `app/**/_components/` |
+| Component used in >1 route | `components/` |
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Satu file = satu komponen utama
-- Export named — bukan default export
-- Selalu forward HTML props asli (`...props`) di wrapper
-- File diakhiri newline (EOF)
+- One file = one main component
+- Export named — not default export
+- Always forward native HTML props (`...props`) in wrappers
+- Files must end with newline (EOF)

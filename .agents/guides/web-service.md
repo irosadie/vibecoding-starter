@@ -1,26 +1,26 @@
 # Guide: Web Service (`apps/web/services/`)
 
-## Kontrak Folder
+## Folder Contract
 
-Folder `services/` hanya berisi **axios instance** dengan konfigurasi dan interceptors.
-Tidak ada service function per endpoint — hooks memanggil axios **langsung**.
+The `services/` folder only contains **axios instance** with configuration and interceptors.
+No service functions per endpoint — hooks call axios **directly**.
 
-✅ Boleh:
-- Setup axios instance dengan base URL internal proxy dari `configs/env.ts`
+✅ Allowed:
+- Setup axios instance with internal proxy base URL from `configs/env.ts`
 - Response interceptor (unwrap data, handle 401)
 
-❌ Dilarang:
-- Service function per endpoint di sini — taruh di hook file
-- Berisi JSX atau React hooks
-- Hardcode base URL — gunakan env variable
-- Handle error domain di sini
-- Attach bearer token browser-side untuk request yang memang lewat internal proxy
+❌ Forbidden:
+- Service functions per endpoint here — put them in hook files
+- Contains JSX or React hooks
+- Hardcode base URL — use env variable
+- Handle domain errors here
+- Attach bearer token browser-side for requests that go through internal proxy
 
 ---
 
-## Konvensi
+## Conventions
 
-### Struktur
+### Structure
 
 ```
 services/
@@ -57,11 +57,11 @@ axios.interceptors.response.use(
       }
     }
 
-    // Single response → return data langsung
+    // Single response → return data directly
     return responseData
   },
   (error) => {
-    // 401 → redirect ke login
+    // 401 → redirect to login
     if (error.response?.status === 401) {
       window.location.href = authConfig.loginPath
     }
@@ -72,9 +72,9 @@ axios.interceptors.response.use(
 
 ---
 
-## Cara Pakai di Hook
+## Usage in Hooks
 
-Hooks import axios instance dari `$/services/axios` dan langsung memanggil endpoint:
+Hooks import axios instance from `$/services/axios` and directly call endpoints:
 
 ```typescript
 // hooks/transactions/use-payment-methods/use-data-table.ts
@@ -84,7 +84,7 @@ import { apiRouters } from '$/constants'
 const fetchDataTable = async (args) => {
   const [, { page, limit, filter }] = args.queryKey
 
-  // Panggil axios langsung — tidak perlu service function
+  // Call axios directly — no need for service function
   const result = await axios<DataTableResponse<DataTypeProps>>({
     method: 'GET',
     url: apiRouters.paymentMethods.index,
@@ -97,9 +97,9 @@ const fetchDataTable = async (args) => {
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- Hanya satu axios instance (singleton)
-- Import di hooks sebagai `import { axios } from '$/services/axios'`
-- Browser frontend hit `/api/proxy/*`; token injection dan refresh terjadi server-side di route `app/api/proxy/[...path]/route.ts`
-- File diakhiri newline
+- Only one axios instance (singleton)
+- Import in hooks as `import { axios } from '$/services/axios'`
+- Browser frontend hits `/api/proxy/*`; token injection and refresh happen server-side in route `app/api/proxy/[...path]/route.ts`
+- Files must end with newline

@@ -1,20 +1,20 @@
 # Guide: API DTO (`apps/api/src/application/dtos/`)
 
-## Kontrak Folder
+## Folder Contract
 
-✅ Boleh:
-- TypeScript `type` atau `interface` untuk output yang dikirim ke client
-- Subset atau transform dari Entity (serializable: string, number, boolean — bukan Date object)
+✅ Allowed:
+- TypeScript `type` or `interface` for output sent to client
+- Subset or transform from Entity (serializable: string, number, boolean — not Date object)
 
-❌ Dilarang:
-- Zod schema (itu di `validators/`)
-- Business logic atau method
+❌ Forbidden:
+- Zod schema (that goes in `validators/`)
+- Business logic or methods
 - Prisma types
-- Gunakan `any`
+- Use `any`
 
 ---
 
-## Konvensi
+## Conventions
 
 ### DTO Pattern
 
@@ -26,7 +26,7 @@ export type UserDto = {
   email: string
   role: string
   isActive: boolean
-  createdAt: string   // ISO string, bukan Date
+  createdAt: string   // ISO string, not Date
 }
 
 export type UserListDto = {
@@ -41,14 +41,14 @@ export type UserListDto = {
 
 ### Naming
 
-- Nama file: `{Domain}Dto.ts` — PascalCase dengan suffix `Dto`
-- Contoh: `UserDto.ts`, `OrderDto.ts`
+- File name: `{Domain}Dto.ts` — PascalCase with `Dto` suffix
+- Example: `UserDto.ts`, `OrderDto.ts`
 - Type name: `{Domain}Dto`, `{Domain}ListDto`, `{Domain}DetailDto`
 
 ---
 
-## Aturan Tambahan
+## Additional Rules
 
-- `Date` → `string` (ISO format) di DTO agar JSON serializable
-- Nullable field gunakan `type | null`, bukan `type | undefined` untuk response
-- File diakhiri newline
+- `Date` → `string` (ISO format) in DTO for JSON serialization
+- Nullable fields use `type | null`, not `type | undefined` for responses
+- File must end with newline
